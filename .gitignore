@@ -1,0 +1,15 @@
+/static/ckeditor
+/staticfiles/ckeditor
+/staticfiles/admin
+/staticfiles/drf-yasg
+*.pyc
+/.idea
+/static/admin
+/static/rest_framework
+/staticfiles/rest_framework
+/user/migrations
+/cash/migrations
+/order/migrations
+/store/migrations
+/report/migrations
+/warehouse/migrations
