@@ -1,0 +1,38 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+<section class="content-main">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl col-lg">
+                                <h3>Xush kelibsiz  {{ request.user.first_name}} {{ request.user.last_name }}</h3>
+                            </div>
+                            <div class="col-xl-4 text-md-end">
+                                <a onclick="return Swal.fire({
+                                                  title: 'Buyurtma rostdan ham yetib bordimi?',
+                                                  showDenyButton: true,
+                                                  showCancelButton: false,
+                                                  confirmButtonText: 'Saqlash',
+                                                  denyButtonText: `Qaytish`,
+                                                }).then((result) => {
+                                                  /* Read more about isConfirmed, isDenied below */
+                                                  if (result.isConfirmed) {
+                                                      window.open('{% url 'logout' %}', '_self');
+                                                  }
+                                                })" class="btn btn-primary"> Chiqish <i class="material-icons md-exit_to_app"></i> </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if request.user.username == '998777777777' or request.user.username == '998000000000' %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <a href="?sync_permission=212" class="btn btn-brand btn-sm">Permissionlarni sinxronlash</a>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+{% endblock %}

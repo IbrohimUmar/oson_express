@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{{SITE_NAME}} internet magazin</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="Eltuvchi boshqaruv paneli"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="Eltuvchi bot"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="eltuvchi"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <script src="{% static '' %}js/vue.js"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+</head>
+<body style="background-color: #222736">
+<section class="content-main mt-80 mb-80" id="app" style="background-color: #222736">
+    <div class="card mx-auto card-login">
+        <div class="card-body">
+
+            <h3 class="text-center"><img class="text-center mx-auto" src="{% static '' %}imgs/theme/fav.svg"
+                                         class="mt-2" height="80px" alt=""><br> {{SITE_NAME}}</h3>
+
+            <h6 class="card-title mb-4  text-center">Ro'yxatdan o'tish</h6>
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                <div class="form-group  mb-10">
+                    <input type="tel" v-model="phoneNumber"
+                           style="border-radius: 10px; background-color: #4f5d77; color: white"
+                           @input="formatPhoneNumber" placeholder="+998_________" class="form-control" maxlength="13"
+                           name="login" required="true">
+                </div>
+                <div class="form-group  mb-10">
+                    <input required="" class="form-control" :type="passwordFieldType" v-model="password"
+                           style="width: 82% !important;display: inline; border-radius: 10px; background-color: #4f5d77; color: white"
+                           name="password"
+                           placeholder="Parol">
+                    <button type="button" style="border-radius: 10px; background-color: #4f5d77; color: white"
+                            class="btn btn-brand" v-if='passwordFieldType === "password" ' @click="switchVisibility"><i
+                            class="icon material-icons md-visibility"></i></button>
+                    <button type="button" style="border-radius: 10px; background-color: #4f5d77; color: white"
+                            class="btn btn-brand" v-if='passwordFieldType === "text"' @click="switchVisibility"><i
+                            class="icon material-icons md-visibility_off"></i></button>
+                </div>
+
+                {% if messages_error %}
+                    <p class="text-center mt-2 mb-2 text-danger">{{ messages_error }}</p>
+                {% endif %}
+                <div class="form-group  mb-10 text-center">
+                    <button type="submit" style="border-radius: 10px; background-color: #4f5d77; color: white"
+                            :disabled="!(phoneNumber.length === 13)" class="btn btn-primary hover-up">Yuborish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<!--        <script type='text/javascript'>$("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});</script>-->
+<script>
+    var vue = new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+            password: {% if password %}"{{password}}"{% else %}""{% endif %},
+            passwordFieldType: "password",
+            phoneNumber: {% if login %}'{{login}}'{% else %}'+998'{% endif %},
+            error: false,
+            error_message: '',
+            check_box: false,
+        }, methods: {
+            validation_items() {
+
+            },
+            switchVisibility() {
+                this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
+            },
+
+            formatPhoneNumber() {
+                let formattedNumber = this.phoneNumber.replace(/\D/g, "");
+                this.phoneNumber = "+998" + formattedNumber.slice(3); // İlk üç haneli kısmı koru
+                if (this.phoneNumber.length > 16) {
+                    this.phoneNumber = this.phoneNumber.slice(0, 16);
+                }
+            },
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Mahsuloti yuborilgan buyurtmalar, Haydovchi : {{ d.first_name }} {{ d.last_name }} , {{ d.region.name }}
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <form method="post">
+            <input type="hidden" value="send" name="output_id">
+            <div class="content-header">
+                {% csrf_token %}
+                <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+                <div>
+                    <a href="{% url 'driver_warehouse_operation_history' d.id %}" class="btn btn-brand"><i
+                            class="material-icons md-arrow_left"></i> Qaytish</a>
+                    <span>
+                </span>
+                </div>
+            </div>
+        </form>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+
+                        </nav>
+                    </aside>
+
+
+                    <div class="col-lg-9">
+
+
+                        <section class="content-body p-xl-4">
+                            <div class="row">
+                                <h3 class="text-center mb-10 mt-30">Haydovchiga yuborilgan mahsulotlar ro'yxati
+                                </h3>
+                                <div>
+                                     <a href="{% url 'driver_warehouse_operation_history' d.id %}" class="btn btn-brand"><i
+                                        class="material-icons md-arrow_left"></i> Qaytish</a>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table dataTable" id="dataTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Mahsulot nomi</th>
+                                            <th>Rangi</th>
+                                            <th>O'lchami</th>
+                                            <th>Jami soni</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for i in warehouse_operation_item %}
+                                        <tr>
+                                            <td><h6>{{i.product__name}}</h6></td>
+                                            <td>
+                                                {% if i.product_variable__color__name %}
+                                                    {{i.product_variable__color__name}}
+                                                {% else %}
+                                                --
+                                                {% endif  %}
+                                            </td>
+                                            <td>
+                                                {% if i.product_variable__measure_item__name %}
+                                                    {{i.product_variable__measure_item__name}}
+                                                {% else %}
+                                                --
+                                                {% endif  %}</td>
+                                            <td>{{i.total_amount}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table dataTable" id="dataTable">-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th>Sana</th>-->
+<!--                                            <th>Mahsulot nomi</th>-->
+<!--                                            <th>Jami soni</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        {% for i in warehouse_operation_item %}-->
+<!--                                        <tr>-->
+<!--                                            <td>{{i.created_at|date}}</td>-->
+<!--                                            <td>{{i.product.name}}</td>-->
+<!--                                            <td>{{i.amount}}</td>-->
+<!--                                        </tr>-->
+<!--                                        {% endfor %}-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+
+    <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+
+    <script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/dataTables.buttons.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/jszip.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/buttons.html5.min.js"></script>
+    <script src="{% static '' %}js/datatables/pdfmake.min.js"></script>
+    <script src="{% static '' %}js/datatables/vfs_fonts.js"></script>
+    <script>
+
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

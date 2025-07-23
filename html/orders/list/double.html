@@ -1,0 +1,230 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Duble buyurtmalarni o'chirish</h4>
+        <div>
+        </div>
+    </div>
+    <form method="post">
+        {% csrf_token%}
+
+    <div class="card mb-4">
+        <div class="card-header">
+
+            <button type="submit" class="btn btn-sm btn-brand "><i class="material-icons md-delete"></i> Belgilangan buyurtmalarni o'chirish</button>
+        </div>
+        <div class="card-body">
+            <div style="overflow-x:auto !important;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                            <th>#</th>
+                            <th>id</th>
+                            <th>Sayt</th>
+                            <th>Holati</th>
+                            <th>Operator</th>
+                            <th>Haydovchi</th>
+                            <th>Mahsulot</th>
+                            <th>Mijoz</th>
+                            <th>Buyurtma kelgan sana</th>
+                            <th>O'zgartirilgan sana</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for a in data %}
+
+                    <tr style="padding:50px; border-top:3px solid white;">
+                        <td colspan="2">Tel : {{a.phone}}</td>
+                        <td colspan="2">Buyurtma soni : {{a.count}} ta</td>
+                    <td colspan="6"></td>
+                    </tr>
+                    {% for o in a.queryset %}
+                                  {% if o.status == '1' %}
+                                
+                              <tr style="background-color:#29355a;">
+
+                                <td>
+                                    <input type="checkbox" value="{{o.id}}" name="checked_order" class="form-check">
+                                </td>
+                                
+
+                                    {% else %}
+                            <tr>
+
+                                <td>
+                                </td>
+                                    {% endif %}
+                                
+                                
+                                
+                                <td>
+                                    #{{ o.id }}
+                                </td>
+
+                                <td>
+                                    {{ o.get_site_display }}  <br>
+                                   {% if o.site_order_id %}<span class="badge badge-soft-success">Avto - #id:{{o.site_order_id}}</span>{% endif %}
+                                </td>
+                                <td>
+
+                                    {{ o.get_status_display }} <br>
+
+                                <!--    O'chirilgan buyurtmalarda                                -->
+
+                                    {% if o.status == '0' %}
+                                   <span class="badge badge-soft-info"> O'chirdi : {{o.responsible.first_name}} {{o.responsible.last_name}}</span>
+                                    <br>
+
+                                    Sababi : {{o.delete_desc}}
+                                    {% endif %}
+
+                                    {% if o.status == '1' and o.driver %}
+                                    <span class="badge badge-soft-danger">Haydovchi belgilandi</span>
+                                    {% endif %}
+                                    {% if o.status == '1' and o.driver == None %}
+
+                                    <span class="badge badge-soft-info">Haydovchi belgilanmagan</span>
+                                    {% endif %}
+
+
+
+
+                                </td>
+                                <td>
+                                    {{ o.operator.first_name }} {{ o.operator.last_name }}
+                                </td>
+                                <td>
+                                    {{ o.driver.first_name }} {{ o.driver.last_name }} <br>
+                                    <small class="text-sm badge badge-soft-primary">{{ o.driver.username }}</small>
+                                </td>
+                                <td>
+
+                                     {% for p in o.order_products %}
+                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                            {% endfor %}
+
+                                <td>{{ o.customer_name }} <br>
+                                    {{ o.customer_phone }}
+                                    {% if o.customer_phone2 %} <br>
+                                        {{ o.customer_phone2 }}
+                                    {% endif %}
+
+                                </td>
+                                <td>{{ o.created_at|date:"Y-m-d H:i" }}</td>
+                                                                <td>{{ o.updated_at|date:"Y-m-d H:i" }}</td>
+
+                            </tr>
+                    {% endfor %}
+                    <tr style="padding:100px;">
+                    <td colspan="10" style="padding:50px; border-bottom:3px solid white;"></td>
+                    </tr>
+
+
+
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+                                     <div class="pagination-area mt-20 mb-20">
+            <nav aria-label="Page navigation example">
+
+                <div class="mb-3 text-center">
+                    {% if queryset.has_next %}
+<!--                    <div>-->
+
+                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                           href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                    {% elif queryset.has_previous %}
+
+                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                           href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            <span class="m-auto">< Oldingi sahifaga qaytish </span> </a>
+<!--                    </div>-->
+
+                    {% endif %}
+<!--                </div>-->
+                </div>
+                <ul class="pagination justify-content-center">
+
+                   {% if queryset.has_previous %}
+
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> < </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{queryset.previous_page_number}}</a>
+                    </li>
+                      {% endif %}
+
+
+
+                    <li class="page-item active">
+                        <span class="badge btn-brand page-link" href="#"> {{ queryset.number }} </span>
+                    </li>
+
+                   {% if queryset.has_next %}
+
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                        >{{queryset.next_page_number}}</a></li>
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;"
+                                href="?page={{ queryset.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> >
+                        </a>
+                    </li>
+                    {% endif %}
+
+
+
+
+                </ul>
+            </nav>
+                <div>
+                                    <h6 class="text-center m-auto text-muted mt-2" style="font-size:10px;">Jami sahifalar soni : {{ queryset.paginator.num_pages }} ta</h6>
+
+                </div>
+
+        </div>
+
+
+
+        </div>
+        <!-- card-body end// -->
+    </div>
+</form>
+</section>
+{% endblock %}
+{% block header %}
+<style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+</style>
+{% endblock %}

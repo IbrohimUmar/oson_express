@@ -1,0 +1,114 @@
+{% extends 'operator_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+    <h3>Hisobot</h3>
+
+
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+                            <div class="row">
+                    <h5 class="text-center">Sana bo'yicha qancha buyurtma kirtayotganingiz</h5>
+                    <div class="col-md-10 mt-30 m-auto">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-5 col-10" style="padding-right:0px !important;">
+
+                        <label>Oy tanlang :</label>
+<!--                        <input type="month" class="form-control" name="to" value="{{to}}">-->
+                        <input type="month" class="form-control" required name="to" value="{{dates}}">
+                    </div>
+                    <div class="col-md-2 col-2" style="padding-left:0px !important;">
+                        <label>Filterlash</label><br>
+                        <button class="btn btn-brand"><i class="icon material-icons md-search"></i></button>
+                    </div>
+                </div>
+                <br>
+            </form>
+
+                 <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Sana</th>
+                        <th>Kiritgan buyurtmalaringiz soni</th>
+<!--                        <th>Batafsil</th>-->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in data%}
+                    <tr class="text-center">
+                        <td>{{d.date|date}}
+
+                            </td>
+                        <td>{{d.input_order}} ta</td>
+
+                    </tr>
+                    {% endfor %}
+
+
+                    </tbody>
+                    <thead>
+                     <tr>
+                        <th>Jami</th>
+                        <th>
+                            <h6 class="text-center">{{total_order}} ta</h6>
+                            </th>
+<!--                        <th>{{total_payment}} so'm oldingiz </th>-->
+
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block header %}
+<style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+{% block footer %}
+<script>
+    function submitForm() {
+                 document.getElementById('take_order_card').style.display = 'none';
+                 document.getElementById('loading').style.display = 'block';
+
+     }
+
+
+</script>
+{% endblock %}

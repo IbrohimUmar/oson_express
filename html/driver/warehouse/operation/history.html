@@ -1,0 +1,159 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Haydovchi : {{ d.first_name }} {{ d.last_name }}ga yuborilgan mahsulotlar
+{% endblock %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+            <h3 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}
+            </h3>
+
+            {% include "driver/top_button.html" %}
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+
+                        </nav>
+                    </aside>
+
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+                            <div class="row">
+                                <h4 class="text-center mt-2 mb-2">Amaliyotlar tarixi</h4>
+                                <div style="overflow-x:auto;" class="mt-5">
+                                    <a href="{% url 'driver_warehouse' d.id %}" class="btn btn-sm btn-brand"><i class="material-icons md-arrow_back"></i> Qaytish</a>
+                                        <table  class="table dataTable" id="dataTable">
+                                            <thead>
+                                            <tr style="border-bottom:1px solid;">
+                                                <th>Id</th>
+                                                <th>Amaliyot turi</th>
+
+                                                <th>Yuboruvchi tasdiqi</th>
+                                                <th>Haydovchi tasdiqi</th>
+
+                                                <th>Mahsulot</th>
+                                                <th>Buyurtmalar</th>
+                                                <th>Sana</th>
+<!--                                                <th>Chop etish</th>-->
+<!--                                                <th>#</th>-->
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for l in page_obj %}
+                                            <tr>
+                                                <td> #{{l.id}}
+                                                    </td>
+                                                <td>
+                                                    <span class="badge " style="border:1px solid white">{{l.get_action_display}}</span>
+
+                                                    </td>
+                                                <td>
+                                                    <h6 class="badge {% if l.from_warehouse_status == '1' %}badge-soft-info{% elif l.from_warehouse_status == '2' %}badge-soft-success{% else %}badge-soft-danger{% endif %}"> {{l.get_from_warehouse_status_display}}</h6>
+<!--                                                    <br>-->
+<!--                                                    <button class="btn btn-sm btn-brand"><i class="material-icons md-check"></i></button>-->
+<!--                                                    <button class="btn btn-sm btn-danger"><i class="material-icons md-cancel"></i></button>-->
+
+                                                </td>
+                                                <td>
+                                                    <h6 class="badge {% if l.to_warehouse_status == '1' %}badge-soft-info{% elif l.to_warehouse_status == '2' %}badge-soft-success{% else %}badge-soft-danger{% endif %}"> {{l.get_to_warehouse_status_display}}</h6>
+                                                </td>
+                                                <td>
+                                                    {% if  perms.admin.driver_warehouse_operation_history_details_by_product %}
+                                                    <a href="{% url 'driver_warehouse_operation_history_details_by_product' d.id l.id %}" target="_blank" class="btn btn-brand  btn-sm"><i class="material-icons md-edit"></i> Mahsulotlar soni: {{l.items_total_amount}} ta</a></td>
+                                                    {% endif %}
+                                                <td>
+                                                    {% if  perms.admin.driver_warehouse_operation_history_details_by_order %}
+                                                    <a href="{% url 'driver_warehouse_operation_history_details_by_order' d.id l.id %}" target="_blank" class="btn btn-brand  btn-sm">Buyurtmalar soni: {{l.relations_order_count}} ta</a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>  <span class="badge" style="border:1px solid #ffffff54">{{l.created_at|date}}</span></td>
+
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                         <h5 class="text-muted d-inline">Soni : {{ count }} ta</h5>
+                                </div>
+
+
+                                            <div class="row mt-20">
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <h5>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h5>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1" class="btn btn-primary btn-round btn-sm"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}"
+                                                               class="btn btn-primary btn-round btn-sm"><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}"
+                                                               class="btn btn-primary btn-round btn-sm">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                                                               class="btn btn-primary btn-round btn-sm">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+            </div>
+
+
+                                <!-- col.// -->
+                            </div>
+                            <!-- row.// -->
+                        </section>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+
+
+{% endblock %}
+{% block header %}
+    <style>
+            .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+
+    #dataTable tr:nth-child(odd){background:#3c4252}
+{##dataTable tr:nth-child(even){background:blue}#}
+    </style>
+{% endblock %}

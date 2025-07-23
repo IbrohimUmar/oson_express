@@ -1,0 +1,130 @@
+
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main">
+        <div class="card mb-4" style="border:1px solid white;">
+            <div class="card-header bg-brand-2" style="height: 130px">
+                <h3>Xush kelibsiz.</h3>
+                <h5>{% if d.balance < 0 %}
+                                                    Oldindan to'lov
+                                                    {% else %}
+                                                    Qarzingiz
+                                                    {% endif %} : {{ request.user.balance }} so'm</h5>
+                <h5 style="margin-bottom: 0px!important;">Jami daromadingiz : {{ request.user.fee }} so'm
+
+                </h5>
+                <small class="fst-italic" style="margin-top: 0px!important;">( Shu kungacha jami qilgan daromadingiz )</small>
+
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                </div>
+                <div class="row g-4">
+                    <div class="col-sm-6 col-lg-4 col-xl-3">
+                        <h6>Ma'lumotlaringiz</h6>
+                        <p>
+                            FIO: {{ user.first_name }} {{ user.last_name }}<br>
+                            Tel: {{ user.username }} <br>
+                        </p>
+                    </div>
+                    
+                    
+                    
+                     <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h4>Sotuv foizi</h4>
+
+                             {% for i in user.driver_data.three_days_sold_percentage|dictsortreversed:"date" %}
+
+                                            <h4 class="badge btn-dark btn-sm ml-1 readonly" style="font-size:1rem; padding:9px;">{{ i.date|date:"j" }} {{ i.date|date:"F" }} : {{i.sold_percentage}}% ({{i.details.total}} tadan /
+                                                {{i.details.delivered}} ta)
+                                                </h4>
+                             {% endfor %}
+
+                        </div>
+                    
+                         <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Buyurtmalaringiz bo'yicha</h6>
+
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda : {{ user.order_status.being_delivered }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Sotildi : {{ user.order_status.delivered }} ta</h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Bekor qilindi : {{ user.order_status.canceled }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ user.order_status.call_back }} ta
+                                                </h6>
+                                        </div>
+
+
+                         <div class="col-md-12 text-center mt-2" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Mahsulot summasi bo'yicha</h6>
+
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda: {{user.total_being_delivered_order_price}} so'm
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Bekor qilindi: {{user.total_cancelled_order_price}} so'm</h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{user.total_call_back_order_price}} so'm
+                                                </h6>
+                                            <h6 class="mt-1 ml-1 readonly" style="font-size:11px;">Jami qo'lingizdagi mahsulotlar summasi : {{user.total_hand_product_price}} so'm
+                                                </h6>
+                                        </div>
+
+                     <h5 class="badge btn-warning btn-sm ml-1 readonly">Sana : <span id="ct5"></span>    </h5>
+
+<!--                    <div class="col-sm-6 col-lg-4 col-xl-3">-->
+<!--                        <h6>Manzil</h6>-->
+<!--                        <p>-->
+<!--                            Viloyat: {{ user.region.name }}<br>-->
+<!--                            Tuman: {{ user.district.name }} <br>-->
+<!--                            Mo'ljal : {{ user.street }}-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-6 col-lg-4 col-xl-3">-->
+<!--                        <h6>Mahsulotlaringiz summasi</h6>-->
+<!--                        <p>-->
+<!--                           <span class="badge badge-soft-success mt-1" style="font-size:14px">Yetkazilmoqda: {{user.total_being_delivered_order_price}} so'm</span> <br>-->
+<!--                            <span class="badge badge-soft-success  mt-1" style="font-size:14px">Bekor qilindi: {{user.total_cancelled_order_price}} so'm </span><br>-->
+<!--                            <span class="badge badge-soft-success  mt-1" style="font-size:13px">Qayta qo'ng'iroq : {{user.total_call_back_order_price}} so'm</span> <br>-->
+<!--                            <span class="badge badge-soft-success  mt-1" style="font-size:13px">Jami qo'lingizdagi mahsulotlar summasi : <br> {{user.total_hand_product_price}} so'm</span>-->
+<!--                        </p>-->
+<!--                    </div>-->
+                </div>
+            </div>
+        </div>
+
+
+
+    </section>
+
+
+    <script>
+
+function display_ct5() {
+var x = new Date()
+
+var x1=x.getMonth() + 1+ "/" + x.getDate() + "/" + x.getFullYear();
+
+var minutes=x.getMinutes().toString()
+minutes=minutes.length==1 ? 0+minutes : minutes;
+
+x1 = x1 + " - " +  x.getHours( )+ ":" +  minutes + ":" +  x.getSeconds();
+document.getElementById('ct5').innerHTML = x1;
+display_c5();
+ }
+ function display_c5(){
+var refresh=1000; // Refresh rate in milli seconds
+mytime=setTimeout('display_ct5()',refresh)
+}
+display_c5()
+
+
+
+        function myFunction() {
+            var copyText = document.getElementById("code");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+
+        }
+    </script>
+    </script>
+{% endblock %}

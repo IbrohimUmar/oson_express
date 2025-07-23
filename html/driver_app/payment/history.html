@@ -1,0 +1,135 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <div>
+                <h3>To'lov tarixi</h3>
+                <p class="text-muted">Bizga to'lagan pullaringizni tarixi</p>
+            </div>
+            <div>
+                <a href="{% url 'driver_app_payment_create' %}">
+                        <span class="btn btn-sm btn-brand">
+                            <i class="fas fa-plus"></i>Yana to'lov qilish</span>
+                    </a>
+            </div>
+        </div>
+        <header class="card-header">
+            <div class="row gx-3">
+
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <small>Holat bo'yicha filter</small> <br>
+                    <a href="{% url 'driver_app_payment_history' %}" >
+                        <span class="badge  text-white" {% if request.GET.type == None %}style="background-color: rgb(59 183 126)"{% else %}style="background-color: rgb(34 39 54); border:1px solid white;"{% endif %}>Hammasi</span>
+                    </a>
+
+                    <a href="{% url 'driver_app_payment_history' %}?type=1">
+                        <span class="badge  text-white" {% if request.GET.type|add:"0" == 1 %}style="background-color: rgb(59 183 126)"{% else %}style="background-color: rgb(34 39 54); border:1px solid white;"{% endif %}>Tasdiqlangan</span>
+                    </a>
+
+                    <a href="{% url 'driver_app_payment_history' %}?type=2">
+                        <span class="badge  text-white" {% if request.GET.type|add:"0" == 2 %}style="background-color: rgb(59 183 126)"{% else %}style="background-color: rgb(34 39 54); border:1px solid white;"{% endif %}>Tasdiqlanmagan</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+
+        <div class="mt-4">
+            {% for i in data %}
+            <div class="card " style="border: 1px solid #adacac !important;" id="infinite-lists">
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div class="col-md-12">
+                            <div class="text">
+                                <h4 style="display:inline;">{{i.amount}} so'm </h4>
+
+                                  <div style="display: inline;">
+                                      {% if i.model == 'TempPayment' %}
+
+                                    <span  class="badge badge-soft-danger bage-sm text-sm f-right">Tasdiqlanmadi</span>
+                                    {% else %}
+                                       <span  class="badge badge-soft-success bage-sm text-sm f-right">Tasdiqlandi</span>
+
+                                    {% endif %}
+
+                                  </div>
+                                <hr>
+                                <h5>
+                                    {% if i.model == 'TempPayment' %}
+                                    {% if i.to_user %}
+                                    <i class="fas fa-credit-card"></i> Pulni qabul qiluvchi : {{i.to_user.first_name}} {{i.to_user.last_name}}
+                                   {% endif %}
+                                    {% if i.category %}
+                                    <br>
+                                    <i class="fas fa-list"></i> Kategoriya : {{i.category.name}}
+                                    <br>
+                                   {% endif %}
+                                    {% endif %}
+                                    {% if i.model == 'Cash' %}
+                                    {% if i.to_user %}
+                                    <i class="fas fa-credit-card"></i> Pulni qabul qildi : {{i.to_user}}
+                                    {% elif i.category %}
+                                    <i class="fas fa-credit-card"></i> To'lov sababi : {{i.category}}
+                                    {% endif %}
+                                    <br>
+                                    {% endif %}
+                                    <i class="fas fa-check-double"></i> Tasdiqlangan sana : {{i.created_at|date:"Y-m-d H:i"}} <br>
+<!--                                    <i class="fas fa-share"></i> Tushurilgan sana : 2023-03-12 12:22 <br>-->
+                                    <i class="fas fa-comment"></i> Izoh : {{i.desc}} <br>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if i.model == 'TempPayment' %}
+                {% if i.status == '1'  %}
+                <header class="card-header bg-info-light" style="padding: 0.6rem !important;">
+                    <form method="post" onsubmit="document.getElementById('#button_submit').disabled=true">
+                      <button type="button" id="button_submit"  style="padding-left: 16px; padding-right: 18px" class="btn-sm btn btn-brand"><i
+                              class="material-icons md-check"></i> Tasdiqlashni talab qilish</button>
+
+                    </form>
+                </header>
+                {% endif %}
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+                                <div class="row mt-20 mb-20">
+{% if count > 0 %}
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <small >Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</small>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1" class="btn btn-brand text-white"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}"
+                                                               class="btn btn-brand text-white"><</a>
+                                                        {% endif %}
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}"
+                                                               class="btn btn-brand text-white"> ></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                                                               class="btn btn-brand text-white">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+                        {% else %}
+                        <h5 class="text-center">To'lov topilmadi!</h5>
+                        {% endif %}
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

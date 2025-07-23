@@ -1,0 +1,484 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Amaliyotlar tarixi
+{% endblock %}
+{% block content %}
+<div id="loading" style="display:none;">
+    <div class="text-center mt-20 mb-20 m-auto loader" ></div>
+    <h6 class="text-center">Bajarilmoqda...</h6>
+</div>
+
+
+<section class="content-main" id="app">
+    <div class="content-header" id="take_order_card" style="display:block;">
+        <h2 class="content-title">{{warehouse.get_type_display }} amaliyotlar tarixi</h2>
+        <div>
+            <a href="{% url 'warehouse_list' %}" class="btn btn-md rounded btn-sm font-sm hover-up"><i
+                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+        </div>
+    </div>
+    <div class="card">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <form method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>Haydovchi bo'yicha</h6>
+                                <select class="form-control" name="driver">
+                                    <option value="0">--------</option>
+
+                                    {% for i in drivers %}
+                                    <option value="{{i.id}}" {% if request.GET.driver|add:'0' == i.id %}selected{% endif %}>{{i.first_name}} {{i.last_name}} {{i.username}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            <div class="col-md-2">
+                                <label>Yuboruvchi tasdiqi :</label>
+                                <select class="form-control" name="from_warehouse_status">
+                                    <option value="0" {% if request.GET.from_warehouse_status|add:'0' == 0 %}selected{% endif %}>--------</option>
+                                    <option value="1"  {% if request.GET.from_warehouse_status|add:'0' == 1 %}selected{% endif %}>Tasdiqlanmadi</option>
+                                    <option value="2" {% if request.GET.from_warehouse_status|add:'0' == 2 %}selected{% endif %}>Tasdiqlandi</option>
+                                    <option value="3" {% if request.GET.from_warehouse_status|add:'0' == 3 %}selected{% endif %}>Bekor qilindi</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Qabul qilivchi tasdiqi :</label>
+                                <select class="form-control" name="to_warehouse_status">
+                                    <option value="0"  {% if request.GET.to_warehouse_status|add:'0' == 0 %}selected{% endif %}>--------</option>
+                                    <option value="1" {% if request.GET.to_warehouse_status|add:'0' == 1 %}selected{% endif %}>Tasdiqlanmadi</option>
+                                    <option value="2" {% if request.GET.to_warehouse_status|add:'0' == 2 %}selected{% endif %}>Tasdiqlandi</option>
+                                    <option value="3" {% if request.GET.to_warehouse_status|add:'0' == 3 %}selected{% endif %}>Bekor qilindi</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6>Qo'llash</h6>
+                                <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                </button>
+                                {% if request.GET.to_warehouse_status or request.GET.from_warehouse_status or request.GET.driver %}
+                                <a class="btn btn-danger" href="{{request.META.PATH_INFO}}" type="submit"><i
+                                        class="material-icons md-search_off"></i>
+                                </a>{% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    {% for i in page_obj %}
+
+    <div class="card mb-4" style="border:1px solid green;">
+        <div class="card-header">
+            <h5 class="d-inline">#{{i.id}}</h5>
+            <h5 class="d-inline f-right">Amaliyot Turi :
+                <span class="badge badge-soft-success">
+                    {{i.get_action_display}}</span></h5>
+            <br>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot boshladi : {{i.creating_user.first_name}} {{i.creating_user.last_name}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyotni o'zgartirdi : {{i.responsible.first_name}} {{i.responsible.last_name}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot boshlangan sana: {{i.created_at}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot o'zgartirilgan sana: {{i.updated_at}}</span>
+
+        </div>
+        <div class="card-body">
+
+
+            <div class="row">
+                <div class="col-md-6 m-auto">
+
+                    <h6>{{i.get_from_warehouse_type_name}}dan</h6>
+                    <div class="card-body" style="border:1px solid red; border-radius:10px;">
+
+                        {% if i.from_warehouse %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">Ombor</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.from_warehouse.get_type_display}}</h6>
+                        {% elif i.from_warehouse_responsible %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">{{i.from_warehouse_responsible.get_type_display}}</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.from_warehouse_responsible.first_name}} {{i.from_warehouse_responsible.last_name}}</h6>
+                        {% else %}
+                        <h6><b class="text-primary">Turi :</b> -----------</h6>
+                        <h6><b class="text-primary">Nomi :</b> -----------</h6>
+                        {% endif %}
+
+                        <h6><b class="text-primary">Ma'sul :</b> {% if i.from_warehouse_responsible  %}{{i.from_warehouse_responsible.first_name}} {{i.from_warehouse_responsible.last_name}}{% else %}-------{% endif %}</h6>
+
+                            <h6><b class="text-primary">Holati :</b>
+                                {% if i.from_warehouse_status == '1' %}
+                                    <span class="badge" style="border:1px solid white">{{i.get_from_warehouse_status_display}}</span>
+                                {% elif i.from_warehouse_status == '2' %}
+                                    <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                {% elif i.from_warehouse_status == '3' %}
+                                    <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                {% endif %}
+                            </h6>
+
+                        <h6><b class="text-primary">Holatini o'zgartirdi :</b> {% if i.from_warehouse_status_changed_user  %}{{i.from_warehouse_status_changed_user.first_name}} {{i.from_warehouse_status_changed_user.last_name}}{% else %}-------{% endif %}</h6>
+                        <h6><b class="text-primary">Holatini o'zgartirilgan sana :</b> {% if i.from_warehouse_confirm_date %}{{i.from_warehouse_confirm_date}} {% else %}-------{% endif %}</h6>
+
+                        <h6><b class="text-primary">Izoh :</b> {% if i.from_warehouse_desc %}{{i.from_warehouse_desc}}{% endif %}</h6>
+
+                        <!--     fromni qachon o'zgartiradi agar from status == 1,                    -->
+
+
+
+
+
+
+                            {% if i.from_warehouse.responsible.id == request.user.id or request.user.is_superuser == True or request.user.id == 202 %}
+                            <div class="row">
+                                {% if i.from_warehouse_status == '1' %}
+
+                                <div class="col-md-6">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{i.id}}" name="operation_id">
+                                        <input type="hidden" value="2" name="status">
+                                        <input type="hidden" value="from" name="position">
+                                        <button class="btn btn-brand submitButton btn-sm d-inline col-12"  type="button" onclick="return Swal.fire({
+                                                                          title: 'Tasdiqlamoqchimisiz',
+                                                                          showDenyButton: true,
+                                                                          showCancelButton: false,
+                                                                          confirmButtonText: 'Xa',
+                                                                          denyButtonText: `Qaytish`,
+                                                                        }).then((result) => {
+                                                                          /* Read more about isConfirmed, isDenied below */
+                                                                          if (result.isConfirmed) {
+                                                                          submitForm()
+                                                                              form.submit();
+                                                                          }
+                                                                        })"><i class="material-icons md-check"></i> Tasdiqlash</button>
+
+                                    </form>
+                                </div>
+                                {% endif %}
+
+
+                                {% if i.from_warehouse_status == '1' or i.to_warehouse_status == '3' and i.from_warehouse_status != '3'  %}
+
+
+                                <div class="col-md-6">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="3" name="status">
+                                        <input type="hidden" value="{{i.id}}" name="operation_id">
+                                        <input type="hidden" value="from" name="position">
+                                        <input type="hidden" id="cancel_note_{{i.id}}" name="note" value="">
+                                    <h6>
+                                         <button :disabled="submit_is_disable" class="btn submit_button btn-danger rounded col-12 d-inline submitButton font-sm btn-sm" type="button" onclick="return Swal.fire({
+                                                  title: 'Bekor qilishingiz sababi',
+                                                  input: 'textarea',
+                                                   showCancelButton: true,
+                                                  cancelButtonText: 'Qaytish',
+                                                  cancelButtonColor: '#4f5d77',
+                                                  confirmButtonText: 'Bekor qilish',
+                                                    confirmButtonColor: '#F30000',
+                                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...'
+                                            }).then(function(result) {
+                                              if (result.value) {
+                                                document.getElementById('cancel_note_{{i.id}}').value = result.value
+                                                submitForm()
+                                                form.submit();
+                                              }
+
+                                            })"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                                        </h6>
+
+                                    </form>
+                                </div>
+
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="col-md-6 m-auto">
+
+                    <h6>{{i.get_to_warehouse_type_name}}ga</h6>
+                    <div class="card-body" style="border:1px solid green; border-radius:10px;">
+
+                        {% if i.to_warehouse %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">Ombor</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.to_warehouse.get_type_display}}</h6>
+                        {% elif i.to_warehouse_responsible %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">{{i.to_warehouse_responsible.get_type_display}}</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.to_warehouse_responsible.first_name}} {{i.to_warehouse_responsible.last_name}}</h6>
+                        {% else %}
+                        <h6><b class="text-primary">Turi :</b> -----------</h6>
+                        <h6><b class="text-primary">Nomi :</b> -----------</h6>
+                        {% endif %}
+
+
+                        <h6><b class="text-primary">Ma'sul :</b> {% if i.to_warehouse_responsible %}{{i.to_warehouse_responsible.first_name}} {{i.to_warehouse_responsible.last_name}}{% else %}-------{% endif %}</h6>
+
+                            <h6><b class="text-primary">Holati :</b>
+                                {% if i.to_warehouse_status == '1' %}
+                                    <span class="badge" style="border:1px solid white">{{i.get_to_warehouse_status_display}}</span>
+                                {% elif i.to_warehouse_status == '2' %}
+                                    <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                {% elif i.to_warehouse_status == '3' %}
+                                    <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                {% endif %}
+                            </h6>
+
+                        <h6><b class="text-primary">Holatini o'zgartirdi :</b> {% if i.to_warehouse_status_changed_user %}{{i.to_warehouse_status_changed_user.first_name}} {{i.to_warehouse_status_changed_user.last_name}}{% else %}-------{% endif %}</h6>
+                        <h6><b class="text-primary">Holatini o'zgartirilgan sana :</b> {% if i.to_warehouse_confirm_date %}{{i.to_warehouse_confirm_date}} {% else %}-------{% endif %}</h6>
+
+                        <h6><b class="text-primary">Izoh :</b> {% if i.to_warehouse_desc %}{{i.to_warehouse_desc}}{% endif %}</h6>
+
+
+
+<!--                        <h6><b class="text-primary">Tasdiq :</b> {% if i.to_warehouse_is_confirm %} <span class="badge badge-soft-success">Tandiqlandi</span>{% else %}<span class="badge badge-soft-danger">Tasdiqlanmadi</span>{% endif %}</h6>-->
+<!--                        <h6><b class="text-primary">Tasdiqladi :</b> {% if i.to_warehouse_responsible %}{{i.to_warehouse_responsible.first_name}} {{i.to_warehouse_responsible.last_name}}{% else %}-&#45;&#45;&#45;&#45;&#45;&#45;{% endif %}</h6>-->
+<!--                        <h6><b class="text-primary">Tasdiqlangan sana :</b> {% if i.to_warehouse_confirm_date %}{{i.to_warehouse_confirm_date}} {% else %}-&#45;&#45;&#45;&#45;&#45;&#45;{% endif %}</h6>-->
+
+                        {% if i.to_warehouse_status == '1' and i.from_warehouse_status == '2' %}
+
+                        {% if i.to_warehouse.responsible.id == request.user.id or request.user.is_superuser == True or request.user.id == 202  %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="{{i.id}}" name="operation_id">
+                                    <input type="hidden" value="2" name="status">
+                                    <input type="hidden" value="to" name="position">
+                                    <button class="btn btn-brand btn-sm d-inline col-12 submitButton" :disabled="submit_is_disable" type="button" onclick="return Swal.fire({
+                                                                      title: 'Tasdiqlamoqchimisiz',
+                                                                      showDenyButton: true,
+                                                                      showCancelButton: false,
+                                                                      confirmButtonText: 'Xa',
+                                                                      denyButtonText: `Qaytish`,
+                                                                    }).then((result) => {
+                                                                      /* Read more about isConfirmed, isDenied below */
+                                                                      if (result.isConfirmed) {
+                                                                      submitForm()
+                                                                          form.submit();
+                                                                      }
+                                                                    })"><i class="material-icons md-check"></i> Tasdiqlash</button>
+
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="3" name="status">
+                                    <input type="hidden" value="{{i.id}}" name="operation_id">
+                                    <input type="hidden" value="to" name="position">
+                                        <input type="hidden" id="cancel_note_{{i.id}}" name="note" value="">
+                                    <h6>
+                                         <button :disabled="submit_is_disable" class="btn submit_button btn-danger rounded col-12 d-inline font-sm btn-sm" type="button" onclick="return Swal.fire({
+                                                  title: 'Bekor qilishingiz sababi',
+                                                  input: 'textarea',
+                                                   showCancelButton: true,
+                                                  cancelButtonText: 'Qaytish',
+                                                  cancelButtonColor: '#4f5d77',
+                                                  confirmButtonText: 'Bekor qilish',
+                                                    confirmButtonColor: '#F30000',
+                                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...'
+                                            }).then(function(result) {
+                                              if (result.value) {
+                                                document.getElementById('cancel_note_{{i.id}}').value = result.value
+                                                submitForm()
+                                                form.submit();
+                                              }
+
+                                            })"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                                        </h6>
+<!--                                    <button class="btn btn-danger btn-sm d-inline col-12" type="button" onclick="return Swal.fire({-->
+<!--                                                                      title: 'Tasdiqlamoqchimisiz',-->
+<!--                                                                      showDenyButton: true,-->
+<!--                                                                      showCancelButton: false,-->
+<!--                                                                      confirmButtonText: 'Xa',-->
+<!--                                                                      denyButtonText: `Qaytish`,-->
+<!--                                                                    }).then((result) => {-->
+<!--                                                                      /* Read more about isConfirmed, isDenied below */-->
+<!--                                                                      if (result.isConfirmed) {-->
+<!--                                                                          form.submit();-->
+<!--                                                                      }-->
+<!--                                                                    })"><i class="material-icons md-check"></i> Bekor qilish</button>-->
+
+                                </form>
+                            </div>
+                            
+                            
+                            
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        
+                        
+                        <div class="row">
+                            
+                            
+                            
+                        {% if i.action == '3' %}
+                            <div class="mt-5 col-md-12">
+                                <div>
+
+
+
+                                    <a href="{% url 'driver_warehouse_operation_history_details_by_order' i.to_warehouse_responsible.id i.id %}" target="_blank" class="btn btn-brand  btn-sm">Buyurtmalar soni: {{i.relations_order_count}} ta</a>
+                                                                                    <a href="{% url 'driver_warehouse_operation_history_details_by_product' i.to_warehouse_responsible.id i.id %}" target="_blank" class="btn btn-brand  btn-sm"><i class="material-icons md-edit"></i>
+                                                                                        Mahsulotlar soni: {{i.items_total_amount}} ta</a>
+
+
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+
+
+
+                {% if i.action == '3' and i.to_warehouse_status == '1' %}
+                        <div class="text-center">
+                            <a href="{% url 'warehouse_operation_edit' 1 i.id %}" class="btn btn-sm btn-brand"><i class="material-icons md-edit"></i> Haydovchi o'zgartirish</a>
+                        </div>
+                {% endif %}
+
+
+        </div>
+    </div>
+
+    {% endfor %}
+    <div class="row ">
+        <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+        </div>
+        <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+        </div>
+        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+    </div>
+
+
+</section>
+{% endblock %}
+{% block header %}
+<style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+.d-none {
+	display:none;
+}
+.d-block {
+	display:block;
+}
+    li {
+        color: black;
+    }
+
+    .select2-container--open .select2-dropdown--below {
+        color: black !important;
+    }
+
+    .custom_select .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #3BB77E !important;
+    }
+
+    .select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results {
+        color: #3BB77E !important;
+    }
+
+    .select2-dropdown .select2-search--dropdown .select2-search__field {
+        border: 1px solid black;
+    }
+
+</style>
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+{% block footer %}
+<script>
+   function submitForm() {
+
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+
+    }
+function showLoading() {
+        // Loading mesajını ekrana eklemek için örnek olarak bir div kullanıyoruz
+        var loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading-message';
+        loadingDiv.textContent = 'Loading...';
+        loadingDiv.style.color = 'blue';
+
+        document.body.appendChild(loadingDiv);
+    }
+
+
+
+</script>
+{% endblock %}
+
+
+
+

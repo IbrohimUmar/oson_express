@@ -1,0 +1,72 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+    <section class="content-main">
+        <div class="card mb-4" style="border:1px solid white;">
+            <div class="card-header bg-brand-2" style="height: 130px">
+                <h3>Xush kelibsiz.</h3>
+                <h5>{% if request.user.driver_data.balance < 0 %}
+                                                    Oldindan to'lov
+                                                    {% else %}
+                                                    Qarzingiz
+                                                    {% endif %} : {{ request.user.driver_data.balance|format_money }} so'm</h5>
+                <h5 style="margin-bottom: 0px!important;">Jami daromadingiz : {{ request.user.driver_data.fee|format_money }} so'm
+
+                </h5>
+                <small class="fst-italic" style="margin-top: 0px!important;">( Shu kungacha jami qilgan daromadingiz )</small>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-sm-6 col-lg-4 col-xl-3">
+                        <h6>Ma'lumotlaringiz</h6>
+                        <p>
+                            FIO: {{ user.first_name }} {{ user.last_name }}<br>
+                            Tel: {{ user.username }} <br>
+                            Viloyat: {{ user.region.name }} <br>
+                        </p>
+                    </div>
+                     <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h4>Sotuv foizi</h4>
+
+                             {% for i in user.driver_data.three_days_sold_percentage|dictsortreversed:"date" %}
+
+                                            <h4 class="badge btn-dark btn-sm ml-1 readonly" style="font-size:1rem; padding:9px;">{{ i.date|date:"j" }} {{ i.date|date:"F" }} : {{i.sold_percentage}}% ({{i.details.total}} tadan /
+                                                {{i.details.delivered}} ta)
+                                                </h4>
+                             {% endfor %}
+                        </div>
+                     <h5 class="badge btn-warning btn-sm ml-1 readonly">Sana : <span id="ct5"></span>    </h5>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+
+function display_ct5() {
+        var x = new Date()
+
+        var x1=x.getMonth() + 1+ "/" + x.getDate() + "/" + x.getFullYear();
+
+        var minutes=x.getMinutes().toString()
+        minutes=minutes.length==1 ? 0+minutes : minutes;
+
+        x1 = x1 + " - " +  x.getHours( )+ ":" +  minutes + ":" +  x.getSeconds();
+        document.getElementById('ct5').innerHTML = x1;
+        display_c5();
+         }
+         function display_c5(){
+        var refresh=1000; // Refresh rate in milli seconds
+        mytime=setTimeout('display_ct5()',refresh)
+        }
+        display_c5()
+        function myFunction() {
+            var copyText = document.getElementById("code");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+
+        }
+    </script>
+    </script>
+{% endblock %}

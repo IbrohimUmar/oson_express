@@ -1,0 +1,43 @@
+{% extends 'operator_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+
+<div class="mt-100 text-center">
+    <h2 class="material-icons md-schedule" style="font-size:150px;"></h2>
+<h4 class="text-center">Kechirasiz ish vaqti {{WORK_START_HOUR}}:{{WORK_START_MINUTE}} boshlanadi</h4>
+                     <h5 class="text-center">Soat : <span id="ct5"></span>    </h5>
+</div>
+
+</section>
+{% endblock %}
+{% block footer %}
+
+    <script>
+
+function display_ct5() {
+var x = new Date()
+
+var minutes=x.getMinutes().toString()
+minutes=minutes.length==1 ? 0+minutes : minutes;
+
+x1 =  x.getHours( )+ ":" +  minutes + ":" +  x.getSeconds();
+document.getElementById('ct5').innerHTML = x1;
+display_c5();
+ }
+ function display_c5(){
+var refresh=1000; // Refresh rate in milli seconds
+mytime=setTimeout('display_ct5()',refresh)
+}
+display_c5()
+
+
+
+        function myFunction() {
+            var copyText = document.getElementById("code");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+
+        }
+    </script>
+{% endblock %}

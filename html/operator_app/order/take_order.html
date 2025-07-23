@@ -1,0 +1,181 @@
+
+{% extends 'operator_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+                        <div>
+                             <h3>Buyurtma olish</h3>
+                            {% if statistic %}
+                            <span class="badge badge-soft-success">Olinmagan yangilar : {{statistic.new_order}} ta</span>
+                            <span class="badge badge-soft-info mt-1 mb-1 mr-1">Olingan yangilar : {{statistic.taked_new_order}} ta</span>
+                            <span class="badge badge-soft-danger">Jami Qayta qo'ng'iroq : {{statistic.call_back}} ta</span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+
+
+        <div id="loading" style="display:none">
+    <div class="text-center mt-20 mb-20 m-auto loader" ></div>
+    <h4 class="text-center">Bajarilmoqda...</h4>
+</div>
+
+        <div id="take_order_card">
+
+                {% for o in order %}
+                                    <form method="post" onsubmit="submitForm()">
+                                        {% csrf_token%}
+            <div class="card m-auto mb-15" style="border: 1px solid #adacac !important; max-width: 800px;" id="order_{{o.id}}">
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div class="col-md-12">
+                            <div class="text">
+                                <h6 style="font-size:13px;" class="d-inline"><i class="material-icons md-hourglass_top"
+                                                                                style="    vertical-align: bottom;    font-size: 19px;"></i>
+                                    Keldi {{ o.created_at|timesince }} oldin </h6>
+
+                                {% if o.status == '9' %}
+                                <span class="text-sm f-right badge badge-soft-success">{{o.get_status_display}} </span>
+                                {% else %}
+                                <span class="text-sm f-right badge badge-soft-warning">{{o.get_status_display}} </span>
+                                {% endif %}
+
+                                <hr style="margin: 5px;">
+                                <h6>
+                                    <span  style="-webkit-user-select: all; -moz-user-select: all; -ms-user-select: all; user-select: all">#ID : {{o.id}}</span>
+                                    <br>
+                                    <i class="material-icons md-perm_identity"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz ismi : {{o.customer_name}}<br>
+
+                                    {% if o.customer_region %}
+                                    <i class="material-icons md-place"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Manzil : {{o.customer_region.name}}
+                                    {% endif %}
+
+                                    <br>
+                                    <div style="padding:15px ; background-color:#141731; border-radius:10px;">
+                                        <span class="text-center"><i class="material-icons md-shopping_basket"
+                                                                     style=" font-size:17px; vertical-align: text-top;"></i> Buyurtma qilingan mahsulot </span>
+
+                                        <hr style="margin: 3px;">
+
+                                        {% for p in o.order_products %}
+                                        <div style="border:1px solid white; border-radius:10px; padding:5px;">
+                                            <small class="d-block">Nomi : {{p.product.name}}</small>
+                                        <small class="d-block">Soni : {{p.total_quantity}} ta</small>
+                                        <small class="d-block">Narxi : {{p.unit_price}} so'm</small>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+
+
+
+                                    <hr style="margin: 3px;">
+
+                                </h6>
+
+
+                                <hr style="margin: 4px;">
+                                <div class="mb-1">
+                                    <input type="hidden" name="id" value="{{o.id}}">
+
+                                    {% if o.operator %}
+                                    <h6>Olgan operator : {{o.operator.first_name}} ID:{{o.operator.operator_name}}</h6>
+
+                                    {% else %}
+                                    <button type="submit"  class="badge btn-brand" style="padding: 7px;font-size: 14px; width:100%;"><i
+                                            style="font-size: 15px;vertical-align: text-bottom;"
+                                            class="material-icons md-check"></i> Buyurtmani olish</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+                                    </form>
+
+                {% endfor %}
+
+
+
+
+
+
+                             <div class="pagination-area mt-20 mb-50">
+
+                        <nav aria-label="Page navigation example">
+                            <div class="mb-3 text-center">
+                                {% if order.has_next %}
+
+                                <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                                   href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                                   {% endif %}
+
+                            </div>
+
+                            <ul class="pagination justify-content-center">
+                           {% if order.has_previous %}
+                               <li class="page-item">
+                                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> << </a>
+                                </li>
+                               <li class="page-item"><a class="page-link" href="?page={{ order.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ order.previous_page_number }}</a></li>
+                           {% endif %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ order.number }}</a></li>
+
+                                {% if order.has_next %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ order.next_page_number }}</a></li>
+                                    <li class="page-item">
+                                    <a class="page-link" href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> >> </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+
+    </section>
+{% endblock %}
+
+{% block header %}
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+{% block footer %}
+<script>
+   function submitForm() {
+                document.getElementById('take_order_card').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+
+    }
+
+
+
+</script>
+{% endblock %}

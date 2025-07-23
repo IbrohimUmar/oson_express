@@ -1,0 +1,133 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-head">
+            <h4>Hisobot bo'limi</h4>
+        </div>
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline active">Hisobot</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card" style="border:1px solid white;">
+            <div class="card-header bg-brand-2" style="0.7rem 1.3rem">
+                <h5 class="text-center" >{% if balance < 0 %}
+                                                    Oldindan to'lov
+                                                    {% else %}
+                                                    Qarzingiz
+                                                    {% endif %} : {{balance}} so'm</h5>
+
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                </div>
+                <div class="row g-1">
+
+
+
+                         <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Balans tafsiloti</h6>
+
+                                           <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Sotildilar summasi : {{ report.debt_uzs }} so'm</h6>
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Daromadingiz : {{ report.fee_uzs }} so'm
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">To'ladingiz : {{ report.total_payment_uzs }} so'm
+                                                </h6>
+
+                                            <h6 class="badge btn-brand btn-sm mt-1 ml-1 readonly">Natija : {{ balance }} so'm {% if balance < 0 %}
+                                                    Oldindan to'lov
+                                                    {% else %}
+                                                    Qarzsiz
+                                                    {% endif %}
+                                                </h6>
+<!--                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ user.order_status.call_back }} ta-->
+<!--                                                </h6>-->
+                                        </div>
+
+
+
+                         <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Buyurtmalaringiz bo'yicha</h6>
+
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda : {{ order_status_by.being_delivered }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Sotildi : {{ order_status_by.delivered }} ta</h6>
+
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsulot haydovchida ) : {{ order_status_by.canceled_driver }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti qaytarildi ) : {{ order_status_by.canceled_returned }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti boshqa buyurtmaga berildi ) : {{ order_status_by.canceled_given_other_order }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ order_status_by.call_back }} ta
+                                                </h6>
+                                        </div>
+
+
+
+
+                         <div class="col-md-12 text-center mt-2" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Mahsulot summasi bo'yicha</h6>
+
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda: {{order_product_by_uzs.being_delivered}} so'm
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti haydovchida ): {{order_product_by_uzs.cancelled_driver}} so'm</h6>
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Qayta qo'ng'iroq : {{order_product_by_uzs.call_back}} so'm
+                                                </h6>
+                                            <h6 class="mt-1 ml-1 readonly" style="white-space:normal;font-size:11px;">Jami qo'lingizdagi mahsulotlar summasi : {{order_product_by_uzs.total}} so'm
+                                                </h6>
+                                        </div>
+
+                     <h5 class="badge btn-sm ml-1 readonly text-white" style="background-color:#da7713f0;">Sana : <span id="ct5"></span>    </h5>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </section>
+
+
+    <script>
+
+function display_ct5() {
+var x = new Date()
+
+var x1=x.getMonth() + 1+ "/" + x.getDate() + "/" + x.getFullYear();
+
+var minutes=x.getMinutes().toString()
+minutes=minutes.length==1 ? 0+minutes : minutes;
+
+x1 = x1 + " - " +  x.getHours( )+ ":" +  minutes + ":" +  x.getSeconds();
+document.getElementById('ct5').innerHTML = x1;
+display_c5();
+ }
+ function display_c5(){
+var refresh=1000; // Refresh rate in milli seconds
+mytime=setTimeout('display_ct5()',refresh)
+}
+display_c5()
+
+
+
+        function myFunction() {
+            var copyText = document.getElementById("code");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+
+        }
+    </script>
+    </script>
+{% endblock %}

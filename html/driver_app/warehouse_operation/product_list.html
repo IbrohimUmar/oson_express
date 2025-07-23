@@ -1,0 +1,119 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h4 class="content-title">{{warehouse_operation.id}} idli amaliyotdagi mahsulotlar ro'yxati</h4>
+
+        </div>
+
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+<!--                        <ol class="breadcrumb float-sm-right m-0">-->
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            {% if request.META.HTTP_REFERER %}
+                            <li class="breadcrumb-item d-inline"><a href="{{request.META.HTTP_REFERER}}">Amaliyotlar</a></li>
+                            {% else %}
+                           <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_warehouse_operation_list' %}">Amaliyotlar</a></li>
+                            {% endif %}
+
+                            <li class="breadcrumb-item d-inline active">Amaliyotlari mahsulotlari ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div style="overflow-x:auto !important;">
+                            <table class="table" id="dataTable">
+                                <thead>
+                                <tr>
+                                    <th>Mahsulot</th>
+                                    <th>Rangi</th>
+                                    <th>Razmeri</th>
+                                    <th>Soni</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+
+                                {% for a in warehouse_item_details %}
+                                <tr>
+                                    <td style="white-space: nowrap"><h6> {{a.product_variable__product__name}}</h6></td>
+                                    <td style="white-space: nowrap">{% if a.product_variable__color__name %}{{a.product_variable__color__name}}{% else %}-------{% endif %}</td>
+                                    <td style="white-space: nowrap">{% if a.product_variable__measure_item__name %}{{a.product_variable__measure_item__name}}{% else %}-------{% endif %}</td>
+                                    <td style="            white-space: nowrap
+            ">{{a.count}} ta
+                                    </td>
+
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                                <thead>
+                                <tr>
+                                    <th colspan="3"><h6>Jami</h6></th>
+                                    <th><h6>{{warehouse_operation.items_total_amount}} ta </h6></th>
+                                </tr>
+                                </thead>
+
+                            </table>
+
+                        </div>
+        </div>
+    </div>
+    </section>
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+
+{% include 'table/footer.html' %}
+    <script>
+        var table = $('#dataTable').DataTable({
+
+            paging: true,
+            pageLength: 30,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

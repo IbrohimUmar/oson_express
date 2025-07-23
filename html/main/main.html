@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+{% load static %}
+{% with request.resolver_match.url_name as u %}
+
+    <html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>{% block title %}{{SITE_NAME}} boshqaruv paneli{% endblock title %}</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+        <meta name="description" content="Elituvchi boshqaruv paneli"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta property="og:title" content="Eltuvchi"/>
+        <meta property="og:type" content="text/css"/>
+        <meta property="og:url" content="eltuvchi"/>
+        <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+        {% block header %}{% endblock %}
+        <script src="{% static 'js/sweetalert2@10.js' %}"></script>
+        <style>.swal2-title {
+            color: black !important;
+        }</style>
+         
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+    </head>
+    <body class="dark">
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <script>
+                            Swal.fire({
+                                customClass: {
+                                    title: 'swal2-title'
+                                },
+                                position: 'center',
+                                icon: '{{message.tags}}',
+                                title: '{{message}}',
+                                showConfirmButton: false,
+                                showCancelButton:true,
+                                cancelButtonText:'Tushundim',
+                            })
+                        </script>
+                {% else %}
+            <script>
+                Swal.fire({
+                    customClass: {
+                        title: 'swal2-title'
+                    },
+                    position: 'center',
+                    icon: '{{message.tags}}',
+                    title: '{{message}}',
+                    showConfirmButton: false,
+                    timer: 2300
+                })
+            </script>
+            {% endif %}
+
+        {% endfor %}
+    {% endif %}
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="{% url 'home' %}" class="brand-wrap">
+                               <h3 class="text-center"><img src="{% static '' %}imgs/theme/fav.svg" class="mt-2" height="40px" alt=""><br> {{SITE_NAME}}</h3>
+
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i>
+                </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+
+                <li class="menu-item {% if "home" == u %}active{% endif %}">
+                    <a class="menu-link" href="{% url 'home' %}">
+                        <i class="icon material-icons md-home"></i>
+                        <span class="text">Boshqaruv paneli </span>
+                    </a>
+                </li>
+                {% if perms.admin.order_list or perms.admin.canceled_list or perms.admin.delivered_list or perms.admin.being_order_list %}
+                    <li class="menu-item has-submenu {% if "double_order_list" == u or "orders_list_late_warehouse_exit" == u or "orders_list_canceled" == u or "orders_list_sold" == u or "being_order_list" == u or "orders_list_delayed_delivery" == u or 'orders_list_all' == u  or u == "order_details" %}active{% endif %}">
+
+                        <a class="menu-link">
+                            <i class="icon material-icons md-shopping_cart"></i>
+                            <span class="text">Buyurtmalar</span>
+                        </a>
+                        <div class="submenu">
+                            {% if perms.admin.orders_list_all %}
+                                <a href="{% url 'orders_list_all' %}"
+                                   {% if u == "orders_list_all" or u == "order_details" %}class="active"{% endif %}>
+                                    Barcha buyurtmalar</a>
+                            {% endif %}
+                            {% if perms.admin.orders_list_canceled %}
+                                <a href="{% url 'orders_list_canceled' %}"
+                                   {% if u == "orders_list_canceled" %}class="active"{% endif %}>
+                                    Bekor qilinganlar</a>
+                            {% endif %}
+                            {% if perms.admin.orders_list_sold %}
+                                <a href="{% url 'orders_list_sold' %}"
+                                   {% if u == "orders_list_sold" %}class="active"{% endif %}>
+                                    Sotilganlar</a>
+                            {% endif %}
+
+
+<!--                            {% if perms.admin.orders_list_double %}-->
+<!--                                <a href="{% url 'orders_list_double' %}"-->
+<!--                                   {% if u == "orders_list_double" %}class="active"{% endif %}>-->
+<!--                                    Dubl buyurtmalar</a>-->
+<!--                            {% endif %}-->
+
+
+
+
+                            {% if perms.admin.orders_list_delayed_delivery %}
+                                <a href="{% url 'orders_list_delayed_delivery' %}"
+                                   {% if u == "orders_list_delayed_delivery" %}class="active"{% endif %}>
+<!--                                    Kechikayotgan yetkazilmoqdalar-->
+                            Yetqazish kechikayotganlar
+                            </a>
+                            {% endif %}
+                            
+                            {% if perms.admin.orders_list_late_warehouse_exit %}
+                                <a href="{% url 'orders_list_late_warehouse_exit' %}"
+                                   {% if u == "orders_list_late_warehouse_exit" %}class="active"{% endif %}>
+                                    Chiqmayotgan yangilar</a>
+                            {% endif %}
+                            
+                            
+                            
+                        </div>
+                    </li>
+
+                {% endif %}
+                {% if perms.admin.driver_list or perms.admin.driver_temp_payment_list %}
+                <li class="menu-item has-submenu {% if u == 'driver_date_by_district_statistic' or u == 'driver_date_by_statistic' or u == 'driver_daily_report' or u == "driver_temp_payment_list" or u == "driver_list_statistic" or u == "driver_order_history" or u == "driver_list" or u == "driver_about" or u == "driver_payment_list" or u == "driver_payment_create" %}active{% endif %}">
+                    <a class="menu-link">
+                        <i class="icon material-icons md-people"></i>
+                        <span class="text">Haydovchilar</span>
+                    </a>
+                             <div class="submenu">
+                        
+                        {% if perms.admin.driver_list %}
+                        
+                        <a  href="{% url 'driver_list' %}"
+                           class="{% if u == "driver_order_history" or u == "driver_list" or u == "driver_about" or u == "driver_payment_list" or u == "driver_payment_create" %}active{% endif %}">Oddiiy ro'yxat</a>
+                        <a  href="{% url 'driver_list_statistic' %}">statistikali ro'yxat</a>
+                                 <a  href="{% url 'driver_daily_report' %}"
+                                                class="{% if u == "driver_daily_report" %}active{% endif %}">Kunlik hisobot</a>
+                                                <a  href="{% url 'driver_date_by_statistic' %}" class="{% if u == 'driver_date_by_statistic' or u == 'driver_date_by_district_statistic' %}active{% endif %}">Sana bo'yicha hisobot</a>
+                                     
+                                                
+                                       {% endif %}         
+                                                
+                                                
+                                                
+                                                
+                                                {% if perms.admin.driver_temp_payment_list %}
+                                                <a  href="{% url 'driver_temp_payment_list' %}"
+                        class="{% if "driver_temp_payment_list" == u %}active{% endif %}"
+                        >Tasdiqlanmagan to'lovlar</a>  {% endif %}
+                        
+                        
+                        
+
+                    </div>
+                </li>
+                {% endif %}
+
+
+
+               {% if perms.admin.warehouse_list  %}
+
+                <li class="menu-item has-submenu {% if u == 'driver_send_barcode_main' or u == 'warehouse_purchase_main' or u == 'warehouse_product_attachment_history' or u == 'warehouse_list' %}active{% endif %}">
+                    <a class="menu-link" href="{% url 'warehouse_list' %}">
+                        <i class="icon material-icons md-widgets"></i>
+                        <span class="text">Ombor</span>
+                    </a>
+                    <div class="submenu">
+
+
+                    {% if perms.admin.warehouse_list %}
+                        <a href="{% url 'warehouse_list' %}"
+                           {% if u == "warehouse_list" %}class="active"{% endif %}>Ro'yxati</a>
+                        {% endif %}
+              
+
+
+                    {% if perms.admin.warehouse_product_attachment_history %}
+                        <a href="{% url 'warehouse_product_attachment_history' %}"
+                           {% if u == "warehouse_product_attachment_history" %}class="active"{% endif %}>Mahsulot biriktirish</a>
+                        {% endif %}
+                        
+                        
+                        
+                    {% if perms.admin.warehouse_purchase_main %}
+                        <a href="{% url 'warehouse_purchase_main' %}"
+                           {% if u == "warehouse_purchase_main" %}class="active"{% endif %}>Sotib olinishi kerak</a>
+                        {% endif %}
+                        
+                        
+<!--                         {% if perms.admin.warehouse_product_attachment_history %}-->
+<!--                                                <a  href="{% url 'driver_send_barcode_main' %}"-->
+<!--                                                class="{% if u == "driver_send_barcode_main" %}active{% endif %}">Barcode yuborish</a>-->
+<!--                                       {% endif %}-->
+                        
+      </div>
+
+                </li>
+                {% endif %}
+
+
+                {% if perms.admin.seller_list or perms.admin.seller_app_profile  %}
+                <li class="menu-item has-submenu {% if u == 'seller_list' or u == 'seller_edit' or u == 'seller_create' %}active{% endif %}">
+                    <a class="menu-link">
+                        <i class="icon material-icons md-groups"></i>
+                        <span class="text">Sotuvchi</span>
+                    </a>
+                    <div class="submenu">
+                        {% if perms.admin.seller_list %}
+                        <a href="{% url 'seller_list' %}"
+                           {% if u == 'seller_list' or u == 'seller_edit' or u == 'seller_create' %}class="active"{% endif %}>Sotuvchilar ro'yxati</a>
+                        {% endif %}
+                        {% if perms.admin.seller_app_profile %}
+                        <a href="{% url 'seller_app_profile' %}"
+                           {% if u == "seller_app_profile" %}class="active"{% endif %}>Sotuvchi paneli</a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endif %}
+
+
+
+                {% if perms.admin.operator_statistic or perms.admin.operator_list %}
+
+                <li class="menu-item has-submenu {% if u == 'operator_management_list' or u == "operator_my_order" or u == "operator_statistic" %}active{% endif %}">
+                    <a class="menu-link">
+                        <i class="icon material-icons md-headset_mic"></i>
+                        <span class="text">Operator</span>
+                    </a>
+                    <div class="submenu">
+
+
+                    {% if perms.admin.operator_list %}
+                        <a href="{% url 'operator_list' %}"
+                           {% if u == "operator_list" %}class="active"{% endif %}>Operatorlarni boshqarish</a>
+
+                        {% endif %}
+
+                    {% if perms.admin.operator_list %}
+                        <a href="{% url 'operator_app_profile' %}"
+                           {% if u == "operator_app_profile" %}class="active"{% endif %}>Operator app</a>
+                        {% endif %}
+
+                    </div>
+
+
+                </li>
+                {% endif %}
+                
+                
+                                                {% if perms.admin.shopkeeper_manage_list  %}
+
+                <li class="menu-item has-submenu {% if u == 'shopkeeper_manage_list' %}active{% endif %}">
+                    <a class="menu-link" href="{% url 'shopkeeper_manage_list' %}">
+                        <i class="icon material-icons md-widgets"></i>
+                        <span class="text">Ta'minotchilar</span>
+                    </a>
+                    <div class="submenu">
+
+
+                    {% if perms.admin.shopkeeper_manage_list %}
+                        <a href="{% url 'shopkeeper_manage_list' %}"
+                           {% if u == "shopkeeper_manage_list" %}class="active"{% endif %}>Boshqaruvi</a>
+
+                        {% endif %}
+                    </div>
+
+
+                </li>
+                {% endif %}
+                
+                
+
+                
+                {% if perms.admin.report or perms.admin.accountant or perms.admin.sites_report %}
+
+                <li class="menu-item has-submenu {% if u == 'report_big_balance' or u == 'report_employee' or u == 'report_shopkeeper' or u == 'finance_department_assets' or u == 'finance_department' or u == 'accountant' or u == 'report' or u == 'sites_report' %}active{% endif %}">
+                    <a class="menu-link">
+                        <i class="icon material-icons md-calculate"></i>
+                        <span class="text">Hisobotlar</span>
+                    </a>
+                    <div class="submenu">
+
+
+                    {% if perms.admin.report_big_balance %}
+                        <a href="{% url 'report_big_balance' %}"
+                           {% if u == "report_big_balance" %}class="active"{% endif %}>Katta balans</a>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                </li>
+                {% endif %}
+                
+                
+ 
+			{% if perms.cash.cash_list %}
+
+                <li class="menu-item  {% if u == "cash" %}active{% endif %}">
+                    <a class="menu-link" href="{% url 'cash' %}">
+                        <i class="icon material-icons md-local_atm"></i>
+                        <span class="text">Kassa</span>
+                    </a>
+                </li>
+                {% endif %}               
+
+                
+                
+                
+                {% if perms.admin.setting_product_list  %}
+                <li class="menu-item has-submenu {% if u == 'excel_files_list' or u == 'setting_product_list' or u == 'setting_product_create' or u == 'setting_product_edit' %}active{% endif %}">
+                    <a class="menu-link" href="{% url 'setting_product_list' %}">
+                        <i class="icon material-icons md-settings"></i>
+                        <span class="text">Sozlamalar</span>
+                    </a>
+                    <div class="submenu">
+                    {% if perms.admin.setting_product_list %}
+                        <a href="{% url 'setting_product_list' %}"
+                           {% if u == "setting_product_list" or u == 'setting_product_create' or u == 'setting_product_edit'  %}class="active"{% endif %}>Mahsulotlar</a>
+
+                        {% endif %}
+                        
+                        
+                        {% if perms.admin.excel_download %}
+
+                         <a {% if u == 'excel_files_list'  %}class="active"{% endif %} href="{% url 'excel_files_list' %}">
+                        <span class="text">Excel yuklamalar</span>
+                    </a>
+                        
+                {% endif %}
+                        
+                        
+                    </div>
+                </li>
+                {% endif %}
+                
+
+
+            </ul>
+            <hr/>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"><i
+                        class="material-icons md-apps"></i></button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" onclick="#" type="submit"
+                           id="change-color" href="#"> <i
+                                class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i
+                                class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
+                           aria-expanded="false"> <i class="material-icons md-perm_identity md-36"></i></a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger"
+                               onclick="return Swal.fire({
+                                                  title: 'Siz rostdan chiqmoqchimisiz?',
+                                                  showDenyButton: true,
+                                                  showCancelButton: false,
+                                                  confirmButtonText: 'Saqlash',
+                                                  denyButtonText: `Qaytish`,
+                                                }).then((result) => {
+                                                  /* Read more about isConfirmed, isDenied below */
+                                                  if (result.isConfirmed) {
+                                                      window.open('{% url 'logout' %}', '_self');
+                                                  }
+                                                })"
+                              ><i class="material-icons md-exit_to_app"></i>Chiqish</a>
+                        </div>
+
+
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!-- content-main end// -->
+        {% block content %}{% endblock %}
+
+
+    </main>
+
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(95245347, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/95245347" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+
+
+    <script src="{% static '' %}js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="{% static '' %}js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="{% static '' %}js/vendors/select2.min.js"></script>
+    <script src="{% static '' %}js/vendors/perfect-scrollbar.js"></script>
+    <script src="{% static '' %}js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="{% static '' %}js/vendors/chart.js"></script>
+    <!-- Main Script -->
+    <script src="{% static '' %}js/main.js?v=1.1" type="text/javascript"></script>
+    <script src="{% static '' %}js/custom-chart.js" type="text/javascript"></script>
+<!--    <script src="{% static '' %}js/axios.min.js" type="text/javascript"></script>-->
+    {% block footer %}{% endblock %}
+    </body>
+    </html>
+{% endwith %}

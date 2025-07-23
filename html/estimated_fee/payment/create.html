@@ -1,0 +1,70 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Xodim : {{user.first_name}} {{user.last_name}}ga to'lov qilish</h4>
+            </div>
+            <div>
+
+                <a href="{% url 'estimated_fee_payment_list' cash_flow.id %}" class="btn btn-brand btn-sm">
+
+                    <i class="material-icons md-arrow_back"></i> Qaytish
+                </a>
+                <button class="btn btn-brand btn-sm" id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                        <div class="col-md-6">
+                            <label> To'lov qilgan kassirni tanlang</label>
+                            <select name="from_user" class="form-select">
+                                {% for c in cashier_user %}
+                                <option value="{{c.user_id}}">{{c.user.first_name}} {{c.user.last_name}} +{{c.user.username}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                        <label>To'lov miqdori</label>
+                        <input type="number" required name="amount" class="form-control" {% if r %}value="{{r.amount}}" {% endif %} placeholder="miqdori">
+                        </div>
+
+
+
+                    <div class="col-md-12">
+
+                        <label>Izoh</label>
+
+                        <input type="text" class="form-control" readonly value="{{cash_flow.name}}" name="desc" >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<script type='text/javascript'>
+    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});
+
+</script>
+
+{% endblock %}
+{% block header %}
+<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+{% endblock %}
+{% block footer %}
+{% endblock %}

@@ -1,0 +1,50 @@
+    <div class="example_box " id="printableArea_{{order.id}}">
+        <h6 class="d-inline">{{order.get_site_display}}</h6> <h6 class="f-right">ID : {{order.id}}</h6>
+        {% if order.is_there_previous_order %}
+        <span class="d-block" style="font-size: 7px; line-height:0.5;">!Haydovchida mahsulot bor id:#{{order.is_there_previous_order.id}}</span>
+        {% endif %}
+        <ul class="mb-1 text-center">
+            <li>
+                <span><i class="material-icons md-person"></i> {{order.customer_name }}</span>
+            </li>
+            <li><span><i class="material-icons md-phone d-inline"></i> {{ order.customer_phone }}</span>
+                {% if order.customer_phone2 %}|
+                <span><i class="material-icons md-phone"></i> {{order.customer_phone2 }}</span>
+                {% endif %}
+            </li>
+            <li>
+                <span><i class="material-icons md-place"></i> {{order.customer_region.name }}, {{order.customer_district.name}}</span>
+            </li>
+            <li class="text-center">
+                <span><i class="material-icons md-headset_mic"></i> Call center: +998692261164</span>
+            </li>
+        </ul>
+        <table class="w-100 mr-auto m-auto text-center">
+            <tr>
+                <th>Mahsulot</th>
+                <th>Soni</th>
+                <th>Narxi</th>
+            </tr>
+            {% for a in order.order_products %}
+            <tr>
+                <td>{{ a.product.name|slice:"25" }}{% if a.product.name|length > 25 %}...{% endif %}</td>
+                <td>{{ a.ordered_amount }} ta</td>
+                <td>{{a.price}} so'm</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th>Jami :</th>
+                <td>{{ order.order_products_total_ordered_amount }} ta</td>
+                <td>{{order.order_products_total_price}} so'm</td>
+            </tr>
+
+        </table>
+        <span style="font-size: 10px; display:block;"><i class="material-icons md-comment" style="font-size: 9px"></i> {{order.customer_street }}</span>
+
+        <span style="font-size: 10px; font-weight: bold; display:block;"><i class="material-icons md-schedule"
+                                                                            style="font-size: 9px"></i> {{request.user.today }}</span>
+    </div>
+      <input type="button" class="btn btn-primary" target="_blank" onclick="printDiv('printableArea_{{order.id}}')" value="Printernad chiqarish!"/>
+
+<!--  width: 222px !important;-->
+<!--  height: 227px !important;-->

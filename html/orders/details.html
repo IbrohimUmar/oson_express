@@ -1,0 +1,370 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Buyurtmani o'zgartirish</h2>
+                
+                {% if o.site_order_id %}
+                {{o.get_site_display}}dagi buyurtma id si: {{o.site_order_id}}
+                {% endif %}
+                
+            </div>
+            <div>
+                <a href="{% url 'orders_list_all' %}" class="btn btn-brand btn-sm"><i
+                        class="material-icons md-arrow_left"></i> Qaytish</a>
+                <a href="{% url 'order_print' o.id %}" target="_blank" type="submit" class="btn btn-brand btn-sm"><i
+                        class="material-icons md-print"></i> Chop etish</a>
+                <button type="submit" class="btn btn-brand btn-sm"><i class="material-icons md-add"></i> Saqlash</button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 mb-lg-0 ">
+                        <span> <i
+                                class="material-icons md-calendar_today"></i> <b>{{ o.created_at|date:"Y-m-d h:i" }}</b> </span>
+                        <br>
+                        <small class="text-muted">Buyurtma ID: {{ o.id }}</small>
+
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <label>Holati :</label>
+                        <select class="form-select d-inline-block mb-lg-0 mr-5 mw-200" name="status">
+                             {% if o.status == '5' and o.cancelled_status != '1' %}
+                                <option value="5" {% if o.status == '5' %}selected{% endif %}>Bekor qilindi {{o.get_cancelled_status_display}}</option>
+                            {% else %}
+                                <option value="3" {% if o.status == '3' %}selected{% endif %}>Yetkazilmoqda</option>
+                                <option value="4" {% if o.status == '4' %}selected{% endif %}>Sotildi</option>
+                                <option value="5" {% if o.status == '5' %}selected{% endif %}>Bekor qilindi</option>
+                                <option value="6" {% if o.status == '6' %}selected{% endif %}>Qayta qo'ng'iroq</option>
+                            {% endif %}
+                        </select>
+                        <br>
+
+                    {% if o.status == '5' %}
+                        {% if o.cancelled_status == '1' %}
+                            <span class="badge badge-soft-success">Mahsulotlar haydovchi qo'lida</span>
+                        {% elif o.cancelled_status == '2' %}
+                                                <span class="badge badge-soft-danger">{{o.get_cancelled_status_display}}</span>
+                                                {% if o.is_there_product %}
+                                                <br>
+                                                
+                                                <a href="{% url 'order_details' o.is_there_product.id %}" class="btn btn-sm btn-brand">Mahsulotlari berilgan buyurtmani ko'rish id: {{o.is_there_product.id}}</a>
+                                                {% endif %}
+                        {% else %}
+                        <span class="badge badge-soft-danger">{{o.get_cancelled_status_display}}</span>
+                        {% endif %}
+                        {% endif %}
+
+
+
+<!--                        {% if o.status == '5' %}-->
+<!--                        {{o.get_cancelled_status_display}}-->
+<!--                        {% if o.is_there_product %}-->
+<!--                        -->
+<!--                        -->
+<!--                        -->
+<!--                        <span class="badge badge-soft-danger">Mahsulotlarini : #20 id li buyurtmaga berib yuborilgan</span>-->
+<!--                        {% elif o.is_there_product == None %}-->
+<!--                        <span class="badge badge-soft-success">Mahsulotlar qo'lida</span>-->
+<!--                        {% endif %}-->
+<!--                        {% endif %}-->
+                    </div>
+
+
+
+                </div>
+            </header>
+            <!-- card-header end// -->
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    {# col customer about #}
+                    <div class="col-md-6">
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                            <div class="text">
+                                <h6 class="mb-1 text-center">Mijoz</h6>
+                            </div>
+                        </article>
+                        <hr>
+
+                        <h6>Mijoz ismi</h6>
+                        <input type="text" value="{{ o.customer_name }}" class="form-control" name="customer_name">
+                        <h6>Mijoz tel</h6>
+                        <input type="text" value="{{ o.customer_phone }}" class="form-control" name="customer_phone">
+                        <h6>Mijoz 2 chi telefon raqami</h6>
+                        <input type="text" value="{{ o.customer_phone2 }}" placeholder="Mijoz 2 chi telefon raqami" class="form-control" name="customer_phone2">
+
+
+                        <hr>
+
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-history"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Tarixi</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+
+                        <label>Buyurtma kelgan joy</label>
+                        <input type="text" readonly value="{{ o.get_where_come_from_display }}" class="form-control">
+
+                        <label>Buyurtmachi ip</label>
+                        <input type="text" readonly value="{{ o.ip }}" class="form-control">
+
+                        <label>User agent</label>
+                        <input type="text" readonly value="{{ o.user_agent }}" class="form-control">
+
+
+                        <hr>
+
+
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-headset_mic"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Operator</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+                        <h6>Operator</h6>
+                        <input type="text" readonly value="{{ o.operator.first_name }} {{ o.operator.last_name }} +{{ o.operator.username }}" class="form-control">
+                        <h6>Operator daromadi</h6>
+                        <input type="text" readonly value="{{ o.operator_fee }}" class="form-control">
+                        <h6>Operator izohi</h6>
+                        <textarea class="form-control" disabled>{{o.operator_note}}</textarea>
+
+
+
+                        <hr>
+
+
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Sotuvchi</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+                        <h6>Sotuvchi</h6>
+                        <input type="text" readonly value="{{ o.seller.first_name }} {{ o.seller.last_name }} +{{ o.seller.username }}" class="form-control">
+                        <h6>Sotuvchi daromadi</h6>
+                        <input type="text" readonly value="{{ o.seller_fee }}" class="form-control">
+                        <h6>Sotuvchi oqimi</h6>
+                        <input type="text" readonly value="url : {{ o.seller_stream.url }}, Nomi : {{ o.seller_stream.name }}" class="form-control">
+                        <hr>
+
+
+
+
+
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-today"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Sana</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+                        <h6>Buyurtma kelgan sana</h6>
+                        <input type="text" readonly value="{{ o.created_at }}" class="form-control">
+                        <h6>Buyurtma so'ngi o'zgartirish sanasi</h6>
+                        <input type="text" readonly value="{{ o.updated_at }}" class="form-control">
+                        <h6>Yetkazilmoqdaga o'tgan sana</h6>
+                        <input type="text" readonly value="{{ o.delivered_date|date:'Y-m-d' }}" class="form-control">
+                        <hr>
+
+
+
+
+
+<!--                        <label>Buyurtma kelgan sana</label>-->
+<!--                        <h6>{{ o.created_at}}</h6>-->
+                        <!--<input type="date" name="order_date" value="{{ o.created_at|date:"Y-m-d" }}" readonly required-->
+                        <!--class="form-control">-->
+<!--                        <label>Buyurtma Topshirish sanasi</label>-->
+<!--                        <h6>{{ o.delivered_date|date:"Y-m-d" }}</h6>-->
+                        <!--<input type="date" class="form-control" value="{{ o.delivered_date|date:"Y-m-d" }}" readonly-->
+                        <!--required name="delivered_date">-->
+
+
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-directions_car"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Haydovchi</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+
+                        <h6>Haydovchi</h6>
+                        <input type="text" readonly class="form-control" value="{{ o.driver.first_name }} {{o.driver.last_name}} +{{o.driver.username}}">
+
+                        <h6>Haydovchi hizmat haqqi</h6>
+                        <input type="number" required class="form-control" value="{{ o.driver_fee }}" name="driver_fee">
+
+
+                        <h6>Bonus beriladimi</h6>
+                        <input type="checkbox" v-model="checkbox" value="True" class="form-check"
+                               name="is_bonus">
+                        <div v-if="checkbox">
+                            <h6>1 kunda yetib borsa</h6>
+                            <input type="number" class="form-control" required value="{{ o.driver_one_day_bonus }}"
+                                   name="one_day_bonus">
+
+                            <h6>2 kunda yetib borsa</h6>
+                            <input type="number" class="form-control" required value="{{ o.driver_two_day_bonus }}"
+                                   name="two_day_bonus">
+
+                        </div>
+
+
+                        <hr>
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-place"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mt-3">Manzil</h5>
+
+                            </div>
+                        </article>
+                        <hr>
+
+                        <div>
+                            <h6>Viloyat</h6>
+                            <input type="text" readonly class="form-control" required value="{{ o.customer_region.name }}">
+
+                            <h6>Tumanini tanlang {{o..id}}</h6>
+                            <select class="form-control" required name="district">
+                                {% for dis in district %}
+                                <option value="{{ dis.id }}" {% if dis.id == o.customer_district.id %}selected{% endif %}>{{dis.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <h6>Ko'cha uy, mo'ljal</h6>
+                            <textarea rows="1" required class="form-control"
+                                      name="street">{{ o.customer_street }}</textarea>
+                            <hr>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                         <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-production_quantity_limits"></i>
+                                    </span>
+                            <div class="text">
+                                <h6 class="mb-1 text-center">Mahsulotlar</h6>
+                            </div>
+
+                        </article>
+                        <!--                            <hr>-->
+                        <div>
+                            <!--                                <label>Mahsulot tanlang</label>-->
+                            <div class="custom_select mt-5 mb-5">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Mahsulot</th>
+                                        <th>Soni</th>
+                                        <th>Summasi</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for i in order_products %}
+                                    <tr>
+                                        <td>{{i.product.name}} <br>
+
+
+                                            {% if i.product_variable and i.product_variable.color %}
+                                            <span class="badge" style="border:1px solid;">Rangi : {{i.product_variable.color.name}}</span>
+                                            {% endif %}
+
+                                            {% if i.product_variable and i.product_variable.measure_item %}
+                                            <span class="badge" style="border:1px solid;">O'lchov : {{i.product_variable.measure_item.name}}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{i.total_quantity}} ta</td>
+                                             <td>
+                                            <input class="form-control" style="display:inline !important;" required type="number" name="order_product_price" value="{{i.total_price}}">
+                                            <input class="form-control" style="display:inline !important;" type="hidden"
+                                                   name="order_product_id" value="{{i.id}}">
+</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <thead>
+                                    <tr>
+                                        <th>Jami :</th>
+                                        <th>{{o.total_product_quantity}} ta</th>
+                                        <th>{{o.total_product_price}} so'm</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+        <!-- card end// -->
+    </form>
+</section>
+{% endblock %}
+{% block header %}
+<script src="{% static '' %}js/vue.js"></script>
+<style>
+ li{
+     color: black;
+ }
+.select2-container--open .select2-dropdown--below{
+    color: black !important;
+}
+.custom_select .select2-container--default .select2-selection--single .select2-selection__rendered{
+    color:#3BB77E !important;
+ }
+.select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results{
+    color:#3BB77E !important;
+}
+
+</style>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript">
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+                checkbox: Number({{ is_bonus }}),
+            }
+
+        });
+
+</script>
+{% endblock %}

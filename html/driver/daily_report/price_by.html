@@ -1,0 +1,285 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <div>
+            <h4 class="content-title card-title">Jami buyurtmalar bo'yicha statistika</h4>
+        </div>
+        <div>
+             <a href="{% url 'driver_daily_report' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Soni bo'yicha
+                </a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <h5 class="text-center mb-10">Buyurtmalarni oy bo'yicha filterlash</h5>
+                <div class="col-md-12 m-auto">
+
+                    <form method="get">
+                        <!--                {% csrf_token %}-->
+
+                        <div class="row">
+                            <div class="col-md-5">
+
+                                <label>Oy tanlang :</label>
+                                <input type="month" class="form-control" required name="to" value="{{dates}}">
+                            </div>
+                            <div class="col-md-5">
+
+                                <label>Haydovchi tanlang :</label>
+                                <select name="driver" class="form-select">
+                                  <option value="0" {% if request.GET.driver|add:"0" == '0' %}selected{% endif %}>----------</option>
+                                      {% for i in drivers %}
+                                      <option value="{{i.id}}" {% if request.GET.driver|add:"0" == i.id %}selected{% endif %}>{{i.first_name}} {{i.last_name}}</option>
+                                      {% endfor %}
+                          </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Filterlash</label><br>
+                                <button class="btn btn-brand"><i class="icon material-icons md-search"></i></button>
+                            </div>
+
+
+                        </div>
+                        <br>
+                    </form>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Sana</th>
+                        <th>Mahsulot yuborilgan summasi</th>
+                        <th>Sotilgan summasi (Yo'l kirasi bilan)</th>
+                        <th>Sotilgan summasi (Yo'l kirasiz)</th>
+                        <th>Sotilgan yo'lkirsa summasi</th>
+                        <th>Bekor qilngan summasi</th>
+                        <th>Yetkazilmoqda summasi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in data %}
+                    <tr>
+                        <td>{{d.date|date}}
+
+                        </td>
+
+
+                        <td><h6>[[ money_format({{d.report.total_send_products_price}})]] so'm</h6></td>
+
+                        <td><h6>[[ money_format({{d.report.total_sell_price}})]] so'm</h6></td>
+                        <td><h6>[[ money_format({{d.report.selling_price_with_out_driver_fee}})]] so'm</h6></td>
+                        <td><h6>[[ money_format({{d.report.driver_fee}})]] so'm</h6></td>
+
+
+                        <td><h6>[[ money_format({{d.report.total_cancelled_price}})]] so'm</h6></td>
+                        <td><h6>[[ money_format({{d.report.total_being_delivery_price}})]] so'm</h6></td>
+
+                    </tr>
+                    {% endfor %}
+
+                    </tbody>
+                    <thead>
+                    <tr>
+                       <td>Jami</td>
+                       <td><h6>[[ money_format({{total_send_products}})]] so'm</h6></td>
+                       <td><h6>[[ money_format({{total_sell}})]] so'm</h6></td>
+
+                       <td><h6>[[ money_format({{total_selling_price_with_out_driver_fee}})]] so'm</h6></td>
+                       <td><h6>[[ money_format({{total_selling_driver_fee}})]] so'm</h6></td>
+
+                       <td><h6>[[ money_format({{total_cancelled}})]] so'm</h6></td>
+                       <td><h6>[[ money_format({{total_being_delivery}})]] so'm</h6></td>
+                   </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card bg-white">
+        <div class="card-body">
+            <div id="chart" style="color:black;">
+            </div>
+
+        </div>
+    </div>
+
+    <!--    </form>-->
+</section>
+<!--<script type='text/javascript'>-->
+<!--    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});-->
+
+<!--</script>-->
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto);
+
+
+</style>
+
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+
+
+
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+
+        });
+
+
+
+
+
+var options = {
+  chart: {
+    height: 350,
+    type: "area",
+              //stacked: false,
+
+    zoom: {
+            enabled: false
+    },
+  },
+  dataLabels: {
+    enabled: false
+  },
+        markers: {
+          size: 0,
+        },
+  series: [
+    {
+      name: "Sotilganlar",
+      //data: [45, 52, 38, 45, 19, 23, 2]
+      data: {{sold_orders_price|safe}}
+    },
+    {
+      name: "Bekor qilinganlar",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{canceled_orders_price|safe}}
+    },
+    {
+      name: "Mahsuloti yuborildi",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{send_product_orders_price|safe}}
+    },
+    {
+      name: "Yetkazilmoqda",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{being_delivery_price|safe}}
+    }
+  ],
+ tooltip: {
+          y: [
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " (mins)"
+                }
+              }
+            },
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " per session"
+                }
+              }
+            },
+            {
+              title: {
+                formatter: function (val) {
+                  return val;
+                }
+              }
+            }
+          ]
+        },
+  title: {
+          text: 'Buyurtmalar buyicha',
+          align: 'left',
+          offsetX: 14
+        },tooltip: {
+          shared: true
+        },legend: {
+          position: 'top',
+          horizontalAlign: 'right',
+          offsetX: -10
+        },legend: {
+          tooltipHoverFormatter: function(val, opts) {
+            return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
+          }
+        },
+  xaxis: {
+    categories: {{days|safe}}
+
+  }
+};
+
+var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+chart.render();
+
+
+
+
+
+        var table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+
+</script>
+{% endblock %}

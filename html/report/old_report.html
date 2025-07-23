@@ -1,0 +1,421 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Statistika</h2>
+
+            </div>
+            <div>
+            </div>
+        </div>
+        <div class="row ">
+            <hr>
+            {# xarajatlar #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Buyurtmadan foyda qilish bo'yicha</h4>
+                                        <p class="text-center text-warning">Xarbir sotilgan buyurtmaning admin to'lovi haydovchi hizmat haqqi ayrilgandagi foyda miqdori</p>
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Sotilgan buyurtmalardan bo'lgan foyda haydovchi pulini biz belgilaganmiz</h6>
+                                <span>{{ get_fee_order.total_fee_real }} so'm</span>
+{#                                <span class="text-sm">Jami qilingan xarajatlar miqdori</span>#}
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Sotilgan buyurtmalardan bo'lgan foyda haydovchi pulini standart hissobda</h6>
+                                <span>{{ get_fee_order.total_fee_marked }} so'm</span>
+{#                                <span class="text-sm">2 Kundagi qilingan xarajat</span>#}
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            {# Haydovchilar #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Haydovchilar</h4>
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilar jami qarzi</h6>
+                                <span>{{ get_driver_statistic.total_driver_debt }} so'm</span>
+                                <span class="text-sm">Faqat sotilgan mahsulotlar hissobga olingandagi qarzi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilar qo'lidagi mahsulotlar narxi</h6>
+                                <span>{{ get_product_total_price.total_all_regions_driver_price }} so'm</span>
+                                <span class="text-sm">Sotilgan mahsulotlar hissobga olinmagandagi qarzi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            {# xarajatlar #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Xarajatlar bo'yicha</h4>
+                                        <p class="text-center text-warning">Xaydovchilar uchun qilingan xarajatlar qo'shilmagandagi xarajatlar</p>
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Jami xarajat</h6>
+                                <span>{{ expenses_statistic.total_expenses }} so'm</span>
+                                <span class="text-sm">Jami qilingan xarajatlar miqdori</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">2 kunda</h6>
+                                <span>{{ expenses_statistic.two_day }} so'm</span>
+                                <span class="text-sm">2 Kundagi qilingan xarajat</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">1 Haftada</h6>
+                                <span>{{ expenses_statistic.seven_day }} so'm</span>
+                                <span class="text-sm">1 haftadagi qilingan xarajat</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">1 Oyda</h6>
+                                <span>{{ expenses_statistic.one_month }} so'm</span>
+                                <span class="text-sm">1 oydagi qilingan xarajat</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            {# admin fee #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Admin Daromadi bo'yicha</h4>
+                                        <p class="text-center text-warning">Bu yerda faqat adminlar daromadni ko'rishingiz mumkin
+                                            <br>Adminlarga to'lovlarni xarajatlar qismidan ko'rishingiz mumkin</p>
+
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Jami adminlar daromadi</h6>
+                                <span>{{ seller_fee.seller_fee_total }} so'm</span>
+                                <span class="text-sm">Jami qilgan daromadi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Mahsulot comdagi adminlar qilgan jami daromadi</h6>
+                                <span>{{ seller_fee.mahsulot_seller_fee }} so'm</span>
+                                <span class="text-sm">Faqat mahsulot comdagi adminlar daromadi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Airshop uzdagi adminlar qilgan jami daromadi</h6>
+                                <span>{{ seller_fee.airshop_seller_fee }} so'm</span>
+                                <span class="text-sm">Faqat Airshop comdagi adminlar daromadi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+            <hr>
+
+            {# daromad #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Daromad bo'yicha</h4>
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Jami daromad</h6>
+                                <span>{{ fee.total_fee }} so'm</span>
+                                <span class="text-sm">Jami daromad admin to'lov va rasxodlar ayrilganda</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">2 kunda</h6>
+                                <span>{{ fee.two_day }} so'm</span>
+                                <span class="text-sm">2 Kundagi daromad admin to'lov va rasxodlar ayrilganda</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">1 Haftada</h6>
+                                <span>{{ fee.seven_day }} so'm</span>
+                                <span class="text-sm">1 haftadagi daromad admin to'lov va rasxodlar ayrilganda</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">1 Oyda</h6>
+                                <span>{{ fee.one_month }} so'm</span>
+                                <span class="text-sm">1 oydagi daromad admin to'lov va rasxodlar ayrilganda</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            {# product #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="text-center">Tovar bo'yicha</h4>
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Jami tovar narxi</h6>
+                                <span>{{ get_product_total_price.total }} so'm</span>
+                                <span class="text-sm">Ombordagi va haydovchilardagi mahsulotlar summasi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Asosiy ombordagi tovar narxi</h6>
+                                <span>{{ get_product_total_price.total_store_house_price }} so'm</span>
+                                <span class="text-sm">Asosiy ombordagi mahsulotlar jami narxi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilar qo'lidagi tovar narxi</h6>
+                                <span>{{ get_product_total_price.total_all_regions_driver_price }} so'm</span>
+                                <span class="text-sm">Haydovchilar zahirasidagi va yetkaziyotgan mahsulotlar narxi</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Yo'ldagi mahsulotlar narxi</h6>
+                                <span>{{ get_product_total_price.driver_send_product_price }} so'm</span>
+                                <span class="text-sm">Haydovchilarga yuborilgan yo'ldagi mahsulotlar ro'yxati</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <div class="col-lg-4">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Foydalanuvchilar</h6>
+                            <span>{{ users }} ta</span>
+                            <span class="text-sm">Ro'yxatdan o'tgan foydalanuvchilar soni</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Jami buyurtmalar</h6>
+                            <span>{{ total_orders }} ta</span>
+                            <span class="text-sm">Jami buyurtmalar soni</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Mahsulotlar</h6>
+                            <span>{{ total_orders }} ta</span>
+                            <span class="text-sm"> Jami Mahsulotlar soni</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+
+            <div class="row text-center">
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Qabul qilindi</h6>
+                                <span>{{ total_statistic.accepted }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Yetkazilmoqda</h6>
+                                <span>{{ total_statistic.being_delivered }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Sotildi</h6>
+                                <span>{{ total_statistic.delivered }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Bekor qilindi</h6>
+                                <span>{{ total_statistic.canceled }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Qayta qo'ng'iroq</h6>
+                                <span>{{ total_statistic.call_back }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Mahsulot kutilmoqda</h6>
+                                <span>{{ total_statistic.wait }} ta</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="text-center">Saytlar bo'yicha kelgan buyurtmalarning mahsulot soni bo'yicha</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Sayt</th>
+                            <th>Statistika</th>
+{#                            <th>Jami daromadi</th>#}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in site_statistic %}
+                            <tr>
+                                <td><h5>{{ i.site }}</h5></td>
+                                <td>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Mahsulot kutilmoqda : {{ i.wait }} ta</span>
+
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Mahsuloti yuborildi : {{ i.send_products }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Yetkazilmoqda : {{ i.being_delivered }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Sotildi : {{ i.delivered }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Bekor qilindi : {{ i.canceled }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Qayta qo'ng'iroq : {{ i.call_back }} ta</span>
+
+                                </td>
+{#                            <td>250 so'm</td>#}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

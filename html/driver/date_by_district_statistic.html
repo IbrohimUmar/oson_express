@@ -1,0 +1,141 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Haydovchi {{driver.first_name}} {{driver.last_name}}ning tumanlari statistikasi</h2>
+        <div>
+                            {% if request.GET.from_date %}
+                                <a href="{% url 'driver_date_by_statistic' %}?from_date={{request.GET.from_date}}&to_date={{request.GET.to_date}}" class="btn btn-brand btn-sm"> Qaytish</a>
+
+                            {% else %}
+                                <a href="{% url 'driver_date_by_statistic' %}" class="btn btn-brand btn-sm"> Qaytish</a>
+                            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5>Sana oralig'idagi statistika</h5>
+
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <form method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Dan :</label>
+                                <input type="date" class="form-control" id="from" {% if request.GET.from_date %} value="{{request.GET.from_date}}"{% else %}value="{{now}}"{% endif %} name="from_date">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Gacha :</label>
+                                <input type="date" class="form-control" id="to" {% if request.GET.to_date %} value="{{request.GET.to_date}}"{% else %}value="{{now}}"{% endif %} name="to_date">
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.from_date or request.GET.to_date %}
+                                 <a class="btn btn-danger" href="{% url 'driver_date_by_statistic' %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            
+            
+        </div>
+    </div>
+    
+    
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Tuman nomi</th>
+                        <th>Haydovchi</th>
+                        <th>Sotuv foizi</th>
+                        <th>Sotildi</th>
+                        <th>Bekor qilindi</th>
+                        <th>Tovar yuborildi</th>
+                        <th>Qayta qo'ng'iroqda</th>
+                        <th>Yetkazilmoqda</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in district_statistic %}
+                    <tr>
+                        <td>
+                            {{d.district_name}}
+                        </td>
+                        <td>
+                            {{ driver.first_name }} {{ driver.last_name }}
+                        </td>
+                        <td>%{{ d.sales_interest }}</td>
+                        <td>{{ d.selling_count }}</td>
+                        <td>{{ d.cancelled_count }}</td>
+                        <td>{{ d.send_product_count }}</td>
+                        <td>{{ d.call_back_count }}</td>
+                        <td>{{ d.being_delivery_count }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 55,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'searchPanes', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

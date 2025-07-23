@@ -1,0 +1,101 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Operatorni ma'lumotlarini o'zgartirish</h4>
+            </div>
+            <div>
+                <a href="{% url 'operator_list' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Operatorning  ma'lumotlari</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Operator ismi</label>
+                        <input type="text" name="first_name" placeholder="Operator ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
+                               class="form-control">
+
+                        <label>Operator familiyasi</label>
+                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi"
+                               class="form-control">
+                        <label>Parol</label>
+                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+                               class="form-control">
+
+                    <!--        <label class="text-sm">Targetdan kelgan buyurtma qo'shish paneli ko'rinsinmi</label>-->
+                    <!--{% if 'admin.operator_ads_order_panel' in r.get_all_permissions %}-->
+                    <!--    <input type="checkbox" name="target_panel" class="form-check" checked>-->
+                    <!--    {% else %}-->
+                    <!--   <input type="checkbox" name="target_panel" class="form-check">-->
+                    <!--    {% endif %}-->
+
+
+<!--                    {% if r.get_all_permissions in operator_ads_order_panel %}-->
+<!--                        <input type="checkbox" name="target_panel" class="form-check" checked>-->
+<!--                        {% else %}-->
+<!--                       <input type="checkbox" name="target_panel" class="form-check">-->
+<!--                        {% endif %}-->
+<!--                        <label class="text-sm">Iznlar</label>-->
+
+<!--                          <select id="allow_districts" name="permissions" multiple row="3" style="min-height:100px;" class="form-control">-->
+<!--                                <option value="operator_ads_order_panel" {% if 'admin.operator_ads_order_panel' in r.get_all_permissions %}selected{% endif %}>Targetdan kelgan buyurtma qo'shish paneli</option>-->
+<!--                                <option value="operator_create_new_orders" {% if 'admin.operator_create_new_orders' in r.get_all_permissions %}selected{% endif %}>Buyurtma qo'shish</option>-->
+<!--                          </select>-->
+
+
+
+                    </div>
+                    <div class="col-md-6">
+                        <label>Operator Id</label>
+                        <input type="number" class="form-control" {% if r %}value="{{r.operator_id}}" {% endif %} name="operator_id" required placeholder="Operator Id">
+
+                        <label>Operator telefon raqami</label>
+                        <input type="text" name="username" {% if r %}value="{{r.username}}" {% endif %}
+                               class="form-control" placeholder="Operator telefon raqami">
+
+                        <label class="text-sm">Operator aktivmi </label>
+                        {% if main %}
+                        <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active %} checked{% endif %}{% endif %}>
+                        {% else %}
+                       <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active %} checked{% endif %}{% endif %}>
+                        {% endif %}
+                        <br>
+                        <label>Operatorning daromadi</label>
+                        <input type="text" name="special_fee_amount" required {% if r %}value="{{r.special_fee_amount}}" {% endif %} placeholder="Operator kiritgan buyurtmalari sotilsa beriladigan daromad"
+                               class="form-control">
+
+
+                        <br>
+                        <label>Operatorning kartasi</label>
+                        <input type="text" name="payment_card" required {% if r %}value="{{r.payment_card}}" {% endif %} placeholder="Operator karta raqami"
+                               class="form-control">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+{% block footer %}
+{% endblock %}

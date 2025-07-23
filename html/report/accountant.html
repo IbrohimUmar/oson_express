@@ -1,0 +1,159 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Hisobchi bo'limi</h2>
+
+            </div>
+            <div>
+            </div>
+        </div>
+        <div class="row ">
+
+            <div class="col-lg-6">
+                <form method="post" style="display:inline !important;">
+
+                {% csrf_token %}
+                    <div class="row">
+
+                        <div class="col-6">
+                            <input type="date" class="form-control" name="sana" {% if sana %}value="{{sana}}"{% endif %} style="display:inline !important;">
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-brand btn-sm" style="display:inline !important;">Filterlash</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-6 mx-auto">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Qoldiq pul</h6>
+                            <span>{{ balance }} so'm</span>
+                            <span class="text-sm">Kassada qoldiq pul miqdori</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center">Kirim</h3>
+                                                {% if perms.admin.driver_list %}
+
+                    <a href="{% url 'driver_list' %}" class="btn btn-info btn-sm ">Kirim qilish</a><br>
+                    {% endif %}
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilardan tushgan jami pul</h6>
+                                <span>{{ get_total_fee.total_fee }} so'm</span>
+                                <span class="text-sm">Haydovchilar to'lagan pul</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilardan tushgan jami pul 2 kun</h6>
+                                <span>{{ get_total_fee.two_day }} so'm</span>
+                                <span class="text-sm">2 Kundagi haydovchilar to'lov lari</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilardan tushgan jami pul 7 kun</h6>
+                                <span>{{ get_total_fee.seven_day }} so'm</span>
+                                <span class="text-sm">7 Kundagi haydovchilar to'lov lari</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Haydovchilardan tushgan jami pul 30 kun</h6>
+                                <span>{{ get_total_fee.one_month }} so'm</span>
+                                <span class="text-sm">30 Kundagi haydovchilar to'lov lari</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            {# product #}
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center">Chiqim</h3>
+                                                                    {% if perms.admin.expenses_list %}
+
+                    <a href="{% url 'expenses_list' %}" class="btn btn-info btn-sm ">Chiqim qilish</a><br>
+                    {% endif %}
+                    <br>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">Jami chiqim</h6>
+                                <span>{{ expenses_statistic.total_expenses }} so'm</span>
+                                <span class="text-sm">Jami chiqim bo'lgan pul</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">5 kunlik chiqim</h6>
+                                <span>{{ expenses_statistic.two_day }} so'm</span>
+                                <span class="text-sm">5 kunlik chiqim bo'lgan pul</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">15 kunlik chiqim</h6>
+                                <span>{{ expenses_statistic.seven_day }} so'm</span>
+                                <span class="text-sm">15 kunlik chiqim bo'lgan pul</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card card-body mb-4">
+                        <article class="icontext">
+                            <div class="text">
+                                <h6 class="mb-1 card-title">30 kunlik chiqim</h6>
+                                <span>{{ expenses_statistic.one_month }} so'm</span>
+                                <span class="text-sm">30 kunlik chiqim bo'lgan pul</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+{% endblock %}

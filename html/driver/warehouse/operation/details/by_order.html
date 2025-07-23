@@ -1,0 +1,309 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Mahsuloti yuborilgan buyurtmalar, Haydovchi : {{ d.first_name }} {{ d.last_name }} , {{ d.region.name }}
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <input type="hidden" value="send" name="output_id">
+    <div class="content-header">
+        {% csrf_token %}
+        <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+        <div>
+            <a href="{% url 'driver_warehouse_operation_history' d.id %}" class="btn btn-brand"><i
+                    class="material-icons md-arrow_left"></i> Qaytish</a>
+            <span>
+                </span>
+        </div>
+    </div>
+
+    <div class="card">
+        <form method="post" onsubmit="document.getElementById('submit_button').disabled=true" class="card-body">
+
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="col-md-10" style="display:inline-block !important;">
+                        <label>Masul omborchi</label>
+
+
+                        <div class="custom_select" style="display:inline !important;">
+
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-md-2" style="display:inline;">
+
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row gx-5">
+                <div class="col-lg-12">
+                    <section class="content-body p-xl-4">
+                        <div class="row">
+                            <h3 class="text-center mb-10 mt-30">Mahsuloti yoki barcode yuborilgan buyurtmalar
+                            </h3>
+
+
+                            <header class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                                        <form method="get">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <h6>Qidiruv</h6>
+                                                    <input type="text" class="form-control" id="search"
+                                                           placeholder="id, klient tel bo'yicha qidiruv" name="search"
+                                                           {% if request.GET.search %}value="{{ request.GET.search }}"
+                                                           {% endif %}>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <h6>Qo'llash</h6>
+                                                    <button class="btn btn-brand" type="submit"><i
+                                                            class="material-icons md-search"></i>
+                                                    </button>
+
+                                                    {% if request.GET.search %}
+                                                    <a class="btn btn-danger" href="{{request.META.PATH_INFO}}"><i
+                                                            class="material-icons md-search_off"></i>
+                                                    </a>{% endif%}
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </header>
+
+
+                            <div class="table-responsive">
+                                <a href="?excel=True{% for key, value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
+                                   class="btn btn-success btn-sm">Excel variantini olish</a>
+
+<!--                                <a href="" target="_blank" class="btn btn-success btn-sm"><i-->
+<!--                                        class="material-icons md-print"></i> Hamma buyurtmalarni chop etish</a>-->
+                                <table class="table dataTable" id="dataTable">
+                                    <thead>
+                                    <tr>
+
+<!--                                        <th>Qaytarish</th>-->
+                                        <th>id</th>
+                                        <th>Holati</th>
+                                        <th>Barcode</th>
+                                        <th>Mahsulot</th>
+                                        <th>Jami soni</th>
+                                        <th>Jami narxi</th>
+
+                                        <th>Mijoz ismi</th>
+                                        <th>Mijoz tel</th>
+                                        <th>Tumani</th>
+                                        <th>Yo'l kirasi</th>
+                                        <th>Buyurtma sana</th>
+                                        <th>Yetkazish sanasi</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for o in queryset %}
+                                    <tr {% if o.is_send_barcode %}style="background-color:#095252;" {% endif %}>
+<!--                                        <td>-->
+<!--                                            {% if output.is_shipping == False %}-->
+<!--                                            <form method="POST">-->
+<!--                                                {% csrf_token %}-->
+<!--                                                <input type="hidden" name="order_id" value="{{o.id}}">-->
+<!--                                                <input type="hidden" name="is_send_barcode"-->
+<!--                                                       value="{{o.is_send_barcode}}">-->
+<!--                                                <button class="btn btn-sm btn-danger" type="button" onclick="-->
+<!--                                                    Swal.fire({-->
+<!--                                                      title: 'Siz mahsulot kutilmoqdaga o\'tkazmoqchimisiz',-->
+<!--                                                      showDenyButton: true,-->
+<!--                                                      showCancelButton: false,-->
+<!--                                                      confirmButtonText: 'Xa',-->
+<!--                                                      denyButtonText: `Qaytish`,-->
+<!--                                                    }).then((result) => {-->
+<!--                                                      /* Read more about isConfirmed, isDenied below */-->
+<!--                                                      if (result.isConfirmed) {-->
+<!--                                                           form.submit()-->
+<!--                                                      }-->
+<!--                                                    })"><i class="material-icons md-undo"></i></button>-->
+<!--                                            </form>-->
+<!--                                            {% else %}-->
+<!--                                            <p>Mahsulotlari yetib borgan</p>-->
+<!--                                            {% endif %}-->
+
+<!--                                        </td>-->
+                                        <td>
+                                            <h6><a href="{% url 'order_details' o.id %}"
+                                                   class="btn btn-brand btn-sm"><i
+                                                    class="material-icons md-edit"></i></a> #{{ o.id }}</h6>
+                                        </td>
+                                        <td><h6>
+                                            {{ o.get_status_display }}
+
+                                        </h6>
+
+                                            {% if o.is_send_barcode %}
+                                            <small>Bekor qilingan : #{{o.is_there_previous_order.id}} idli buyurtmaning
+                                                mahsuloti belgilandi</small>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{o.barcode}}
+                                        </td>
+
+                                        <td style="white-space:normal !important;">
+                                            {% for p in o.order_products %}
+                                            <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span>
+                                            <br>
+                                            {% endfor %}
+                                            <!-- <h6>{{ o.order_product.product.name }}</h6> -->
+                                        </td>
+                                        <td><h6>{{ o.order_products_total_ordered_amount }}</h6></td>
+                                        <td><h6>{{ o.order_products_total_price }}</h6></td>
+
+                                        <td><h6>{{ o.customer_name }}</h6></td>
+                                        <td><h6>{{ o.customer_phone }} <br>
+                                            {% if o.customer_phone2 %}
+                                            {{ o.customer_phone2 }}
+                                            {% endif %}
+                                        </h6></td>
+
+                                        <td><h6>{{ o.customer_district.name }}</h6></td>
+                                        <td><h6>{{ o.driver_fee }}</h6></td>
+                                        <td><h6>{{ o.order_date|date:"d-m-Y" }}</h6></td>
+                                        <td><h6>{{ o.delivered_date|date:"d-m-Y" }}</h6>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="pagination-area mt-20 mb-20">
+                                <nav aria-label="Page navigation example">
+
+                                    <div class="mb-3 text-center">
+                                        {% if queryset.has_next %}
+                                        <!--                    <div>-->
+
+                                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                                           href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                            <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                                        {% elif queryset.has_previous %}
+
+                                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                                           href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                            <span class="m-auto">< Oldingi sahifaga qaytish </span> </a>
+                                        <!--                    </div>-->
+
+                                        {% endif %}
+                                        <!--                </div>-->
+                                    </div>
+                                    <ul class="pagination justify-content-center">
+
+                                        {% if queryset.has_previous %}
+
+                                        <li class="page-item">
+                                            <a class="badge page-link" style="background-color:#4d5561;"
+                                               href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                < </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="badge page-link" style="background-color:#4d5561;"
+                                               href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{queryset.previous_page_number}}</a>
+                                        </li>
+                                        {% endif %}
+
+
+                                        <li class="page-item active">
+                                            <span class="badge btn-brand page-link"
+                                                  href="#"> {{ queryset.number }} </span>
+                                        </li>
+
+                                        {% if queryset.has_next %}
+
+                                        <li class="page-item">
+                                            <a class="badge page-link" style="background-color:#4d5561;"
+                                               href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                            >{{queryset.next_page_number}}</a></li>
+                                        <li class="page-item">
+                                            <a class="badge page-link" style="background-color:#4d5561;"
+                                               href="?page={{ queryset.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                >
+                                            </a>
+                                        </li>
+                                        {% endif %}
+
+
+                                    </ul>
+                                </nav>
+                                <div>
+                                    <h6 class="text-center m-auto text-muted mt-2" style="font-size:10px;">Jami
+                                        sahifalar soni : {{ queryset.paginator.num_pages }} ta</h6>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+
+<style>
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+
+            .select2-container--open .select2-dropdown--below {
+        color: black !important;
+    }
+
+    .custom_select .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #3BB77E !important;
+    }
+
+    .select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results {
+        color: #3BB77E !important;
+    }
+
+    .select2-dropdown .select2-search--dropdown .select2-search__field {
+        border: 1px solid black;
+    }
+
+
+</style>
+{% endblock %}

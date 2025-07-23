@@ -1,0 +1,144 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+                            <form method="post">
+                                {% csrf_token %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Ta'minotchilar ro'yxati</h2>
+        <div>
+            <button type="submit"  class=" btn btn-sm btn-primary"><i class="material-icons md-check"></i> O'zgartirishni saqlash</button>
+
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <a href="{% url 'shopkeeper_manage_create' %}" class="btn btn-primary">Yangi qo'shish</a>
+
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <span class="badge" style="border:1px solid white;">Jami qarzdorlik : {{total_balance}}</span>
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fio</th>
+                        <th>Tel</th>
+                        <th>Oldingi ostatka</th>
+                        <th>Jami tovar olindi</th>
+                        <th>Jami to'ladik</th>
+
+                        <th>Balansi</th>
+                        <th>Aktivmi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in shopkeeper %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'shopkeeper_manage_edit' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-edit"></i> O'zgartirish</a>
+                        </td>
+                        <td>
+                            {{ o.first_name }} {{o.last_name}}
+                        </td>
+                        <td>
+                            +{{ o.username }}
+                        </td>
+                        <td>
+                            <!--{{o.special_fee_amount}} so'm-->
+                                <input type="hidden"  name="shopkeeper_id" value="{{o.id}}">
+                                <input type="number" class="form-control" name="amount" placeholder="oldingidan qolgan ostatka" value="{{o.special_fee_amount}}">
+                        </td>
+                        <td>
+                            {{ o.shopkeeper_data.total_buy_products_amount_format_money }} so'm
+                        </td>
+                        <td>
+                            {{ o.shopkeeper_data.total_payment_format_money }} so'm
+                        </td>
+                        <td>
+<!--                            {{ o.shopkeeper_data.balance_format_money }} so'm {% if o.shopkeeper_data.balance < 0 %}qarzmiz{% elif o.shopkeeper_data.balance > 0 %}Bizdan qarz{% endif %}-->
+                            <!--{{ o.shopkeeper_data.balance }} -->
+                            {{ o.shopkeeper_data.balance_format_money }} 
+                            so'm
+                            {% with balance=o.shopkeeper_data.balance %}
+                                    {% if balance < 0 %}
+                                        qarzmiz
+                                    {% elif balance > 0 %}
+                                        Bizdan qarz
+                                    {% endif %}
+                                {% endwith %}
+                        </td>
+<!--                        <td>-->
+<!--&lt;!&ndash;                            {{ o.storekeeper_data.total_done_packet }} ta&ndash;&gt;-->
+<!--                        </td>-->
+                        <td>
+                            {% if o.is_active == True %}
+                            <span class="material-icons md-check badge-soft-success"></span>
+                            {% else %}
+                            <span class="material-icons md-cancel badge-soft-danger"></span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+                                                            </form>
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+{% endblock %}

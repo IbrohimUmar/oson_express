@@ -1,0 +1,156 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Xodimlar ro'yxati</h2>
+        <div>
+             <a href="{% url 'employee_create' %}" class="btn btn-brand btn-sm"><i class="material-icons md-add"></i> Xodim qo'shish</a>
+            <a href="{% url 'employee_statistic_list' %}" class="btn btn-brand btn-sm">
+                <i class="material-icons md-trending_up"></i>
+                Statistikali ro'yxat
+            </a>
+
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+                                    <form method="get">
+
+                <div class="row align-items-center">
+                    <div class="col-md-4 col-12 me-auto mb-md-0 mb-3">
+                        <label>Qidiruv</label>
+
+    <input type="text" class="form-control" placeholder="id, tel, ism bo'yicha qidiruv" name="search"
+                                           {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+
+                    </div>
+                    <div class="col-md-4 col-12 me-auto mb-md-0 mb-3">
+                        <label>Turi bo'yicha filter</label>
+ <select name="type" class="form-control">
+                                        <option value="0" {% if request.GET.type == "0" %}selected{% endif %}>Hammasi</option>
+                                        <option value="1" {% if request.GET.type == "1" %}selected{% endif %}>Admin</option>
+                                        <option value="2" {% if request.GET.type == "2" %}selected{% endif %}>Haydovchi</option>
+                                        <option value="3" {% if request.GET.type == "3" %}selected{% endif %}>Operator</option>
+                                        <option value="4" {% if request.GET.type == "4" %}selected{% endif %}>Upakovkachi</option>
+<!--                                        <option value="5" {% if request.GET.type == "5" %}selected{% endif %}>Ta'minotchilar</option>-->
+                                    </select>
+                    </div>
+
+                     <div class="col-md-4">
+                         <label>Qo'llash</label> <br>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                         {% if request.GET.search or request.GET.type  %}
+
+                                      <a href="{% url 'employee_list' %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                                                    {% endif %}
+                                </div>
+
+
+                </div>
+                                        </form>
+                        <h6 class="text-muted">Soni : {{count}} ta</h6>
+
+
+                            <form method="post">
+                                {% csrf_token %}
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fio</th>
+                        <th>Tel</th>
+                        <th>Turi</th>
+                        <th>Oylik miqdori</th>
+                        <th>Kassirmi</th>
+                        <th>Aktivmi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'employee_monthly_details' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-date_range"></i> Yopilgan oylar</a>
+<!--                            <a href="{% url 'operator_management_edit' o.id %}" class="btn btn-brand btn-sm">-->
+<!--                                <i class="material-icons md-edit"></i> O'zgartirish</a>-->
+
+                            <a href="{% url 'employee_payment_details' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-payment"></i> To'lov</a>
+<!--                            <a href="{% url 'operator_management_details' o.id %}" class="btn btn-brand btn-sm">-->
+<!--                                <i class="material-icons md-payment"></i> Hisobot</a>-->
+                        </td>
+                        <td>
+                            {{ o.first_name }} {{o.last_name}}
+                        </td>
+                        <td>
+                            +{{ o.username }}
+                        </td>
+                        <td>
+                            <span class="badge" style="border:1px solid;">{{o.get_type_display}}</span>
+                        </td>
+                        <td>
+
+                                      <input type="hidden"  name="employee" value="{{o.id}}">
+                            <input type="number" value="{{o.salary}}" required name="salary"
+                                    placeholder="oylik miqdorini kiriting" class="form-control">
+                        </td>
+                        <td>
+                            {% if o.cashier %}
+                            <span class="badge badge-soft-success">Ha</span>
+                            {% else %}
+                           <span class="badge badge-soft-danger">Yo'q</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if o.is_active == True %}
+                            <span class="material-icons md-check badge-soft-success"></span>
+                            {% else %}
+                            <span class="material-icons md-cancel badge-soft-danger"></span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="4"></td>
+                        <td colspan="2">
+                                                                                    <button type="submit" class="btn btn-primary " style="border:1px solid white;">O'zgartirishlarni Saqlash</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+                            </form>
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

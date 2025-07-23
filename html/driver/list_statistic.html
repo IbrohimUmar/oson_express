@@ -1,0 +1,167 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchilar ro'yxati</h2>
+            <div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div  class="table-responsive">
+                    <table class="table"  id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Haydovchi Fio</th>
+                             <th>Haydovchi tel</th>
+
+                            <th>Viloyati</th>
+                            <th>Balansi</th>
+                            <th>Bo'shdagi mahsulotlar</th>
+                            <th>Qo'lidagi mahsulotlar soni</th>
+                            <th>Kechiktirayotgan buyurtmalari</th>
+
+                            <th>Mahsulot kutilmoqda </th>
+                            <th>Mahsuloti yuborilgan </th>
+                            <th>Yetkazilmoqda </th>
+                            <th>Yetkazildi </th>
+                            <th>Bekor qilindi</th>
+                            <th>Qayta qo'ng'iroq </th>
+                            
+                            
+                            <th>Yetkazilmoqdalar summasi</th>
+                            <th>Bekor qilindilar summasi</th>
+                            <th>Qayta qo'ng'iroqlar summasi</th>
+                            <th>Nosoz mahsulotlar summasi</th>
+                            <th>Jami qo'lingizdagi mahsulotlar summasi </th>
+                            <!--<th>Jami qo'lingizdagi mahsulotlar kirim summasi </th>-->
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for d in driver %}
+                        <tr>
+                            <td>
+                                 {% if perms.admin.driver_about %}
+                                <a href="{% url 'driver_about' d.id %}" class="btn btn-success btn-sm"><i class="material-icons md-edit"></i></a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ d.first_name }} {{ d.last_name }}
+
+                            </td>
+                            <td>+{{ d.username }}</td>
+                            <td>{{ d.region.name }}</td>
+                            <td>
+                                
+                                {{ d.balance }}
+                                    <!--{% if balance >= 0 %}-->
+                                    <!--    <span class="badge badge-soft-success">Qarzi yo'q : {{ balance }}</span>-->
+                                    <!--{% else %}-->
+                                    <!--    <span class="badge badge-soft-danger ">Qarz : {{ balance }}</span>-->
+                                    <!--{% endif %}-->
+
+                            <!--{% if d.balance < 0 %}-->
+                            <!--        <span class="badge badge-soft-success">Biz qarzmiz : {{ d.balance }}</span>-->
+
+                            <!--    {% elif d.balance == 0 %}-->
+                            <!--       <span class="badge badge-soft-success">Qarzi yo'q : {{ d.balance }} </span>-->
+                            <!--    {% else %}-->
+
+                            <!--        <span class="badge badge-soft-danger ">Qarz : {{ d.balance }}</span>-->
+                            <!--    {% endif %}-->
+
+                            </td>
+                            <td>{{ d.not_shipping_product_amount }} ta </td>
+                            <td>{{ d.hand_products }} ta </td>
+                            <td>{{ d.delay_orders }} ta </td>
+                            
+
+                            <td>{{ d.order_status.wait }}</td>
+                            <td>{{ d.order_status.send_products }}</td>
+                                                        <td>{{ d.order_status.being_delivered }}</td>
+                            <td>{{ d.order_status.delivered }}</td>
+                            <td>{{ d.order_status.canceled }}</td>
+                            <td>{{ d.order_status.call_back }}</td>
+
+
+                            <td>{{ d.total_being_delivered_order_price }}</td>
+                            <td>{{ d.total_cancelled_order_price }}</td>
+                            <td>{{ d.total_call_back_order_price }}</td>
+                            <td>{{ d.total_defected_products_price }}</td>
+                            <td>{{ d.total_hand_product_price }}</td>
+                            <!--<td>{{d.total_hand_product_input_price }}</td>-->
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+    <script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            columnDefs: [
+                {
+                    searchPanes: {
+                        show: true,
+                    },
+                    targets: [2],
+                },
+                {
+                    searchPanes: {
+                        show: false,
+                    },
+                    targets: [0, 1,3, 4, 6],
+                }
+            ],
+            buttons: [
+                {
+                    extend: 'searchPanes', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

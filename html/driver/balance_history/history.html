@@ -1,0 +1,287 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+
+        {% include "driver/top_button.html" %}
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                           {% include 'driver/header.html' %}
+                        </nav>
+                    </aside>
+
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+                            <form method="get">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="row gx-3">
+                                        <div class="col-md-12">
+                                            <h5 class="text-center">Haydovchi balans tarihi</h5>
+
+                                        </div>
+
+<!--                                      <div class="col-md-8">-->
+<!--                                        <label>Sana tanlang</label>-->
+<!--                                        <input type="date" required class="form-control"-->
+<!--                                               {% if request.GET.date %}value="{{request.GET.date}}"{% endif %}name="date" placeholder="sana">-->
+<!--                                          <select name="time" required class="form-control">-->
+<!--                                              <option value="1"  {% if request.GET.time == 1 %}selected{% endif %}>1:00</option>-->
+<!--                                              <option value="2"  {% if request.GET.time == 2 %}selected{% endif %}>2:00</option>-->
+<!--                                              <option value="3"  {% if request.GET.time == 3 %}selected{% endif %}>3:00</option>-->
+<!--                                              <option value="4"  {% if request.GET.time == 4 %}selected{% endif %}>4:00</option>-->
+<!--                                              <option value="5"  {% if request.GET.time == 5 %}selected{% endif %}>5:00</option>-->
+<!--                                              <option value="6"  {% if request.GET.time == 6 %}selected{% endif %}>6:00</option>-->
+<!--                                              <option value="7"  {% if request.GET.time == 7 %}selected{% endif %}>7:00</option>-->
+<!--                                              <option value="8"  {% if request.GET.time == 8 %}selected{% endif %}>8:00</option>-->
+<!--                                              <option value="9"  {% if request.GET.time == 9 %}selected{% endif %}>9:00</option>-->
+<!--                                              <option value="10"  {% if request.GET.time == 10 %}selected{% endif %}>10:00</option>-->
+<!--                                              <option value="11"  {% if request.GET.time == 11 %}selected{% endif %}>11:00</option>-->
+<!--                                              <option value="12"  {% if request.GET.time == 12 %}selected{% endif %}>12:00</option>-->
+<!--                                              <option value="13"  {% if request.GET.time == 13 %}selected{% endif %}>13:00</option>-->
+<!--                                              <option value="14"  {% if request.GET.time == 14 %}selected{% endif %}>14:00</option>-->
+<!--                                              <option value="15"  {% if request.GET.time == 15 %}selected{% endif %}>15:00</option>-->
+<!--                                              <option value="16"  {% if request.GET.time == 16 %}selected{% endif %}>16:00</option>-->
+<!--                                              <option value="17"  {% if request.GET.time == 17 %}selected{% endif %}>17:00</option>-->
+<!--                                              <option value="18"  {% if request.GET.time == 18 %}selected{% endif %}>18:00</option>-->
+<!--                                              <option value="19"  {% if request.GET.time == 19 %}selected{% endif %}>19:00</option>-->
+<!--                                              <option value="20"  {% if request.GET.time == 20 %}selected{% endif %}>20:00</option>-->
+<!--                                              <option value="21"  {% if request.GET.time == 21 %}selected{% endif %}>21:00</option>-->
+<!--                                              <option value="22"  {% if request.GET.time == 22 %}selected{% endif %}>22:00</option>-->
+<!--                                              <option value="23"  {% if request.GET.time == 23 %}selected{% endif %}>23:00</option>-->
+<!--                                              <option value="00"  {% if request.GET.time == 00 %}selected{% endif %}>00:00</option>-->
+<!--                                          </select>-->
+
+<!--                                      </div>-->
+<!--                                      <div class="col-md-2">-->
+<!--                                        <label>Qo'llash</label> <br>-->
+<!--                                        <button class="btn btn-brand " type="submit">-->
+<!--                                          <i class="material-icons md-search"></i>-->
+<!--                                        </button>-->
+<!--                                      </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                            </form>
+
+<!--                            <hr class="my-5">-->
+<!--                            <div class="row" >-->
+<!--                             <h5 class="text-center">Haydovchining daromadi uchun qilgan to'lovlarimiz</h5>-->
+<!--                            <div>-->
+<!--                            </div>-->
+                                <div class="table-responsive">
+                                    <table class="table dataTable" id="dataTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Nomi</th>
+                                            <th>Izoh</th>
+                                            <th>Miqdori</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <tr>
+                                            <td>
+                                                <h6>
+                                                    Sotilgan summasi
+                                                </h6>
+                                            </td>
+                                            <td>Belgilangan sanagacha sotilgan tovar summasi</td>
+                                            <td><h6>[[money_format({{balance.debt}}) ]] so'm</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h6>
+                                                    Haydovchi daromadi
+                                                </h6>
+                                            </td>
+                                            <td>Sotilganlardan haydovchi qilgan daromad(Biz belgilagan)</td>
+                                            <td><h6>[[money_format({{balance.fee}}) ]] so'm</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h6>
+                                                    Haydovchiga to'lov eski panelda
+                                                </h6>
+                                            </td>
+                                            <td>Haydovchi qilgan to'lovlari eski paneldagisi</td>
+                                            <td><h6>[[money_format({{balance.old_pay}}) ]] so'm</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h6>
+                                                    Haydovchiga to'lov yangi kassaga
+                                                </h6>
+                                            </td>
+                                            <td>Haydovchi qilgan to'lovlari kassa paneliga</td>
+                                            <td><h6>[[money_format({{balance.new_pay}}) ]] so'm</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h6>
+                                                    Balans
+                                                </h6>
+                                            </td>
+                                            <td>Hissoblash usuli (Sotilgan tovar - Haydovchi daromadi - (eski panelga to'lov + yangi panelga to'lov))</td>
+                                            <td><h6>[[money_format({{balance.balance}}) ]] so'm</h6></td>
+                                        </tr>
+
+
+
+
+                                        <tr>
+                                            <td>
+                                                <h5>Buyurtmlar holati bo'yicha</h5>
+                                                </td>
+                                            <td colspan="2">
+                                                <span class="badge" style="border:1px solid white">
+                                                    O'chirilgan : {{balance.order_by.deleted}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Mahsulot kurilmoqda : {{balance.order_by.product_waited}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Mahsulot yuborildi : {{balance.order_by.send_product}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Yetkazilmoqda : {{balance.order_by.being_delivered}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Sotildi : {{balance.order_by.delivred}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Bekor qilindi(Mahsulotini boshqa buyurtmaga berilgan) : {{balance.order_by.cancelled_give_product}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Bekor qilindi(Mahsulotini qaytarib olindi) : {{balance.order_by.cancelled_return_product}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Bekor qilindi(Mahsulotlari qo'lida) : {{balance.order_by.cancelled_hand_product}} ta
+                                                </span>
+                                                <span class="badge" style="border:1px solid white">
+                                                    Qayta qo'ng'iroq : {{balance.order_by.call_back}} ta
+                                                </span>
+                                            </td>
+                                        </tr>
+
+
+
+
+<!--                                        {% for p in payment %}-->
+<!--                                            <tr>-->
+<!--                                            <td>-->
+<!--                                                <a href="{% url 'driver_payment_fee_edit' d.id p.id %}" class="btn btn-brand btn-sm"><i class="material-icons md-edit"></i></a>-->
+<!--                                            </td>-->
+<!--                                                <td>-->
+<!--                                                    <h6>{{ p.user.first_name }} {{ p.user.last_name }} <br>-->
+<!--                                                    tel : +{{ p.user.username }}</h6>-->
+<!--                                                </td>-->
+<!--                                                <td>{{ p.amount }} so'm</td>-->
+<!--                                                <td>{{ p.desc }}</td>-->
+<!--                                                <td>{{ p.created_at|date:"d-m-Y" }}</td>-->
+
+<!--                                            </tr>-->
+<!--                                        {% endfor %}-->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                                <!-- col.// -->
+                            </div>
+                            <!-- row.// -->
+                        </section>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+    <script>
+
+
+       new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+            },
+
+        });
+
+
+
+
+        var table = $('#dataTable').DataTable({
+
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

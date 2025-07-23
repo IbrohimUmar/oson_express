@@ -1,0 +1,54 @@
+{% load static %}
+{% load custom_filters %}
+
+<!--    <div class="example_box " style="border:1px solid black;transform: rotate(90deg);">-->
+    <div class="example_box ">
+        <div >
+        <div class="text-center barcode-div" style="margin-bottom:2px;" >
+            <svg id="barcode" class="mt-1"></svg>
+        </div>
+        {% if order.is_there_previous_order %}
+        <span class="d-block coiny-class"
+              style="margin-top:4px;font-size: 8px!important; border:1px solid black; border-radius:10px;" >!Haydovchida bor barcode: {{order.is_there_previous_order.barcode}},  #id : {{order.is_there_previous_order.id}}</span>
+        {% endif %}
+        <div style="border:1px solid black; border-radius:5px;">
+            <table class="w-100 mr-auto m-auto text-center" style="border-style: hidden !important;">
+                <tr>
+                    <th><i class="material-icons md-person barcode-material-icons"></i></th>
+                    <th>
+                        {{order.customer_name|slice:"15" }}{% if order.customer_name|length > 15 %}..{% endif %}
+                        {{order.customer_phone|slice:"21" }}{% if order.customer_name|length > 21 %}..{% endif %}
+                        {% if order.customer_phone2 %}{{order.customer_phone2|slice:"21" }}{% if order.customer_name2|length > 21 %}..{% endif %} {% endif %}
+                    </th>
+                </tr>
+                <tr>
+                    <th><i class="material-icons md-place barcode-material-icons"></i></th>
+                    <th>{{order.customer_region.name }}, {{order.customer_district.name}}, {{order.customer_street }}
+                    </th>
+                </tr>
+            </table>
+        </div>
+
+        <span class="item-line">-------------------------------------------- Mahsulotlar -----------------------------------------------</span>
+        <h6 class="total-price-span text-center">Jami -------------------------------- {{order.total_product_price|format_money}} so'm</h6>
+        {% for p in order.order_products %}
+        {% if p.product_type == "1" %}
+        <span class="product-list-span">{{p.product.name}} {% if p.product_variable.color %}[{{p.product_variable.color.name}}]{% endif %} {% if p.product_variable.measure_item %}[{{p.product_variable.measure_item.name}}]{% endif %} --- <span class="product-list-price-span">{{p.total_quantity}} ta,{{p.total_price|format_money}} uzs</span></span>
+        {% elif p.product_type == "2" %}
+        <span class="product-list-span">{{p.product.name}} --- {{o.total_quantity}} ta, {{p.total_price}}
+                    <br>
+                        {% for item in o.collection_items %}
+                   <span class="badge product-list-collection-item-span">Ozdiruvchi mayka {% if item.product_variable.color %}[{{item.product_variable.color.name}}]{% endif %} {% if item.product_variable.measure_item %}[{{item.product_variable.measure_item.name}}]{% endif %}</span>
+                        {% endfor %}
+                    </span>
+        {% endif %}
+        {% endfor %}
+        <div class="text-center">
+            <h6 class="mt-1 font-coiny" style="font-size:10px !important; color:black;"><i class="material-icons barcode-material-icons md-headset_mic"></i> Operator: +{{order.operator.username}}</h6>
+        </div>
+        
+        <div class="text-center">
+            <h6 class=" font-coiny" style="font-size:10px !important; color:black;"><i class="material-icons barcode-material-icons md-schedule"></i> Sana: {{request.user.today }} #{{order.id}}</h6>
+        </div>
+        </div>
+    </div>

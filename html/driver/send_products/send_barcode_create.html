@@ -1,0 +1,518 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h5 class="content-title">
+                            Haydovchi : {{ d.first_name }} {{ d.last_name }}ga bekor qilindilar o'rniga barcode yuborish</h5>
+                        <div>
+
+                            <a href="{% url 'driver_send_products_list' d.id  %}"
+                               class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+
+
+                            <div style="display:inline !important">
+                                <button v-if="DriverStoreHouseCheck.length >0" class="btn btn-md rounded font-sm hover-up" id="submit_button" type="submit"><i
+                                    class="material-icons md-add_circle mr-2"></i>
+                                Saqlash
+                            </button>
+
+                                <button v-else class="btn btn-md rounded font-sm hover-up"  disabled><i
+                                    class="material-icons md-add_circle mr-2" type="submit"></i>
+                                Saqlash
+                            </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12" >
+                    <div class="card mb-4">
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-11 me-auto mx-auto text-center">
+                                    <h5>Haydovchining otkazdagi buyurtmalari</h5>
+                                    <table class="table dataTable" id="dataTable2">
+                                        <thead>
+                                        <tr>
+                                          <th>Buyurtma_id</th>
+                                            <th>Mahsulotlar</th>
+                                            <th>Mijoz</th>
+                                            <th>Jami soni</th>
+                                            <th>Jami narxi</th>
+                                            <th>Bekor qilingani sababi</th>
+                                            <th>Bekor qilingan sana</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody v-for="o in CanceledPackets" :key="o.id">
+                                        <tr v-if="">
+                                            <td>#[[o.order_id]]
+                                                <br>
+                                                <span class="badge badge-soft-success" v-if="o.is_select==true">[[o.select_order]]# buyurtma uchun tanlandi</span>
+
+
+                                            </td>
+                                            <td>
+                                                <div v-for="a in o.products">
+
+                                                    <span class="badge badge-soft-success" >[[a.product_name]], [[a.amount]] ta</span>
+                                                    <br>
+                                                </div>
+
+                                            </td>
+                                            <td>[[o.customer_name]]
+                                                <br>[[o.customer_phone]]
+                                                <br>[[o.customer_phone2]]
+                                            </td>
+                                            <td>[[o.total_amount]] ta</td>
+                                            <td>[[o.total_price]] so'm</td>
+                                            <td>[[o.driver_note]]</td>
+                                            <td>[[o.updated_at]]</td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="card">
+                        <div class="card-body">
+                               <input type="hidden" name="checked_waited_order" :value="myDataJson" />
+                                        <input type="hidden" name="checked_waited_order_dict" :value="myDataDictJson" />
+
+
+                            <div class="row">
+                                <h3 class="text-center mb-10 mt-30">Mahsulot yuboriladigan buyurtmalarni tanlang</h3>
+                                <div class="table-responsive">
+                                    <table class="table dataTable" id="dataTable">
+                                        <thead>
+                                        <tr>
+
+<!--                                            <th>-->
+<!--                                                                          <input type="checkbox" disabled class="form-check" checked="checked" v-model="selectAll">-->
+
+<!--                                                    Ombordan berish-->
+<!--                                            </th>-->
+                                            <th>
+                                               <input type="checkbox" class="form-check" checked="checked" v-model="select_all">
+
+                                                Otkazdan berish
+
+                                            </th>
+                                            <th>id</th>
+                                            <th>Holati</th>
+                                            <th>Mahsulot lar</th>
+                                            <th>Mijoz</th>
+                                            <th>Tumani</th>
+                                            <th>Yo'l kirasi</th>
+                                            <th>Buyurtma sanasi</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for o in waited_order %}
+                                            <tr style="border: 1px solid rgb(56, 117, 158);">
+<!--                                                <td>-->
+
+<!--                                <input type="checkbox" name="store_select" v-model="MainStoreHouseCheck" v-if="!checkDriverStoreHouseCheck({{ o.id }})" value="{{ o.id }}">-->
+<!--                                                                                                                <span v-else class="material-icons md-cancel badge-soft-danger"></span>-->
+
+<!--                                                    <span class="badge badge-soft-info">Ombordan <br> belgilash</span>-->
+<!--&lt;!&ndash;                                                    <input type="checkbox" name="store_select" :disabled="checkDriverStoreHouseCheck({{ o.id }})" v-model="MainStoreHouseCheck"  value="{{ o.id }}">&ndash;&gt;-->
+<!--                                                    </td>-->
+                                                <td style="border: 1px solid rgb(56, 117, 158);">
+                                                      <!-- <input type="checkbox" name="store_select" :disabled="checkMainStoreHouse({{ o.id }})" v-model="DriverStoreHouseCheck"  value="{{ o.id }}"> -->
+                                                    <!--  <input type="checkbox"  :disabled="checkMainStoreHouse({{ o.id }})" v-model="DriverStoreHouseCheck"  value="{{ o.id }}">-->
+
+                                                    <!--[[checkMainStoreHouse({{ o.id }})]]-->
+
+                                                    <input type="checkbox" v-if="!checkMainStoreHouse({{ o.id }})" v-model="DriverStoreHouseCheck"  value="{{ o.id }}">
+                                                                                <span v-else class="material-icons md-cancel badge-soft-danger"></span>
+
+
+
+                                                    <span class="badge badge-soft-info">Otkazdan <br> belgilash </span>
+<!--                                                     <input type="checkbox" name="driver_select" :disabled="checkMainStoreHouse({{ o.id }})" v-model="DriverStoreHouseCheck"  value="{{ o.id }}">-->
+                                                </td>
+                                                <td>
+                                                    <h6> #{{ o.id }}</h6>
+                                                </td>
+                                                <td><h6>{{ o.get_status_display }}</h6>
+                                                    <span class="badge btn-dark">Kelganiga [[dayCount('{{o.created_at|date:"Y-m-d"}}')]] kun bo'ldi</span>
+                                                </td>
+                                                <td style="white-space:normal !important;">
+                                                     {% for p in o.order_products %}
+                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                            {% endfor %}
+                                                    <div>
+                     <span class="badge btn-dark">Jami soni : {{ o.order_products_total_ordered_amount }} ta</span>
+                     <span class="badge btn-dark">Jami summa : {{ o.order_products_total_price }} so'm</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <p style="padding:0px; margin:0px;">{{ o.customer_name }}</p>
+
+
+
+                                                    <span class="badge btn-dark">{{ o.customer_phone }}</span>
+                                                    {% if o.customer_phone2 %}
+                                                        <span class="badge btn-dark d-block">{{ o.customer_phone2 }}</span>
+                                                    {% endif %}
+                                                </h6></td>
+                                                <td><h6>{{ o.customer_district.name }}</h6></td>
+                                                <td><h6>{{ o.driver_fee }} so'm</h6></td>
+                                                <td><h6>{{ o.order_date|date:"d-m-Y" }}</h6></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+    </section>
+{% endblock %}
+
+{% block header %}
+    <style>
+        /* The container */
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 12px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Hide the browser's default checkbox */
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+
+        }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border-radius: 15%;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .container .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    </style>
+    <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+    <script src="{% static '' %}js/vue.js"></script>
+
+    <script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/dataTables.buttons.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/jszip.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/buttons.html5.min.js"></script>
+    <!-- <script src="{% static '' %}js/datatables/pdfmake.min.js"></script> -->
+    <!-- <script src="{% static '' %}js/datatables/vfs_fonts.js"></script> -->
+    <script>
+
+       const v = new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+
+                SelectedOrderDict:{},
+                MainStoreHouseCheck: [],
+                DriverStoreHouseCheck: [],
+                disabledButton: false,
+                CanceledPackets : {{canceled_packets|safe}},
+                WaitedOrders : {{waited_packets|safe}},
+                checkMainStoreHouseData:'',
+                                select_all: false,
+
+            },
+            methods:{
+                selectAllOrder(){
+                    if (this.select_all){
+                    vm = this
+                                    for (index in this.WaitedOrders){
+                                        if (this.checkMainStoreHouse(this.WaitedOrders[index].order_id) == false){
+                                            this.DriverStoreHouseCheck.push(this.WaitedOrders[index].order_id)
+                                            this.updateProductAmount(1)
+                                        }
+                                    }
+                    }
+                    else{
+                        this.DriverStoreHouseCheck =[]
+                    }
+                },
+
+                updateProductAmount(a) {
+                        let waited_order = this.WaitedOrders.filter(order => this.DriverStoreHouseCheck.some(select => order.order_id == select));
+                        this.CanceledPackets = {{canceled_packets|safe}}
+                        vm = this
+                        this.SelectedOrderDict={}
+                        for(count in waited_order){
+                            var canceled_order =this.CanceledPackets.filter(c => JSON.stringify(c.all_product_id)===JSON.stringify(waited_order[count].all_product_id) && JSON.stringify(c.all_product_amount)===JSON.stringify(waited_order[count].all_product_amount) && c.is_select=='false')
+                            canceled_order[0].is_select=true
+                            canceled_order[0].select_order=waited_order[count].order_id
+                            waited_order[count].select_order=canceled_order[0].order_id
+                            vm.SelectedOrderDict[Number(waited_order[count].order_id)] = Number(canceled_order[0].order_id)
+                    }
+
+
+                    },
+                dayCount(dateStr){
+                      const date = new Date(dateStr);
+                      const today = new Date();
+                      const diffInTime = today.getTime() - date.getTime();
+                      const diffInDays = diffInTime / (1000 * 3600 * 24);
+                      return Math.floor(diffInDays);
+                },
+                checkMainStoreHouse(id){
+                    var waited_order = this.WaitedOrders.filter(w => w.order_id==id)[0]  // check qilinayotgan kutilmoqdani olish
+
+                    //  Ayni mahsulotga ayni miqdord bor bo'lsa false yo'qsa true qaytaradi
+                    if (this.CanceledPackets.length > 0 && Number(this.DriverStoreHouseCheck.filter(m => m == id).length) == 0){
+                        var canceled_order =this.CanceledPackets.filter(c => JSON.stringify(c.all_product_id)===JSON.stringify(waited_order.all_product_id) && JSON.stringify(c.all_product_amount)===JSON.stringify(waited_order.all_product_amount) && c.is_select=='false')
+                        if (canceled_order.length > 0){
+                            return false
+                        }else{
+                            return true
+                        }
+                    }
+                    return false
+                },
+                checkDriverStoreHouseCheck(id){
+                    var order_pro = this.WaitedOrders.filter(w => w.order_id==id)[0].products
+                    if (this.DriverStoreHouseCheck.filter(m => m == id).length > 0){
+                        // agar yonidagi select check bo'lsa blok qiladi
+                        return true
+                    }
+
+                    return false
+                },
+            },
+
+            computed: {
+                    myDataJson() {
+                      return JSON.stringify(this.DriverStoreHouseCheck);
+                    },
+                    myDataDictJson() {
+                      return JSON.stringify(this.SelectedOrderDict);
+                    },
+              selectAll: {
+                        get: function (){ return false},
+                        set: function (value) {
+                            if (value) {
+                                var mulist = []
+                                for (index in this.WaitedOrders){
+                                    if (this.checkDriverStoreHouseCheck(this.WaitedOrders[index].order_id) == false){
+                                        mulist.push(this.WaitedOrders[index].order_id)
+                                    }
+                                }
+                                this.MainStoreHouseCheck=mulist
+                            }
+                        }
+                    },
+                    UpdateProductAmounts:function(){
+                        var vm = this
+                    if (vm.MainStoreHouseCheck){
+                        products = this.WaitedOrders.filter(o => this.MainStoreHouseCheck.some(d => o.order_id == d))
+                        for (p in products){
+                        var ordered_products = products[p].products
+                        for (a in ordered_products){
+                            var product=this.Products.filter(p => p.id == ordered_products[a].product_id)[0]
+                            product.amount-=ordered_products[a].ordered_amount
+                            product.select+=ordered_products[a].ordered_amount
+
+                        }
+                    }
+                    }
+
+                    if (vm.DriverStoreHouseCheck){
+                        let waited_order = this.WaitedOrders.filter(order => this.DriverStoreHouseCheck.some(select => order.order_id == select));
+                        this.CanceledPackets = {{canceled_packets|safe}}
+                        vm = this
+                        this.SelectedOrderDict={}
+                        for(count in waited_order){
+                            var canceled_order =this.CanceledPackets.filter(c => JSON.stringify(c.all_product_id)===JSON.stringify(waited_order[count].all_product_id) && JSON.stringify(c.all_product_amount)===JSON.stringify(waited_order[count].all_product_amount) && c.is_select=='false')
+                            canceled_order[0].is_select=true
+                            canceled_order[0].select_order=waited_order[count].order_id
+                            waited_order[count].select_order=canceled_order[0].order_id
+                           // vm.SelectedOrderDict.push({canceled_order[0].order_id:1})
+                            //vm.SelectedOrderDict.push({[waited_order[count].order_id]: canceled_order[0].order_id})
+                            vm.SelectedOrderDict[Number(waited_order[count].order_id)] = Number(canceled_order[0].order_id)
+
+                            //vm.SelectedOrderDict.push({waited_order[count].order_id:canceled_order[0].order_id})
+                        }
+                    }
+                    }
+            },
+            watch : {
+                DriverStoreHouseCheck: function(){
+                    this.updateProductAmount(1)
+
+                },
+                select_all : function(){
+                    this.selectAllOrder()
+                },
+
+             },
+
+        });
+               var table2 = $('#dataTable2').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}
+
+

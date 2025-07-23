@@ -1,0 +1,188 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <div>
+            <h3>Statistika</h3>
+
+        </div>
+    </div>
+
+
+
+
+        <div class="row">
+            <div class="col-6">
+                <a href="{% url 'seller_app_statistic_order' %}">
+                <div class="card"
+                     {% if u == "seller_app_statistic_order" %}
+                        style="border:0.5px solid #ffffff7d;cursor:pointer; background-color:#358565a3;"
+                    {% else %}
+                     style="border:0.5px solid #ffffff7d; cursor:pointer; background-color:#222736;"
+                    {% endif %}>
+                    <div class="card-body text-center">
+                        <i class="material-icons  md-equalizer " style="font-size:50px;"></i>
+                        <h6>Buyurtma bo'yicha</h6>
+                    </div>
+                </div>
+                </a>
+            </div>
+            <div class="col-6">
+                <a href="{% url 'seller_app_statistic_stream' %}">
+                <div class="card" {% if u == "seller_app_statistic_stream" %}
+                        style="border:0.5px solid #ffffff7d;cursor:pointer; background-color:#358565a3;"
+                    {% else %}
+                     style="border:0.5px solid #ffffff7d; cursor:pointer; background-color:#222736;"
+                    {% endif %}
+                >
+                    <div class="card-body text-center">
+                        <i class="material-icons  md-show_chart" style="font-size:50px;"></i>
+                        <h6>Oqim bo'yicha</h6>
+                    </div>
+                </div>
+             </a>
+            </div>
+        </div>
+
+    <div class="card mb-4">
+        <header class="card-header">
+            <!--                <h5 class="card-title">Qidiruv</h5>-->
+            <div class="align-items-center">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h6>Qidiruv</h6>
+                            <input type="text" class="form-control" placeholder="oqim nomi bo'yicha qidiruv" name="filter" {% if quary %}value="{{ quary }}" {% endif %}>
+                        </div>
+
+                        <div class="col-md-2">
+                            <h6>Qo'llash</h6>
+                            <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                            </button>
+                            {% if  request.GET.status or request.GET.site or request.GET.filter %}
+                            <a href="{% url 'seller_app_statistic_stream' %}" class="btn btn-danger"
+                               type="submit"><i class="material-icons md-search_off"></i></a>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </header>
+
+        <div class="card-body">
+        <h6 class="text-muted">Soni : {{count}} ta</h6>
+
+            <div style="overflow-x:auto !important;">
+                <table class="table" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Nomi</th>
+                            <th>Mahsulot tayyorlanmoqda</th>
+                            <th>Mahsulot yuborildi</th>
+                            <th>Yetkazilmoqda</th>
+                            <th>Sotildi</th>
+                            <th>Bekor qilindi</th>
+                            <th>Qayta qo'ng'iroq</th>
+                            <th>Mahsulot belgilandi</th>
+                            <th>Qadoqlanmoqda</th>
+                            <th>Yangi</th>
+                            <th>Arxivlanmoqda</th>
+                            <th>Arxivlandi</th>
+                            <th>Double</th>
+                            <th>Jami</th>
+
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for stream in page_streams %}
+                    <tr>
+                        <td>
+                            <h6>
+                                {{stream.name}}
+                            </h6>
+                        </td>
+                        <td>{{ stream.status_1 }}</td>
+                        <td>{{ stream.status_2 }}</td>
+                        <td>{{ stream.status_3 }}</td>
+                        <td>{{ stream.status_4 }}</td>
+                        <td>{{ stream.status_5 }}</td>
+                        <td>{{ stream.status_6 }}</td>
+                        <td>{{ stream.status_7 }}</td>
+                        <td>{{ stream.status_8 }}</td>
+                        <td>{{ stream.status_9 }}</td>
+                        <td>{{ stream.status_10 }}</td>
+                        <td>{{ stream.status_11 }}</td>
+                        <td>{{ stream.status_12 }}</td>
+                        <td>{{ stream.total_orders }}</td>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row ">
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+<style>
+    .dtsp-name h6 {
+        color: black !important;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        white-space: nowrap
+    }
+
+    td {
+        white-space: nowrap
+    }
+</style>
+{% endblock %}
+
+

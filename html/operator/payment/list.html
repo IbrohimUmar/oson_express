@@ -1,0 +1,163 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Operator {{operator.first_name}} {{operator.last_name}}ga qilingan to'lovlar</h4>
+        <div>
+            <a href="{% url 'operator_list' %}" class="btn btn-brand">Qaytish</a>
+            <a href="{% url 'operator_payment_create' operator.id %}" class="btn btn-brand"><i class="material-icons md-add"></i> Yana to'lov qilish</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <div class="row">
+
+                    <div class="col-md-3 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Balansi : {{ operator.operator_data.balance }} so'm</h6>
+                            <small class="text-muted d-block ">Kiritgan buyurtmalarining sotilganlaridan  yig'gan daromadi</small>
+                        </article>
+                    </div>
+                    <div class="col-md-3 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Jami to'landi : {{ operator.operator_data.total_payment }} so'm</h6>
+                            <small class="text-muted d-block ">Shu kungacha to'langan summa</small>
+                        </article>
+                    </div>
+                    <div class="col-md-3 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Bu oy to'landi : {{ operator.operator_data.this_month_payment }} so'm</h6>
+                            <small class="text-muted d-block ">Shu operatorga Bu oy to'langan summa</small>
+                        </article>
+                    </div>
+                    <div class="col-md-3 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                O'tgan oy to'landi : {{ operator.operator_data.one_month_ago_payment }} so'm</h6>
+                            <small class="text-muted d-block ">Shu operatorga o'tgan oy to'langan summa</small>
+                        </article>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kim to'ladi</th>
+                        <th>To'lov miqdori</th>
+                        <th>Izoh</th>
+                        <th>Sana</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for c in payment_cash %}
+                    <tr>
+                        <td>
+                            #
+                        </td>
+                        <td>{{c.from_user.first_name}} {{c.from_user.last_name}}
+                            <br> {{c.from_user.username}}
+                        </td>
+                        <td>
+                            {{c.amount}}
+                        </td>
+                        <td>
+                            {{c.desc}}
+                        </td>
+                        <td>
+                            {{c.created_at}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+
+
+
+
+                    {% for p in payment %}
+                    <tr>
+                        <td>
+                            <a class="btn btn-brand" href="{% url 'operator_payment_edit' operator.id p.id  %}"><i class="material-icons md-edit"></i></a>
+
+                        </td>
+                        <td>
+
+                            #
+                        </td>
+                        <td>
+                            {{p.amount}}
+                        </td>
+                        <td>
+                            {{p.desc}}
+                        </td>
+                        <td>
+                            {{p.created_at}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+{% endblock %}

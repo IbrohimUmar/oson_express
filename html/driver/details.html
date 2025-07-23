@@ -1,0 +1,61 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchi : {{ d.first_name }} {{ d.last_name }}
+{% endblock %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+            {% include "driver/top_button.html" %}
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+
+                        </nav>
+                    </aside>
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+                            <div class="row">
+                                <aside class="col-lg-6">
+                                    <figure class="text-lg-center">
+                                        <figcaption>
+                                            <h6 class="mt-2">Fio : {{ d.first_name }} {{ d.last_name }}</h6>
+                                            <h6 class="mt-2">Tel : +{{ d.username }}</h6>
+                                            <h6 class="mt-2">Viloyati : {{ d.region.name }}</h6>
+                                            <h6 class="mt-2">Tumani : {{ d.district.name }}</h6>
+                                            <h6 class="mt-2">Ilk tashrifi : {{ d.date_joined|date }}</h6>
+                                            <h6 class="mt-2">Xolati :
+                                                {% if d.is_active == True %}
+                                                    <span class="badge badge-soft-success">Aktiv</span>
+                                                {% else %}
+                                                    <span class="badge badge-soft-danger">Aktiv emas</span>
+                                                {% endif %}
+                                            </h6>
+                                            {% if perms.admin.driver_edit %}
+                                         <a class="btn btn-light rounded font-md mt-10"
+                                               href="{% url 'driver_edit' d.id %}"><i
+                                                    class="icons material-icons md-edit font-md mr-5"></i>
+                                                O'zgartirish </a>
+                                            {% endif %}
+                                        </figcaption>
+                                    </figure>
+                                </aside>
+                            </div>
+                            <!-- row.// -->
+                        </section>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+{% endblock %}

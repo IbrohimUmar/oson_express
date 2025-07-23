@@ -1,0 +1,161 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Katta balans</h2>
+        <div>
+<!--            <a href="{% url 'driver_list' %}" class="btn btn-brand btn-sm"> Qaytish</a>-->
+        </div>
+    </div>
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Nomlanishi</th>
+                        <th>Izoh</th>
+                        <th>Miqdori</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr style="background-color:rgb(0 92 255 / 12%)">
+                        <td><h6>Jami haydovchilar qo'lidagi bekor qilinganlar summasi</h6></td>
+                        <td>Haydovchilar qo'lidagi bekor qilingan buyurtmalar mahsulotlari kirim narxda xissoblandi</td>
+                        <td><h6>[[money_format({{total_driver_cancelled_order_product_input_price}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(0 92 255 / 12%)">
+                        <td><h6>Jami haydovchilar qo'lidagi yetkazilmoqdalar summasi</h6></td>
+                        <td>Haydovchilar qo'lidagi yetkazilmoqda va qayta qo'ng'iroqdagi mahsultolar sotuv narxda xissoblandi</td>
+                        <td><h6>[[money_format({{total_driver_delivery_product_selling_price}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(110 255 0 / 12%);">
+                        <td><h6>Jami haydovchilar qarzi</h6></td>
+                        <td>Haydovchilar sotgan buyurtmalardan bo'lgan qarzi yo'l kira uchun to'lanadigan summa minus qilingan</td>
+                        <td><h6>[[money_format({{total_driver_debt}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(110 255 0 / 12%);">
+                        <td><h6>Jami haydovchilar qo'lidagi mahsulotlar summasi</h6></td>
+                        <td>Haydovchilar qo'lidagi mahsulotlar kirim narxda xissoblandi</td>
+                        <td><h6>[[money_format({{total_driver_hand_product_input_price}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(110 255 0 / 12%);">
+                        <td><h6>Ombor v2 dagi mahsulotlar summasi</h6></td>
+                        <td>Xitoy va elituvchi ombordagi mahsulotlar kirim narxida jami summasi</td>
+                        <td><h6>[[money_format({{total_warehouse_product_price_input}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(110 255 0 / 12%);">
+                        <td><h6>Tranzitdagi mahsulotlar summasi</h6></td>
+                        <td>( Ombordan omborga tranzit yoki haydovchilarga chiqim) hali tasdiqlanmaganlari summasi</td>
+                        <td><h6>[[money_format({{total_transit_product_price_input}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:rgb(110 255 0 / 12%);">
+                        <td><h6>Hamma kassalardagi jami summa</h6></td>
+                        <td>Hamma kassalar balansini tortildi</td>
+                        <td><h6>[[money_format({{total_cash_balances_amount}})]] uzs</h6></td>
+                    </tr>
+                    <tr style="background-color:#d8160040">
+                        <td><h6>Xodimlardan qarzdorlik</h6></td>
+                        <td> Xozircha faqat operatorlar balansi hissoblanmoqda</td>
+                        <td><h6>[[money_format({{employee_services}})]] uzs</h6></td>
+                    </tr>
+<!--                    <tr style="background-color:#d8160040">-->
+<!--                        <td><h6>Adminlardan qarzmiz</h6></td>-->
+<!--                        <td>Mahsulot va airshop adminlar balansi <span class="badge" style="border:1px solid white;">Bajarilmoqda : [[money_format({{site_services.in_progress_balance}})]]</span> <span class="badge" style="border:1px solid white;">Adminlar balansida : [[money_format({{site_services.balance}})]]</span></td>-->
+<!--                        <td><h6>[[money_format({{site_services.total}})]] uzs</h6></td>-->
+<!--                    </tr>-->
+                    <tr style="background-color:#d8160040">
+                        <td><h6>Ta'minotchilardan qarzmiz</h6></td>
+                        <td>Jami ta'minotchilardan qarzimiz (omborlarga kirim bo'lgan tovarlardan va ta'minotchi ostatka summasi qo'shib shakillantirildi)</td>
+                        <td><h6>[[money_format({{total_supplier_debt}})]] uzs</h6></td>
+                    </tr>
+                    <tr >
+                        <td><h6>Katta balans</h6></td>
+                        <td>Quyidagicha hissoblandi (Omborlardagi tovar kirim summasi + haydovchilar qo'lidagi tovarlari +
+                            haydovchilar qarzi + kassalar balansi  - ta'minotchidan qarzimiz)</td>
+                        <td><h6>[[money_format({{big_balance}})]] uzs</h6></td>
+                    </tr>
+
+
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+
+
+<script>
+
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+            },
+
+        });
+
+
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [{
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

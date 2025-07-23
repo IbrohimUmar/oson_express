@@ -1,0 +1,89 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Statistika</h2>
+
+            </div>
+            <div>
+                {% if request.user.is_superuser%}
+                <a href="{% url 'admin_pay' %}" class="btn btn-primary">Admin to'lovi bo'yicha</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="text-center">Saytlar bo'yicha kelgan buyurtmalarning mahsulot soni bo'yicha</h4>
+                <div style="overflow-x:auto;">
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>Sayt</th>
+                            <th>Statistika</th>
+                            <th>Jami daromadi</th>
+                            <th>Shu oyda daromadi</th>
+                            <th>O'tgan oy daromadi</th>
+                                                        <th>Jami haydovchilar daromadi</th>
+                                                        <th>Jami sotilgan tovar tan narxi</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in site_statistic %}
+{#                           {% if perms.admin.accountant %}#}
+                            <tr>
+                                <td><h5>{{ i.site }}</h5></td>
+                                <td  style="overflow-x:auto;">
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Qabul qilindi : {{ i.accepted }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Yetkazilmoqda : {{ i.being_delivered }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Sotildi : {{ i.delivered }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Bekor qilindi : {{ i.canceled }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Qayta qo'ng'iroq : {{ i.call_back }} ta</span>
+                                    <span class="btn btn-outline-success mr-2 btn-sm">Mahsulot kutilmoqda : {{ i.wait }} ta</span>
+                                </td>
+                                <td>{{ i.total_fee }} so'm</td>
+                                <td>{{ i.this_month }} so'm</td>
+                                <td>{{ i.one_month_ago }} so'm</td>
+                                                                <td>{{ i.total_driver_fee }} so'm</td>
+                                <td>{{ i.total_product_in_price }} so'm</td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+        <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}

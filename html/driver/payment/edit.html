@@ -1,0 +1,111 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
+{% endblock %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+
+            {% include "driver/top_button.html" %}
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+                        </nav>
+                    </aside>
+
+
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="row gx-3">
+                                        <div class="col-md-12">
+                                            <h5 class="text-center">Haydovchi balansi</h5>
+                                        </div>
+                                        <div class="col-md-4 mt-10 mb-2">
+
+                                            <article class="box bg-light">
+                                                <h6>To'lashi kerak : {{ d.balance }} so'm</h6>
+                                                <small class="text-muted d-block ">Hozirza balansi</small>
+                                            </article>
+                                        </div>
+
+                                        <div class="col-md-4 mt-10 mb-2">
+
+                                            <article class="box  bg-light">
+                                                <h6>Bu oy to'ladi : {{ d.total_payment_this_mont }} so'm</h6>
+                                                <small class="text-muted d-block ">Bu oy to'lagan pullari</small>
+                                            </article>
+                                        </div>
+                                        <div class="col-md-4 mt-10 mb-2">
+
+                                            <article class="box  bg-light">
+                                                <h6>Jami to'ladi : {{ d.total_payment }} so'm</h6>
+                                                <small class="text-muted d-block ">Jami to'lagan pul miqdori</small>
+                                            </article>
+                                        </div>
+                                    </div>
+                                    <!-- row.// -->
+                                </div>
+                                <!-- col.// -->
+                                <!-- col.// -->
+                            </div>
+                            <hr class="my-5">
+                            <div class="row" >
+
+                             <h5 class="text-center">Haydovchiga yangi to'lov qo'shish</h5>
+
+                            <div>
+
+                                <a href="{% url 'driver_payment_list' d.id %}" class="btn btn-success btn-sm"><i class="material-icons md-arrow_left"></i>Qaytish</a>
+                                <br>
+                            </div>
+                            <form method="post" onsubmit="document.getElementById('submit').disabled=true">
+                                {% csrf_token %}
+                                        <div class="row mt-10">
+                                            <div class="col-lg-12">
+                                                <div class="row gx-3">
+                                                    <div class="col-6 mb-3">
+                                                        <label class="form-label">To'lov miqdori</label>
+                                                        <input class="form-control" value="{{ pay.amount }}" type="text" required name="amount" placeholder="Haydovchining to'lov miqdori">
+                                                    </div>
+                                                    <!-- col .// -->
+                                                    <div class="col-6 mb-3">
+                                                        <label class="form-label">Izoh</label>
+                                                        <input class="form-control" type="text" value="{{ pay.desc }}" name="desc" placeholder="Izoh">
+                                                    </div>
+                                                    <!-- col .// -->
+                                                </div>
+                                                <!-- row.// -->
+                                            </div>
+                                        </div>
+                                        <!-- row.// -->
+                                        <button class="btn btn-primary" type="submit" id="submit">Saqlash</button>
+                                    </form>
+
+
+                                <!-- col.// -->
+                            </div>
+                            <!-- row.// -->
+                        </section>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+
+
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Haydovchi : {{ d.first_name }} {{ d.last_name }}ga yuborilgan mahsulotlar
+{% endblock %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}ga yuborilgan mahsulotlar
+            </h2>
+
+            {% include "driver/top_button.html" %}
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aaside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+
+                        </nav>
+                    </aaside>
+
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+
+                            <div class="row">
+                                <h5 class="text-center">Haydovchiga yuborilgan mahsulotlar</h5>
+
+                                <!--<div>-->
+                                <!--               <a href="{% url 'set_products_driver_region' d.id %}"-->
+                                <!--       class="btn btn-success btn-sm"><i class="material-icons md-add"></i>Yana mahsulot-->
+                                <!--        yuborish</a>-->
+                                        
+                                <!--    <a href="{% url 'driver_send_barcode_create' d.id %}"-->
+                                <!--       class="btn btn-success btn-sm"><i class="material-icons md-add"></i>Atkazi o'rniga mahsulot-->
+                                <!--        yuborish</a>-->
+                                <!--</div>-->
+
+                                <div style="overflow-x:auto;" class="mt-5">
+
+  <header class="card-header" style="border:1px solid white; border-radius:5px; padding:10px;">
+            <div class="row align-items-center" >
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3" >
+                    <h6 class="text-center">Filterlash</h6>
+                    <form method="get" >
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Dan :</label>
+                                <input type="date" class="form-control" id="from" {% if request.GET.from_date %} value="{{request.GET.from_date}}"{% endif %} name="from_date">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Gacha :</label>
+                                <input type="date" class="form-control" id="to" {% if request.GET.to_date %} value="{{request.GET.to_date}}"{% endif %} name="to_date">
+                            </div>
+
+                            <div class="col-md-5">
+                                <label>Qadoqlovchi bo'yicha : </label>
+                                <select class="form-control" id="site" name="storekeeper">
+                                    <option value="0">Hammasi</option>
+                                    {% for s in storekeepers %}
+<!--                                    <option value="{{r.id}}" {% if request.GET.region == r.id %}selected{% endif %}>-->
+                                    <option value="{{s.id}}" {% if request.GET.storekeeper|add:'0' == s.id %}selected{% endif %}>
+                                        {{s.first_name}} {{s.last_name}} {{s.username}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.storekeeper or request.GET.from or request.GET.to  %}
+                                 <a class="btn btn-danger" href="{{request.path}}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>
+                                {% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+                                        <table  class="table dataTable" id="dataTable">
+                                            <thead>
+                                            <tr style="border-bottom:1px solid;">
+                                                <th>Yuborilgan sana</th>
+                                                <th>Ma'sul omborchi</th>
+                                                <th>Mahsulot</th>
+                                                <th>Buyurtmalar</th>
+                                                <th>Chop etish</th>
+                                                <th>#</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for l in page_obj %}
+                                            <tr>
+                                                <td>{{l.created_at|date}}</td>
+                                                <td>
+                                                    {% if l.storekeeper %}
+                                                    {{l.storekeeper.first_name}} {{l.storekeeper.last_name }}
+                                                    {% else %}
+                                                    Tanlanmadi
+                                                    {% endif %}
+                                                </td>
+                                                <td><a href="{% url 'send_product_details_products' d.id l.id %}" target="_blank" class="btn btn-brand  btn-sm"><i class="material-icons md-edit"></i> Mahsulotlar soni: {{l.amount}} ta</a></td>
+                                                <td>
+                                                    <a href="{% url 'order_give_products' d.id l.id %}" target="_blank" class="btn btn-brand  btn-sm">Buyurtmalar soni: {{l.orders_count}} ta</a>
+                                                </td>
+                                                   <td>
+                                                  <a href="{% url 'order_give_products_print' d.id l.id %}" target="_blank" class="btn btn-brand btn-sm">
+                                                      <i class="material-icons md-print"></i> Chop etish</a>
+
+                                                </td>
+                                                <td>
+                                                    
+                                                            {% if l.is_shipping == False %}
+                                                                <a class=" btn  btn-danger btn-sm" onclick="
+                                                    Swal.fire({
+                                                      title: 'Siz rostdanham o\'chirmoqchimisiz?',
+                                                      showDenyButton: true,
+                                                      showCancelButton: false,
+                                                      confirmButtonText: 'Xa',
+                                                      denyButtonText: `Qaytish`,
+                                                    }).then((result) => {
+                                                      /* Read more about isConfirmed, isDenied below */
+                                                      if (result.isConfirmed) {
+                                                           window.open('{% url 'send_product_delete' l.id d.id %}', '_self');
+                                                      }
+                                                    })" type="button">
+    
+                                                                    <i class="material-icons md-delete"></i></a>
+
+
+                                                        <form method="post" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{l.id}}" name="out_id">
+                                                            <button
+
+                                                                    onclick="
+                                                    Swal.fire({
+                                                      title: 'Siz yetib bordiga o\'zgartirmoqchimisiz?',
+                                                      showDenyButton: true,
+                                                      showCancelButton: false,
+                                                      confirmButtonText: 'Xa',
+                                                      denyButtonText: `Qaytish`,
+                                                    }).then((result) => {
+                                                      /* Read more about isConfirmed, isDenied below */
+                                                      if (result.isConfirmed) {
+                                                           form.submit()
+                                                      }
+                                                    })"
+                                                                    class="btn btn-sm btn-success" type="button"><i class="material-icons md-check"></i> </button>
+<!--                                                            <a href="{% url 'order_give_products' id=d.id output_id=l.id %}"  class="btn btn-sm btn-success"> <i class="material-icons md-check"></i> </a>-->
+                                                        </form>
+                                                                {% else %}
+
+                                                                Jo'natmalar yetib borgan
+                                                                {% endif %}
+
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    
+                                </div>
+
+
+
+                                            <div class="row mt-20">
+                <h5>Jami yuborilgan partiya soni : {{ count }} ta</h5> <br>
+
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <h5>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h5>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1" class="btn btn-primary btn-round btn-sm"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}"
+                                                               class="btn btn-primary btn-round btn-sm"><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}"
+                                                               class="btn btn-primary btn-round btn-sm">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                                                               class="btn btn-primary btn-round btn-sm">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+            </div>
+
+
+                                <!-- col.// -->
+                            </div>
+                            <!-- row.// -->
+                        </section>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        <!-- card end// -->
+    </section>
+
+
+{% endblock %}
+{% block header %}
+    <style>
+            .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+
+    #dataTable tr:nth-child(odd){background:#3c4252}
+{##dataTable tr:nth-child(even){background:blue}#}
+    </style>
+{% endblock %}

@@ -1,0 +1,96 @@
+
+ .text-de-active{
+    color:#cbcdd1a6 !important;
+    },
+
+
+        .button-lift {
+            position: relative;
+            top: 0;
+            transition: top ease 0.1s;
+        }
+
+        .button-lift:hover {
+            top: -3px;
+        }
+
+
+        .button-mini-lift {
+            position: relative;
+            top: 0;
+            transition: top ease 0.1s;
+        }
+
+        .button-mini-lift:hover {
+            top: -1px;
+        }
+
+        @media screen and (max-width: 11992px) {
+            .hidden-navbar-top {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .hidden-index-menu {
+                display: none;
+            }
+        }
+
+
+        .header_navbar_collapse_nav {
+            display: none;
+        }
+
+        @media screen and (max-width: 111992px) {
+            .header_navbar_collapse {
+                position: fixed;
+                width: 100%;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(550, 550, 550, 0.91);
+                border-top: .0625rem solid rgba(111, 81, 102, 0.15);
+                margin-bottom: 0;
+                z-index: 100;
+                backdrop-filter: blur(10px);
+            }
+
+            .header_navbar_collapse_nav {
+                justify-content: space-around;
+            }
+
+            .header_navbar_collapse_nav {
+                display: flex;
+                flex-direction: row;
+                padding-left: 0;
+                margin-bottom: 0;
+                list-style: none;
+            }
+
+            .header_navbar_collapse_nav_item {
+                padding: 0 .3125rem;
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .container {
+                padding: 0;
+            }
+
+            .container-fluid {
+                padding: 0;
+            }
+        }
+    #btn-back-to-top {
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        display: none;
+        z-index: 100;
+    }
+.swal2-title {
+            color: black !important;
+            font-size: 1.4rem !important;
+        }

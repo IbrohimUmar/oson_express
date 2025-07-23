@@ -1,0 +1,79 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main">
+
+
+        <div class="card " style="border:1px solid white;">
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col">
+
+
+                        <td width="40%">
+                                            <a href="#" class="itemside">
+                                                <div class="left">
+
+                                                    <img src="{% static 'imgs/theme/fav.svg' %}" class="img-sm img-avatar" alt="Userpic">
+                                                </div>
+                                                <div class="info pl-3">
+                                                    <h6 class="mb-0 title">{{ user.first_name }} {{ user.last_name }}</h6>
+<!--                                                    <small class="text-muted badge" style="border:1px solid #ffffff63;">ID: #{{user.operator_id}}</small>-->
+                                                    <small class="text-muted badge" style="border:1px solid #ffffff63;">Tel: +{{user.username}}</small>
+                                                    <br>
+                                                    <div>
+
+                                                        <span class="span btn-sm rounded font-sm mt-5 pl-6" style="background-color:#3bb77e7a; padding:2px 9px;"> <i class="material-icons md-edit"></i> O'zgartirish</span>
+                                                    </div>
+
+                                                </div>
+                                            </a>
+                                        </td>
+
+                                        </div>
+                    <hr style="margin-top:10px;">
+                    <div>
+                        <nav>
+                            <ul class="menu-aside">
+                                <li style="border:1px solid #ffffff63;border-radius:14px;" class="menu-item">
+                                    <a style="border-radius:14px;" class="menu-link"  href="{% url 'driver_app_order_main' %}">
+                                        <i class="icon fa-solid fa-file-invoice"></i>
+                                        <span class="text">Buyurtmalar</span>
+                                    </a>
+                                </li>
+
+                                <li style="border:1px solid #ffffff63;border-radius:14px;" class="menu-item">
+                                    <a class="menu-link" style="border-radius:14px;" href="{% url 'driver_app_warehouse_operation_list' %}">
+                                        <i class="icon fa-solid fa-warehouse"></i>
+                                        <span class="text">Amaliyotlar</span>
+                                    </a>
+                                </li>
+
+                                <li style="border:1px solid #ffffff63;border-radius:14px;" class="menu-item">
+                                    <a class="menu-link" style="border-radius:14px;" href="{% url 'driver_app_report_balance_history' %}">
+                                        <i class="icon fa-solid fa-history"></i>
+                                        <span class="text">Balans tarihi</span>
+                                    </a>
+                                </li>
+
+
+
+                            </ul>
+                        </nav>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" data-mutate-approach="sync"></script>
+{% endblock %}

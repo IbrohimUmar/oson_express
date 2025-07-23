@@ -1,0 +1,1125 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main mb-20" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Buyurtmani o'zgatirish</h4>
+            </div>
+            <div>
+                <a class="btn btn-brand" href="{% url 'orders_list_all' %}"> Qaytish</a>
+            </div>
+        </div>
+        <div class="card" >
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 col-md-4 mb-lg-0 ">
+         <span class="text-sm">Masul operator</span>
+                        <h6>
+                           <input type="text" class="form-control" readonly name="operator_username" value="{{order.operator.first_name}} {{order.operator.last_name}}, +{{order.operator.username}}">
+                        </h6>
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <input type="hidden" name="order_id" value="{{order.id}}">
+                        <input type="hidden" name="district" :value="selected_district">
+
+                    </div>
+                </div>
+            </header>
+            <!-- card-header end// -->
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-5">
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                            <div class="text">
+                                <h6 class="mb-1">Mijoz</h6>
+                                <p class="mb-1">
+                                    Mijoz haqida ma'lumot kiriting
+                                </p>
+                            </div>
+                        </article>
+                        <hr>
+
+                        <h6><i class="fas fa-user "></i>  Mijoz ismi (Majburiy)</h6>
+                        <input type="text" value="{{order.customer_name}}" name="customer_name" placeholder="ismi va familiyasi" required
+                               class="form-control">
+
+                        <h6 class="mt-3"><i class="fas fa-phone"></i> Mijoz telefon raqami (Majburiy)</h6>
+                        <div>
+                        <input type="text" style="width:87%;display:inline;" readonly required value="{{order.customer_phone}}" class="form-control" name="customer_phone" placeholder="Telefon raqami">
+                            <a href="tel: {{order.customer_phone}} " style="padding:11px" class="btn btn-sm btn-brand"><i class="fas fa-phone"></i></a>
+                        </div>
+
+                        <h6 class="mt-3"><i class="fas fa-phone"></i> Mijoz
+                            telefon raqami 2 (Ixtiyoriy)</h6>
+
+                        {% if order.customer_phone2 %}
+                        <input type="number" value="{{order.customer_phone2}}"  class="form-control" name="customer_phone2" placeholder="+998">
+                        {% else %}
+                        <input type="number"  class="form-control" name="customer_phone2" placeholder="+998">
+                        {% endif %}
+
+                        <h6 class="mt-3"><i class="fas fa-calendar"></i> Mijozga yetkazish sanasi (Ixtiyoriy)</h6>
+
+
+
+
+                        {% if order.delivered_date is not None %}
+                            <input type="date" required name="delivered_date" value='{{order.delivered_date|date:"Y-m-d"}}' class="form-control">
+                        {% else %}
+                            <input type="date" required name="delivered_date" value="{{default_delivered_date|date:"Y-m-d"}}" class="form-control">
+                        {% endif %}
+
+
+                        <h6 class="mt-3"><i class="fas fa-history"></i> Mijoz tarihi</h6>
+                        <span class="badge mt-1" style="border:1px solid white">Jami buyurma qilgan : {{client_phone_history.total}} ta</span>
+                        <span class="badge mt-1" style="border:1px solid white">Sotilgan : {{client_phone_history.total_delivered}} ta</span>
+                        <span class="badge mt-1" style="border:1px solid white">Yetkazilmoqda : {{client_phone_history.total_being_delivered}} ta</span>
+                        <span class="badge mt-1" style="border:1px solid white">Qabul qilingan : {{client_phone_history.total_accepted}} ta</span>
+
+                        <hr>
+ <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-place"></i>
+                                    </span>
+                            <div class="text">
+                                <h6 class="mb-1">Manzil</h6>
+                                <p class="mb-1">
+                                    Mijoz manzili<br>
+                                </p>
+                            </div>
+                        </article>
+                        <hr>
+                        <div>
+                            <h6>Viloyat tanlang</h6>
+                            <h4>
+                                <select style="font-weight:600; font-size:15px;" class="form-control" v-model="selected_region" required name="region">
+                                    <option v-for="r in region_list" :value="r.id">[[ r.name ]]</option>
+                                </select>
+                            </h4>
+
+                            <h6 class="mt-2">Tumanini tanlang </h6>
+                            <multiselect v-model="selected_district_select2"  :options="filteredDistrictList" key="id" @input="onSelectDistrict" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                                <span slot="noResult">Topilmadi!</span>
+                            </multiselect>
+                            <hr>
+                            <h6>Ko'cha uy, mo'ljal</h6>
+                            <textarea rows="1" required class="form-control"
+                                      placeholder="Ko'cha uy, mo'ljal, qo'shimcha ma'limot"
+                                      name="street">{% if order %}{{order.customer_street}}{% endif %}</textarea>
+                            <hr>
+                                <h6>Qo'shimcha ma'lumot (Ixtiyoriy)</h6>
+                                <textarea rows="1" class="form-control"
+                                          placeholder="Qo'shimcha ma'lumot (masalan soat 9 gacha yetkazish kerak ishga ketib qoladi)"
+                                          name="operator_note">{% if order and order.operator_note %}{{ order.operator_note }}{% endif %}</textarea>
+
+                        </div>
+                        <hr>
+                    </div>
+                    <div class="col-md-7">
+                        <div>
+                            <h6 class="text-center">
+                                Belgilangan mahsulotlar
+                            </h6>
+                   <div v-for="(p,index) in selected_products_json" :key="index">
+                            <!--      Donali mahsulot                  -->
+                       <div class="text card-body mb-10" style="background-color:#32394e;     border: 1px solid; border-radius: 10px;">
+                                <h6><i class="fa-solid fa-box-open"></i> <span style="color:rgb(72 226 155);;">Mahsulot :</span> [[p.name]]</h6> 
+                            <h6 class="mb-1">
+                                <div v-if="p.is_collection">
+
+                                    <div style="background-color:#1e2231; border-radius:10px" class="mb-5 mt-5 pb-1">
+                                    <h6 class="text-center mt-5">To'plam mahsulotlari</h6>
+
+                                    <div v-for="(item, index_item) in p.collection_items" style="border:1px solid white; margin:10px; background-color:#32394e; border-radius:10px; padding:5px;">
+                                                <span style="color:rgb(72 226 155);">Mahsulot: </span> [[item.name]]
+                                        <div v-if="Object.keys(item.colors).length > 0">
+                                             <hr style="background-color:white; margin:5px;">
+                                            <span style="color:rgb(72 226 155);">Rangi: </span>
+<!--                                            selectCollectionItemColor-->
+
+                                            <button type="button" v-if="Object.keys(item.selected_color).length  > 0"
+                                                                    v-for="(c, index_color) in item.colors"
+                                                                    class="badge d-inline mr-2 ml-2 mt-1"
+                                                                    @click="selectCollectionItemColor(index, index_item, c)"
+                                                                     style="margin-left:3px; margin-right:3px; border:1px solid white;"
+                                                                     :style="{ backgroundColor: c.id === item.selected_color.id ? 'rgb(59, 183, 126)' : 'rgb(50, 57, 78)', border:  c.on_sale ? '1px solid' : '1px dotted', textDecoration: c.on_sale ? 'none' : 'line-through' }">
+                                                                                                                        [[c.name]]
+                                                                    <span style="width:2px; height:2px;" :style="{color: c.color}">**</span>
+                                                            </button>
+
+                                            <button type="button" v-if="Object.keys(item.selected_color).length=== 0"  v-for="(c, index_color) in item.colors" class="badge d-inline mr-2 ml-2 mt-1"
+                                                                    @click="selectCollectionItemColor(index, index_item, c)"
+                                                                        :style="{ border:  c.on_sale ? '1px solid' : '1px dotted', textDecoration: c.on_sale ? 'none' : 'line-through' }"
+                                                                        style="margin-left:3px; margin-right:3px; border:1px solid white; background-color:rgb(50, 57, 78);">
+                                                                                                                        [[c.name]]
+                                                                    <span style="width:2px; height:2px;" :style="{color: c.color}">**</span>
+
+                                            </button>
+
+
+                                            <h6 class="badge mt-2" v-if="Object.keys(item.selected_color).length  > 0 && item.selected_color.on_sale === false"
+                                                style="white-space:normal;color:black;background-color:#E5B700; padding-top:3px;padding-bottom:4px; width:-webkit-fill-available;"><i class="fa-solid fa-triangle-exclamation"></i>
+                                                [[item.selected_color.name]] rang vaqtinchalik sotuvda emas</h6>
+<!--                                            <span class="badge ml-1 mt-1" style="border:1px solid white;" v-for="color in item.colors">[[color.name]] [[color.color]]</span>-->
+                                        </div>
+                                        <div v-if="Object.keys(item.measure).length>0">
+                                             <hr style="background-color:white; margin:5px;">
+                                            <span style="color:rgb(72 226 155);">[[item.measure.short_name]]:</span>
+<!--                                            <span class="badge" style="border:1px solid white;" v-for="m in item.measure_item">[[m.name]]</span>-->
+                                            <button type="button" v-if="Object.keys(item.selected_measure_item).length  > 0" v-for="(s, index_measure_item) in item.measure_item" class="badge m-1 "
+                                                                 :style="{ backgroundColor: s.id === item.selected_measure_item.id ? 'rgb(59, 183, 126)' : 'rgb(50, 57, 78)', border: s.on_sale ? '1px solid' : '1px dotted', textDecoration: s.on_sale ? 'none' : 'line-through' }"
+                                                         @click="selectCollectionItemMeasureItem(index, index_item, s)"
+                                                       style="border:1px solid;">[[s.name]]</button>
+
+                                                 <button type="button" v-if="Object.keys(item.selected_measure_item).length === 0" v-for="(s, index_measure_item) in item.measure_item" class="badge m-1 "
+                                                          :style="{ border:  s.on_sale ? '1px solid' : '1px dotted', textDecoration: s.on_sale ? 'none' : 'line-through' }"
+                                                         @click="selectCollectionItemMeasureItem(index, index_item, s)"
+                                                         style="border:1px solid;
+                                                                background-color:rgb(50, 57, 78);
+                                                                ">[[s.name]]</button>
+                                            <h6 class="badge mt-2" v-if="Object.keys(item.selected_measure_item).length  > 0 && item.selected_measure_item.on_sale === false"
+                                                style="white-space:normal;color:black;background-color:#E5B700; padding-top:3px;padding-bottom:4px; width:-webkit-fill-available;"><i class="fa-solid fa-triangle-exclamation"></i>
+                                                [[item.selected_measure_item.name]] vaqtinchalik sotuvda emas</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+
+
+                                <div v-else>
+
+                                        <div v-if="Object.keys(p.colors).length  > 0">
+                                    <hr style="background-color:white; margin:5px;">
+                                    <i class="fa-solid fa-paint-roller"></i> <span style="color:rgb(72 226 155);;">Rangi :</span>
+
+
+                                                                <button type="button" v-if="Object.keys(p.selected_color).length  > 0"  v-for="(c, index_color) in p.colors" class="badge d-inline mr-2 ml-2 mt-1"
+                                                                    @click="productSelectColor(index, c)"
+                                                                                                        style="margin-left:3px; margin-right:3px; border:1px solid white;"
+                                                                       :style="{ backgroundColor: c.id === p.selected_color.id ? 'rgb(59, 183, 126)' : 'rgb(50, 57, 78)', border:  c.on_sale ? '1px solid' : '1px dotted', textDecoration: c.on_sale ? 'none' : 'line-through' }"
+                                                                >
+
+                                                                                                                        [[c.name]]
+                                                                    <span style="width:2px; height:2px;" :style="{color: c.color}">**</span>
+
+                                                            </button>
+
+                                                                <button type="button" v-if="Object.keys(p.selected_color).length=== 0"  v-for="(c, index_color) in p.colors" class="badge d-inline mr-2 ml-2 mt-1"
+                                                                    @click="productSelectColor(index, c)"
+                                                                        :style="{ border:  c.on_sale ? '1px solid' : '1px dotted', textDecoration: c.on_sale ? 'none' : 'line-through' }"
+
+                                                                        style="margin-left:3px; margin-right:3px; border:1px solid white; background-color:rgb(50, 57, 78);">
+                                                                                                                        [[c.name]]
+                                                                    <span style="width:2px; height:2px;" :style="{color: c.color}">**</span>
+
+                                                            </button>
+                                            <h6 class="badge mt-2" v-if="Object.keys(p.selected_color).length  > 0 && p.selected_color.on_sale === false"
+                                                style="white-space:normal;color:black;background-color:#E5B700; padding-top:3px;padding-bottom:4px; width:-webkit-fill-available;"><i class="fa-solid fa-triangle-exclamation"></i>
+                                                [[p.selected_color.name]] rang vaqtinchalik sotuvda emas</h6>
+
+                                </div>
+                                        <div v-if="Object.keys(p.measure).length>0">
+                                <hr style="background-color:white; margin:5px;">
+                                <i class="fa-solid fa-maximize"></i> <span style="color:rgb(72 226 155);;">[[p.measure.short_name]]</span> :
+
+                                                 <button type="button" v-if="Object.keys(p.selected_measure_item).length  > 0" v-for="(s, index_measure_item) in p.measure_item" class="badge m-1 "
+                                                                 :style="{ backgroundColor: s.id === p.selected_measure_item.id ? 'rgb(59, 183, 126)' : 'rgb(50, 57, 78)', border: s.on_sale ? '1px solid' : '1px dotted', textDecoration: s.on_sale ? 'none' : 'line-through' }"
+
+                                                         @click="productSelectMeasureItem(index, s)"
+                                                       style="border:1px solid;
+
+                                                                ">[[s.name]]</button>
+                                                 <button type="button" v-if="Object.keys(p.selected_measure_item).length === 0" v-for="(s, index_measure_item) in p.measure_item" class="badge m-1 "
+                                                         @click="productSelectMeasureItem(index, s)"
+                                                          :style="{ border:  s.on_sale ? '1px solid' : '1px dotted', textDecoration: s.on_sale ? 'none' : 'line-through' }"
+
+                                                         style="border:1px solid;
+
+                                                                background-color:rgb(50, 57, 78);
+
+                                                                ">[[s.name]]</button>
+                                            <h6 class="badge mt-2" v-if="Object.keys(p.selected_measure_item).length  > 0 && p.selected_measure_item.on_sale === false"
+                                                style="white-space:normal;color:black;background-color:#E5B700; padding-top:3px; padding-bottom:4px; width:-webkit-fill-available;"><i class="fa-solid fa-triangle-exclamation"></i>
+                                                [[p.selected_measure_item.name]] -  vaqtinchalik sotuvda emas</h6>
+
+                                    </div>
+                                </div>
+
+                                <div v-if="Object.keys(p.selected_product_variable).length  > 0 && p.selected_product_variable.is_different_price === true">
+                                     <hr style="background-color:white; margin:5px;">
+                                    <i class="fa-solid fa-triangle-exclamation" style="color:rgb(253 217 25);"></i> <span style="color:rgb(253 217 25);"> Diqqat :</span> Siz tanlagan combinatsiyada mahsulot narxi farq qiladi
+                                </div>
+
+                                <div v-if="p.bonus_type == '1'">
+                                <hr style="background-color:white; margin:5px;">
+                        <i class="fa-solid fa-gift"></i> <span style="color:rgb(72 226 155);;">Chegirma :</span> Agar [[p.bonus_details.bonus]] ta olsa [[p.bonus_details.bonus_amount]] ta tekin
+                                </div>
+                                <div v-if="p.bonus_type == '2'">
+                                <hr style="background-color:white; margin:5px;">
+                        <i class="fa-solid fa-gift"></i> <span style="color:rgb(72 226 155);;">Chegirma :</span> [[p.bonus_details.bonus ]] chi mahsulotdan [[formatMoney(p.bonus_details.bonus_amount)]] so'mdan chegirmasi bor
+                                </div>
+
+                                <hr style="background-color:white; margin:5px;">
+                                    <i class="fa-solid fa-square-root-variable"></i>
+                                <span style="color:rgb(72 226 155);;">Soni : </span>
+                                <button type="button" style="border:1px solid white;" @click="productAddAmount(index)" class="badge btn-brand">+</button>
+                               [[p.amount]]
+                                <button type="button" style="border:1px solid white;" @click="productMinusAmount(index)" class="badge btn-danger">-</button>
+                                <span class="badge btn-brand" v-if="p.bonus_type === '1' && p.give_bonus_amount > 0">+[[p.give_bonus_amount]] ta bonus</span>
+                                <span class="badge btn-brand" v-show="p.discount > 0 && p.bonus_type === '2'"> -[[p.discount]] so'm chegirma </span>
+                                <div>
+
+
+
+
+
+                                <hr style="background-color:white; margin:5px;">
+<!--                                <i class="fa-solid fa-truck"></i>-->
+                                   <div class="d-inline"><span style="color:rgb(72 226 155);;">Beilayotgan bonus :</span>
+                                       <input type="number" class="form-control" v-if="p.bonus_type === '1'" v-model="p.give_bonus_amount">
+                                       <input type="number" class="form-control" v-if="p.bonus_type === '2'" v-model="p.discount">
+<!--                                  [[p.toll]] so'm-->
+                                   </div>
+                               </div>
+                                <div>
+
+
+
+
+
+                                <hr style="background-color:white; margin:5px;">
+                                <i class="fa-solid fa-truck"></i>
+                                   <div class="d-inline"><span style="color:rgb(72 226 155);;">Yo'l kira :</span>
+                                       <div class="row">
+                                           <div class="col-md-6">
+
+                                               <h6>Yo'l kira miqdori</h6>
+                                                                                      <input type="number" required class="form-control" v-model="p.toll">
+                                           </div>
+                                           <div class="col-md-6">
+                                               <h6>To'langan yo'l kira</h6>
+                                                                                      <input type="number" required class="form-control" v-model="p.pay_toll">
+
+                                           </div>
+                                       </div>
+
+<!--                                  [[p.toll]] so'm-->
+                                   </div>
+                               </div>
+                                <hr style="background-color:white; margin:5px;">
+                                <i class="fa-solid fa-money-bill"></i> <span style="color:rgb(72 226 155);;">Mahsulot dona narxi :</span>
+<!--                                <input type="number" v-model="p.price" required class="form-control">-->
+                                 <div class="row">
+                                           <div class="col-md-6">
+
+                                               <h6>Standard narxi</h6>
+                                                 <input type="number" v-model="p.standard_price" required class="form-control">
+
+                                           </div>
+                                           <div class="col-md-6">
+                                               <h6>Buyurtmadagi narxi</h6>
+                                                                                      <input type="number" required class="form-control" v-model="p.price">
+
+                                           </div>
+                                       </div>
+
+<!--                                [[formatMoney(p.price)]] so'm-->
+                                <hr style="background-color:white; margin:5px;">
+
+                                <span style="color:rgb(72 226 155);;">Jami</span> :
+                                <i style="text-decoration: line-through;" v-if="p.discount > 0">[[formatMoney(p.total_price  + p.discount)]]</i>
+<!--                                [[formatMoney(p.total_price)]] so'm-->
+
+                                 <input type="number" class="form-control" v-model="p.total_price">
+
+                                </h6>
+                                                                   <button @click="priceUpdateItem(index)" type="button" class="btn btn-sm btn-brand mt-1"><i class="fas fa-history "></i> Narxni yangilash</button>
+
+                                <button type="button" @click="deleteListItems(index)" class="badge btn-danger mt-1"><i style="font-size:15px ;vertical-align: middle;" class="material-icons md-delete"></i> O'chirish</button>
+                        </div>
+                   </div>
+                               <div class="card-body mt-10 mb-20" style="background-color:rgb(50 57 78);border:1px solid;border-radius: 10px;">
+                                    <div class="d-inline">
+                                            <h4 class="badge mt-2" v-if="checkDoubleProductVariable"
+                                                style="white-space:normal;color:black;background-color:#E5B700; padding-top:3px;padding-bottom:4px; width:-webkit-fill-available;"><i class="fa-solid fa-triangle-exclamation"></i>
+                                               Diqqat : Siz bir xil xususiyatli mahsulotdan ikki marta qo‘shingiz iltimos o‘zgartiring</h4>
+                                        <h6> <span style="color:rgb(72 226 155);;" >Jami mahsulot soni</span> : [[total_amount]] ta</h6>
+                                    <h6 ><span style="color:rgb(72 226 155);;" > Jami mahsulot narxi</span> : [[formatMoney(total_price-total_toll)]] so'm</h6>
+                                    <h6 ><span style="color:rgb(72 226 155);;" >   Jami yo'l kira</span> : [[formatMoney(total_toll)]] so'm</h6>
+                                                                    <hr style="background-color:white; margin:3px;">
+                                        <h5 ><span style="color:rgb(72 226 155);;" > Jami mijoz to'laydi</span> : [[formatMoney(total_price)]] so'm</h5>
+                                    </div>
+                            </div>
+                            <br>
+
+
+                            <div class=" p-2 mb-10" style="background-color:#32394e;     border: 1px solid; border-radius: 10px;">
+                                <h4 class="text-center"><i class="fa-solid fa-cart-plus"></i> Yangi mahsulot qo'shish  </h4>
+                                <br>
+                                <div class="custom_select  mt-5 mb-5">
+                                    <h6>Mahsulot tanlang</h6>
+
+                                    <h6>
+                                    <select class="form-select select2" v-model="checkedProduct">
+                                    <option v-for="f in all_products_json" :key="f.id" :value="f.id">
+                                       [[ f.name ]] ( narxi : [[f.price]] ) ( Yo'l kirasi : [[formatMoney(f.toll)]] uzs)
+
+                                    </option>
+                                </select></h6>
+                            </div>
+
+                                    <div class="text-center">
+                                        <button :disabled="!(checkedProduct)" @click="AddSelectedProductList" type="button" class="btn btn-sm btn-brand mt-2"><i class="fas fa-check mr-5"></i> Tanlangan mahsulotni qo'shish</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <input type="hidden" name="products" :value="myDataJson" />
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+
+                        <button type="submit" v-if="checkSizeAndColorOnlyBolean()===true" id="submit_button"
+                                class="btn btn-primary">
+
+                            <i class="material-icons md-add"></i> Saqlash</button>
+
+                        <button type="button" @click="checkSizeAndColor()" v-if="checkSizeAndColorOnlyBolean()===false" id="submit_button"
+                                class="btn btn-primary">
+
+                             <i class="material-icons md-add"></i> Saqlash</button>
+                    </div>
+                </div>
+
+                    </div>
+                </div>
+
+    </form>
+</section>
+
+
+{% endblock %}
+{% block header %}
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
+     <link rel="stylesheet" href="{% static 'css/select2.css' %}">
+    <script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+    <script src="{% static '' %}js/vue.js"></script>
+      <style>
+        .d-none {
+            display:none;
+        }
+        .d-block {
+            display:block;
+        }
+        li {
+            color: black;
+        }
+        </style>
+{% endblock %}
+{% block footer %}
+    <script src="{% static '' %}js/vendors/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" data-mutate-approach="sync"></script>
+<!--    <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>-->
+    <script src="{% static 'js/vue-multiselect.min.js' %}"></script>
+    <script src="{% static '' %}js/axios.min.js"></script>
+
+<script type="text/javascript">
+
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+    new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+         components: { Multiselect: window.VueMultiselect.default },
+
+        data: {
+            region_list : {{region_list|safe}},
+            district_list : {{district_list|safe}},
+
+            selected_region : {{selected_region}},
+            selected_district : {{selected_district}},
+            selected_district_select2 : {{selected_district_obj|safe}},
+
+            all_products_json : {{all_products_json|safe}},
+
+            checkedProduct: null,
+            checkedProductData: null,
+
+            selected_products_json : {{selected_products_json|safe}},
+
+            productFilter: [],
+            SelectedProductList: [],
+            operator_standard_fee : {{operator_standard_fee|safe}},
+
+
+            SelectProducts:'',
+            amount:1,
+            price:'',
+            isSubmitting: false,
+
+            Toast : Swal.mixin({
+                  toast: true,
+                  position: 'top-end',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                })
+
+    },
+    mounted()
+    {
+
+
+            for (s in this.selected_products_json){
+                             var value = this.selected_products_json[s]
+                            if (value.is_collection === false){
+                                if (Object.keys(value.colors).length > 0 ){
+                                    for (c in value.colors){
+                                        var selected_color = value.colors[c]
+                                          if (Object.keys(value.product_variable.filter(v => v.color_id === selected_color.id && v.is_active === true )).length === 0 ){
+                                                selected_color.on_sale=false
+                                          }
+                                    }
+                                }
+                                if (Object.keys(value.measure_item).length > 0){
+                                    for (c in value.measure_item){
+                                            var measure_item = value.measure_item[c]
+                                              if (Object.keys(value.product_variable.filter(v => v.measure_item_id === measure_item.id && v.is_active === true )).length === 0 ){
+                                                    measure_item.on_sale=false
+                                              }
+                                        }
+                                }
+                                this.checkAndSelectProductVariable(s)
+                            }else{
+                                var collection_items = value.collection_items
+                                for (c in collection_items) {
+                                    collection_item = collection_items[c]
+                                    // To'plam ichidagi mahsulotlarni shu rangdagilari sotuvdaligini check qiladi
+                                    if (Object.keys(collection_item.colors).length > 0 ){
+                                        for (c in collection_item.colors){
+                                            var selected_color = collection_item.colors[c]
+                                              if (Object.keys(collection_item.product_variable.filter(v => v.color_id === selected_color.id && v.is_active === true )).length === 0 ){
+                                                    selected_color.on_sale=false   // sotuvda bo'lmagan colorni false
+                                                      }
+                                                }
+                                            }
+                                    // To'lam ichidagi mahsulotlarni shu measure itemdagilar borligini check qiladi
+                                    if (Object.keys(collection_item.measure_item).length > 0){
+                                    for (c in collection_item.measure_item){
+                                            var measure_item = collection_item.measure_item[c]
+                                              if (Object.keys(collection_item.product_variable.filter(v => v.measure_item_id === measure_item.id && v.is_active === true )).length === 0 ){
+                                                    measure_item.on_sale=false   // sotuvda bo'lmagan measure itemni false
+                                              }
+                                        }
+                                }
+                                //  agar rang razmer tanlangan xolatda kelsa variable avto tanledi
+                                this.checkAndSelectCollectionProductVariable(s)
+
+                                }
+                            }
+                        }
+
+    let self = this;
+                $('.select2').select2().on("change", function () {
+                    self.onSelectChange(this.value);
+                });
+
+    },
+    methods: {
+        SelectProductCustomLabel ({ name, price, toll }) {
+        if (name){
+            return `${name} [ ${this.formatMoney(price)} uzs ]`
+                    }else{
+                    return "-------------"
+                    }
+        },
+        onSelectChange(val)
+        {
+        this.checkedProduct = val;
+        },
+        onSelectDistrict(value){
+        if (this.selected_district_select2){
+                        var selected_id = this.selected_district_select2.id
+                        this.selected_district = selected_id
+        }else{
+        this.selected_district = 0
+                            this.selected_district_select2 = ""
+               }
+        },
+        priceUpdateItem(index){
+                // agar priceda tavofut bo'lsa qo'shadi
+                // yo'l kira bo'lsa uniham qo'shadi
+                // chegirma summasi bo'lsa uniham ayradi
+                // total priceni chiqarib beradi to'g'ri shakilda
+                product = this.selected_products_json[index]
+                toll = 0
+                if (product.pay_toll>0){
+                    toll=Number(product.pay_toll)
+                }
+                // agar to'plam bo'lmasa variableni check qilish kerak diff price bo'lsa deb
+                product_price = Number(product.standard_price)
+                if (product.is_collection === false){
+                    if (Object.keys(product.selected_product_variable).length > 0){
+                        if (product.selected_product_variable.is_different_price === true){
+                            product_price = product.selected_product_variable.price
+                        }
+                    }
+                }
+                product.price = product_price
+                discount_amount = 0
+                if (product.bonus_type === '2' && product.amount >= Number(product.bonus_details.bonus)){
+                    discount_amount = product.bonus_details.bonus_amount * (product.amount - product.bonus_details.bonus + 1)
+                }
+
+                product.discount = discount_amount
+                product.total_price = (product_price * product.amount) + toll - discount_amount
+              this.$set(this.selected_products_json, index, product);
+
+
+        },
+        productUpdateBonusAmount:function(index){
+            // 2+1 shaklidagi bonus qo'llanilgan bo'lsa total amountga bonus ni ham qo'shib saqlaydi
+             product = this.selected_products_json[index]
+             if (product.bonus_type === "1"){
+                if(product.bonus_details.bonus <= product.amount){
+                    product.give_bonus_amount = Math.floor(product.amount / product.bonus_details.bonus)
+                    product.total_amount = product.give_bonus + product.amount
+                     this.$set(this.selected_products_json, index, product);
+                    return product.give_bonus_amount
+                }
+                product.give_bonus_amount=0
+             }product.give_bonus_amount=0
+            this.$set(this.selected_products_json, index, product);
+
+
+        },
+
+        formatMoney:function(number){
+              let integerPart = Math.floor(number).toString();
+              integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+              return integerPart;
+        },
+        productAddAmount:function(index){
+           product = this.selected_products_json[index]
+           if (product.amount < 20){
+              product.amount += 1
+              product.total_amount += 1
+               this.productUpdateBonusAmount(index)
+               this.priceUpdateItem(index)
+               product.total_amount = product.amount + product.give_bonus_amount
+               this.$set(this.selected_products_json, index, product);
+
+           }
+        },
+        productMinusAmount:function(index){
+           product = this.selected_products_json[index]
+           if (product.amount > 1){
+              product.amount -= 1
+               this.productUpdateBonusAmount(index)
+                         this.priceUpdateItem(index)
+               product.total_amount = product.amount + product.give_bonus_amount
+              this.$set(this.selected_products_json, index, product);
+
+           }
+        },
+        checkAndSelectCollectionProductVariable(selected_product_index){
+                    var selected_collection_product = this.selected_products_json[selected_product_index]
+                        for(value in selected_collection_product.collection_items) {
+                            var selected_product = selected_collection_product.collection_items[value]
+                            var selected_color = selected_product.selected_color
+                            var selected_measure_item = selected_product.selected_measure_item
+                            if (Object.keys(selected_product.measure_item).length > 0 &&  Object.keys(selected_product.colors).length > 0){
+                                if (Object.keys(selected_product.selected_measure_item).length > 0 && Object.keys(selected_product.selected_color).length > 0){
+                                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.color_id === selected_color.id && v.measure_item_id === selected_measure_item.id).find(() => true);
+                                }else{
+                                    selected_product.selected_product_variable = {}  // chala tanlasa yangilaydi
+                                }
+                            }
+                            else if ( Object.keys(selected_product.colors).length > 0){  // faqat color bo'lsa
+                                if (Object.keys(selected_product.selected_color).length > 0){  // agar color tanlangan bo'lsa
+                                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.color_id === selected_color.id).find(() => true);
+                                }else{
+                                    selected_product.selected_product_variable = {}  // tanlanmagan boo'lsa
+                                }
+                            }
+                            else if (Object.keys(selected_product.measure_item).length > 0){ // faqat measure item bo'lsa
+                                if (Object.keys(selected_product.selected_measure_item).length > 0){
+                                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.measure_item_id === selected_measure_item.id).find(() => true);
+                                }else{
+                                    selected_product.selected_product_variable = {}  // chala tanlasa yangilaydi
+                                }
+                            }else { // color va measure tanlanmaydigan productlarga default tanlab qo'yadi
+                                // selected_product.selected_product_variable = selected_product.product_variable.find(() => true);
+                                
+                                selected_product.selected_product_variable = selected_product.product_variable.find(variable => variable.is_active === true);
+                            }
+
+                        }
+        },
+
+
+        checkAndSelectProductVariable(selected_product_index){
+            // productni color tanlashga borligini check qilish
+            // productni measure tanlashga borligini check qilish
+           // agar ikkilasiham bo'lsa ikkalasi tanlangan xoldaligini check qilish tanlangan bo'lsa variableni tanlash kerak
+           // agar ikkilasa yo'q bo'lsa none bo'lgan variableni olib kelish kerak va selected variablega tenglash kerak
+
+            var selected_product = this.selected_products_json[selected_product_index]
+            var selected_color = selected_product.selected_color
+            var selected_measure_item = selected_product.selected_measure_item
+            if (Object.keys(selected_product.measure_item).length > 0 &&  Object.keys(selected_product.colors).length > 0){
+                if (Object.keys(selected_product.selected_measure_item).length > 0 && Object.keys(selected_product.selected_color).length > 0){
+                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.color_id === selected_color.id && v.measure_item_id === selected_measure_item.id).find(() => true);
+                }else{
+                    selected_product.selected_product_variable = {}  // chala tanlasa yangilaydi
+                }
+            }
+            else if ( Object.keys(selected_product.colors).length > 0){  // faqat color bo'lsa
+                if (Object.keys(selected_product.selected_color).length > 0){  // agar color tanlangan bo'lsa
+                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.color_id === selected_color.id).find(() => true);
+                }else{
+                    selected_product.selected_product_variable = {}  // tanlanmagan boo'lsa
+                }
+            }
+            else if (Object.keys(selected_product.measure_item).length > 0){ // faqat measure item bo'lsa
+                if (Object.keys(selected_product.selected_measure_item).length > 0){
+                    selected_product.selected_product_variable = selected_product.product_variable.filter(v => v.measure_item_id === selected_measure_item.id).find(() => true);
+                }else{
+                    selected_product.selected_product_variable = {}  // chala tanlasa yangilaydi
+                }
+            }else { // color va measure tanlanmaydigan productlarga default tanlab qo'yadi
+                // selected_product.selected_product_variable = selected_product.product_variable.find(() => true);
+                                
+                                selected_product.selected_product_variable = selected_product.product_variable.find(variable => variable.is_active === true);
+            }
+
+
+        },
+
+        selectCollectionItemColor(selected_product_index,collection_item_index, selected_color ){  // to'plam itemini rangini kiritish uchun ishlatiladi
+           var collection_item = this.selected_products_json[selected_product_index].collection_items[collection_item_index]
+            // uzini tekshirdim sotuvdaligini shu rangni
+            var check_color_is_active = collection_item.product_variable.filter(v => v.color_id === selected_color.id && v.is_active === true )
+            if (check_color_is_active.length === 0){
+                selected_color.on_sale=false
+            }
+            collection_item.selected_color = selected_color
+            if (Object.keys(collection_item.measure_item).length > 0){
+                    // shu ranga teng variablelarni aylantiriyabman
+                    var variables = collection_item.product_variable.filter(v => v.color_id === selected_color.id )
+                    for (v in variables){
+                        item = variables[v]
+                        if (item.measure_item_id){
+                            if (item.is_active === false){
+                                collection_item.measure_item.filter(m => m.id === variables[v].measure_item_id)[0].on_sale = false
+                            } else {
+                                collection_item.measure_item.filter(m => m.id === variables[v].measure_item_id)[0].on_sale = true
+                            }
+                        }
+                    }
+            }
+            this.checkAndSelectCollectionProductVariable(selected_product_index)
+        },
+
+        selectCollectionItemMeasureItem(selected_product_index, collection_item_index,selected_measure_item ){  // to'plam itemini measureni tanlab kiritiladi
+            var collection_item = this.selected_products_json[selected_product_index].collection_items[collection_item_index]
+            var check_measure_item_is_active = collection_item.product_variable.filter(v => v.measure_item_id === selected_measure_item.id && v.is_active === true )
+            if (check_measure_item_is_active.length === 0){
+                selected_measure_item.on_sale=false
+            }
+            collection_item.selected_measure_item = selected_measure_item
+            if (Object.keys(collection_item.colors).length > 0){
+                    var variables = collection_item.product_variable.filter(v => v.measure_item_id === selected_measure_item.id )
+                    for (v in variables){
+                        item = variables[v]
+                            if (item.is_active === false){
+                                collection_item.colors.filter(c => c.id === variables[v].color_id)[0].on_sale = false
+                            } else {
+                                collection_item.colors.filter(c => c.id === variables[v].color_id)[0].on_sale = true
+                            }
+                    }
+            }
+            this.checkAndSelectCollectionProductVariable(selected_product_index)
+        },
+
+        productSelectColor:function(index, color){
+            let selected_product = this.selected_products_json[index]
+
+            // uzini tekshirdim sotuvdaligini shu rangni
+            var check_color_is_active = selected_product.product_variable.filter(v => v.color_id === color.id && v.is_active === true )
+            if (check_color_is_active.length === 0){
+                color.on_sale=false
+            }
+            // tekshirilgan rangni tanlangan qildim
+            selected_product.selected_color = color
+            if (Object.keys(selected_product.measure_item).length > 0){
+                    // shu ranga teng variablelarni aylantiriyabman
+                    var variables = selected_product.product_variable.filter(v => v.color_id === color.id )
+
+                    for (v in variables){
+                        item = variables[v]
+                        if (item.measure_item_id){
+                            if (item.is_active === false){
+                                selected_product.measure_item.filter(m => m.id === variables[v].measure_item_id)[0].on_sale = false
+                            } else {
+                                selected_product.measure_item.filter(m => m.id === variables[v].measure_item_id)[0].on_sale = true
+                            }
+                        }
+                    }
+            }
+            this.checkAndSelectProductVariable(index)
+            this.priceUpdateItem(index)
+        },
+
+        productSelectMeasureItem:function(index, measure_item){
+            // tanlangan measureni tekshiradi o'zi sotuvdami, sotuvda bo'lsa check qiladi, va colorlarni forda tekshiradi
+          let selected_product = this.selected_products_json[index]
+            var check_measure_item_is_active = selected_product.product_variable.filter(v => v.measure_item_id === measure_item.id && v.is_active === true )
+            if (check_measure_item_is_active.length === 0){
+                measure_item.on_sale=false
+            }
+            selected_product.selected_measure_item = measure_item
+            if (Object.keys(selected_product.colors).length > 0){
+                    var variables = selected_product.product_variable.filter(v => v.measure_item_id === measure_item.id )
+                    for (v in variables){
+                        item = variables[v]
+                            if (item.is_active === false){
+                                selected_product.colors.filter(c => c.id === variables[v].color_id)[0].on_sale = false
+                            } else {
+                                selected_product.colors.filter(c => c.id === variables[v].color_id)[0].on_sale = true
+                            }
+                    }
+            }
+
+            this.checkAndSelectProductVariable(index)
+             this.priceUpdateItem(index)
+
+        },
+
+        checkNullableObject(obj){
+        if (Object.keys(obj).length !== 0){
+            return true
+        }
+        return false
+        },
+
+
+
+        checkSizeAndColorOnlyBolean() {
+            let products = this.selected_products_json;
+
+
+
+          if (this.selected_district === 0 || this.selected_district === null) {
+                    return false;
+                }
+            if (products.length === 0 ||
+                products.some(product => product.is_collection === false && Object.keys(product.selected_product_variable).length === 0) ||
+                products.some(product => product.is_collection === false && !product.selected_product_variable.is_active) ||
+                this.checkDoubleProductVariable ||
+                products.some(product => product.is_collection === true &&
+                 product.collection_items.some(col_item => col_item.selected_product_variable && Object.keys(col_item.selected_product_variable).length === 0)
+
+                )
+                 //|| products.filter(product => product.is_collection === true && product.collection_items.filter(item => item.selected_product_variable.is_active===false)).length > 0
+
+            ) {
+                return false;
+            }
+
+
+                let hasInactiveProducts = products.some(product => {
+                    if (product.is_collection === true) {
+                        return product.collection_items.some(item => !item.selected_product_variable.is_active);
+                    }
+                });
+                if (hasInactiveProducts){
+                                return false;
+                }
+
+
+            this.isSubmitting = true;
+            return true;
+        },
+        checkSizeAndColor(){
+                let products = this.selected_products_json;
+
+                if (this.selected_district === 0 || this.selected_district === null) {
+                    showSwal('Xatolik : Tuman', "Iltimos tuman tanlang", 'info');
+                    return false;
+                }
+
+                if (products.length === 0) {
+                    showSwal('Xatolik : Mahsulot', "Mahsulot tanlamagansiz. Iltimos mahsulot tanlang", 'info');
+                    return false;
+                }
+
+                let checkDoubleProductVariable = this.checkDoubleProductVariable;
+
+                if (products.some(product => product.is_collection === false && Object.keys(product.selected_product_variable).length === 0)) {
+                    showSwal('Xatolik : Mahsulot hususiyatlari', "Iltimos mahsulot hususiyatlarini to'liq tanlang", 'info');
+                    return false;
+                }
+
+                if (products.some(product => product.is_collection === false && !product.selected_product_variable.is_active)) {
+                    showSwal('Xatolik : Mahsulot hususiyatlari', "Sotuvda bo'lmagan mahsulot hususiyati tanlagansiz iltimos o'zgartiring", 'info');
+                    return false;
+                }
+                if (checkDoubleProductVariable) {
+                    showSwal('Xatolik : Bir xil xususiyatli ikkita mahsulot tanlash', "Siz bir xil xususiyatli ikkita mahsulot tanlagansiz /n iltimos o'zgartiring", 'info');
+                    return false;
+                }
+                if (products.some(product => product.is_collection === true && product.collection_items.some(col_item => col_item.selected_product_variable && Object.keys(col_item.selected_product_variable).length === 0))) {
+                    showSwal('Xatolik : To\'plamdagi mahsulotlarga to\'liq rang yoki o\'lchov tanlamadingiz', "Iltimos mahsulotlar to'plamigi to'liq ma'lumotlarni kiriting", 'info');
+                    return false;
+                }
+
+
+                let hasInactiveProducts = products.some(product => {
+                    if (product.is_collection === true) {
+                        return product.collection_items.some(item => !item.selected_product_variable.is_active);
+                    }
+                });
+                if (hasInactiveProducts){
+                      showSwal('Xatolik : To\'plamdagi mahsulotlargani sotuvdda bo\'lmagan xususiyat tanladingiz', "Iltimos to'plamdagi mahsulotlarga sotuvdagi xususiyat tanlang", 'info');
+
+                                return false;
+                }
+
+
+                this.isSubmitting = true;
+                return true;
+
+                function showSwal(title, text, type) {
+                    Swal.fire(title, text, type);
+                }
+        },
+
+        generateRandomString: function(length) {
+          let result = '';
+          const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+          }
+          return result;
+        },
+
+
+
+
+        AddSelectedProductList: function(){
+                var product = this.all_products_json.filter(m => m.id === Number(this.checkedProduct))[0]
+                vm = this
+                axios.get('{% url 'setting_product_details_api' %}',  {
+                  params:{product_id: product.id}
+                }).then(resp => {
+                    var values =Object.assign(product, resp.data.data);
+                    values['amount'] = 1
+                    values['selected_color'] = {}
+                    values['selected_measure_item'] = {}
+                    values['selected_product_variable'] = {}
+                    values['standard_price'] = product.price
+                    values['total_amount'] = 1
+                    values['total_price'] = product.price
+                    values['discount'] = 0
+                    values['give_bonus_amount'] = 0
+                    values['pay_toll'] = 0
+                    this.selected_products_json.push({...values})
+                    this.checkedProduct = null;
+                    var last_index = this.selected_products_json.length - 1
+                    if (values.is_collection === true){
+                            this.checkAndSelectCollectionProductVariable(last_index)
+                    }else{
+                           this.checkAndSelectProductVariable(last_index)
+                    }
+                    this.priceUpdateItem(last_index)
+                     this.Toast.fire({
+                          icon: 'success',
+                          title: "Mahsulot qo'shildi!"
+                        })
+                    vm.checkedProduct = ''
+
+                });
+        },
+
+                deleteListItems: function (index) {
+                    Swal.fire({
+                        title: 'Siz rostanham o\'chirmoqchimisiz?',
+                        showCancelButton: true,
+                        cancelButtonText: 'chiqish',
+                        confirmButtonText: 'O\'chirish',
+                        confirmButtonColor: 'warning',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.selected_products_json.splice(index, 1)
+
+                    this.Toast.fire({
+                      icon: 'success',
+                      title: "Mahsulot o'chirildi!"
+                    })
+                        }
+                    })
+
+                },
+
+
+                findDuplicateSelectedVariables:function(products) {
+                    const selectedVariableIds = new Set();
+
+                    for (const product of products) {
+                        if (!product.is_collection && product.selected_product_variable && product.selected_product_variable.id) {
+                            if (selectedVariableIds.has(product.selected_product_variable.id)) {
+                                return true;
+                            }
+                            selectedVariableIds.add(product.selected_product_variable.id);
+                        }
+                    }
+
+                    return false;
+                },
+            compareObjectsArray: function(arr) {
+                  let objMap = {}; // Her bir objenin string temsilini ve indexini saklayacak obje
+
+                        for (let i = 0; i < arr.length; i++) {
+                            let objStr = JSON.stringify(arr[i]); // Objeyi stringe dönüştür
+
+                            if (objStr in objMap) {
+                                // Aynı obje daha önce bulundu, bu yüzden bu obje ile aynı olanı bulduk
+                                return true;
+                            } else {
+                                // Aynı obje daha önce bulunmadı, bu yüzden objeyi map'e ekle
+                                objMap[objStr] = i;
+                            }
+                        }
+                        // Aynı obje bulunamadı
+                        return false;
+            }
+
+
+
+                },
+               watch: {
+               selected_region : function (){
+                   this.selected_district = 0
+                   this.selected_district_select2 = {}
+               }
+               },
+               computed: {
+
+               checkDoubleProductVariable: function () {
+                        let variable_id = new Set();
+
+                        let collection_product_variables_id = new Set();
+                        let selectedVariableList = [];
+                        this.selected_products_json.filter(s => s.is_collection===true).forEach((obj) => {
+                          let globalId = obj.global_id;
+                              let itemDict = {};
+                            let filteredItems = obj.collection_items.filter((item) => {
+                                return Object.keys(item.selected_product_variable).length === 0; // selected_product_variable özelliğinin boş olduğunu kontrol et
+                              });
+                            if (filteredItems.length === 0){
+                                obj.collection_items.forEach((item) => {
+                                        itemDict[item.global_id] = item.selected_product_variable.id;
+                                });
+                                    let globalDict = {};
+                                 globalDict[globalId] = itemDict; // global_id: {collection_item_id: selected_variable_id}
+                                 selectedVariableList.push(globalDict);
+                            }
+                        });
+
+
+                    const duplicates = this.compareObjectsArray(selectedVariableList);
+                    if (duplicates){
+                        return true
+                    }
+                    var check_single_duplicates = this.findDuplicateSelectedVariables(this.selected_products_json.filter(m => m.is_collection === false))
+                    if (check_single_duplicates){
+                        return true
+                    }
+
+                    },
+
+
+                   filteredDistrictList: function () {
+                    if (this.district_list.length > 0) {
+                        let result = this.district_list.filter(d => d.region_id === this.selected_region);
+                        return result
+                            } else {
+                                return []
+                            }
+                        },
+
+
+                    myDataJson() {
+                      return JSON.stringify(this.selected_products_json);
+                    },
+                   disabledButton: function () {
+                       if (this.SelectedProductList.length > 0 && this.checkSizeAndColor() === true) {
+                           return false
+                       } else {
+                   this.checkSizeAndColor()
+                           return true
+                       }
+                   },
+                   total_amount: function () {
+                   this.operator_standard_fee = 0
+
+
+
+
+                    const only_total_amount = this.selected_products_json.reduce((total, current) => {
+                                          return total + current.amount;
+                                        }, 0);
+
+                    this.operator_standard_fee = 0
+                    if (only_total_amount > 1){
+                        this.operator_standard_fee = (only_total_amount - 1) * 500
+                    }
+                    this.operator_standard_fee += {{operator_standard_fee}}
+
+                    const totalPrice = this.selected_products_json.reduce((total, current) => {
+                                          return total + (current.amount + current.give_bonus_amount);
+                                        }, 0);
+                       return totalPrice
+                   },
+                   total_price: function () {
+                            const totalPrice = this.selected_products_json.reduce((total, current) => {
+                                          return total + parseFloat(current.total_price);
+                                        }, 0);
+                       return totalPrice
+                   },
+
+                   total_toll: function () {
+
+                            const tollArray = this.selected_products_json.filter(a => a.toll > 0)
+                            if (tollArray.length > 0){
+                                tollArray[0].pay_toll = tollArray[0].toll
+                            for (a in this.selected_products_json){
+                                this.priceUpdateItem(a)
+                            }
+                                return tollArray[0].toll
+                            }
+                       return 0
+                   }
+               },
+    })
+    ;
+
+
+</script>
+
+{% endblock %}
+
+
+

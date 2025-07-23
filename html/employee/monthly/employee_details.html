@@ -1,0 +1,340 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+
+            <h4 class="content-title">Yopilgan oylar : {{user.first_name}} {{user.last_name}}</h4>
+            <div>
+                <button type="button" @click="add_card=!add_card" class="btn btn-sm btn-brand">
+                    <i class="material-icons md-minus" v-if="add_card===true"></i>
+                    <i class="material-icons md-add" v-else></i>Yangi qo'shish</button>
+                <a href="{% url 'employee_list' %}" class="btn btn-sm btn-brand btn-sm">
+                <i class="material-icons md-arrow_back"></i>
+                 Qaytish
+            </a>
+            </div>
+        </div>
+
+
+        <div class="card" :style="{ display: add_card ? 'block' : 'none' }" style="display:none!important;" v-if="add_card">
+
+
+
+            <div class="card-body">
+                 <h3 class="text-center">Yana oy yopish </h3>
+                    <hr>
+                <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+                    {% csrf_token %}
+
+                <div class="row mb-50 order-info-wrap">
+
+
+                    <div class="col-md-6">
+                        <div class="mt-2">
+                        <label>Belgilangan oylik miqdori</label>
+                            <h5>[[money_format(salary_amount)]]</h5>
+                        </div>
+                        <hr>
+                        <div class="mt-2">
+                        <label>To'lanadigan oylik miqdori</label>
+                            <h5>[[money_format(amount)]]</h5>
+
+                            <input type="hidden" v-model="amount" name="amount">
+                            <input type="hidden" name="type" value="create">
+                        </div>
+                        <hr>
+
+                        <label>Bonus ( Bazi sabablarga ko'ra oylikdan pul ayrish )</label>
+                        <div>
+
+                        <span class="badge btn-brand btn-sm" @click="add_bonus(5000)"><i class="material-icons md-add"></i></span>
+                            <h5 class="d-inline"> [[bonus]] </h5>
+
+                            <input type="hidden" v-model="bonus" name="bonus">
+                        <button type="button" class="badge btn-danger btn-sm" :disabled="bonus <= 0" @click="discount_bonus(5000)"><i class="material-icons md-minus"></i></button>
+
+                        </div>
+
+                        <hr>
+                        <label>Jarima ( bazi sabablarga ko'ra oylikdan kamaytirish )</label>
+                        <div>
+
+                        <span class="badge btn-brand btn-sm" @click="add_reduce(5000)"><i class="material-icons md-add"></i></span>
+                            <h5 class="d-inline"> [[reduce]] </h5>
+                            <input type="hidden" v-model="reduce" name="reduce">
+                            <button type="button" class="badge btn-danger btn-sm" :disabled="reduce <= 0" @click="discount_reduce(5000)"><i class="material-icons md-minus"></i></button>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6">
+
+                                       <label>Yopiladigan oy</label>
+                        <input type="month" name="date"  placeholder="sana" required
+                               class="form-control">
+
+
+                        <label>Izoh kiritish</label>
+                        <textarea class="form-control" name="desc">
+
+                        </textarea>
+
+                    </div>
+
+                    <div class="col-md-12">
+                        <hr>
+                        <button class="btn btn-brand btn-sm" id="submit_button" type="submit"><i class="material-icons md-add"></i> Qo'shish</button>
+                    </div>
+
+                </div>
+
+                </form>
+            </div>
+
+
+                </div>
+        <div class="card" :style="{ display: edit_card ? 'block' : 'none' }" style="display:none!important;" v-if="edit_card">
+            <div class="card-body">
+                 <h3 class="text-center">Yopilgan oyni o'zgartirish</h3>
+                    <hr>
+                <form method="post" onsubmit="document.getElementById('edit_submit_button').disabled=true">
+                    {% csrf_token %}
+                <div class="row mb-50 order-info-wrap">
+                    <div class="col-md-6">
+                        <div class="mt-2">
+                        <label>Belgilangan oylik miqdori</label>
+                            <h5>[[money_format(edit_data.salary_amount)]]</h5>
+                        </div>
+                        <hr>
+                        <div class="mt-2">
+                        <label>To'lanadigan oylik miqdori</label>
+                            <h5>[[money_format(edit_data.amount)]]</h5>
+
+                            <input type="hidden" v-model="edit_data.amount" name="amount">
+                            <input type="hidden" name="type" value="edit">
+                            <input type="hidden" name="pay_id" :value="edit_data.pay_id">
+                        </div>
+                        <hr>
+
+                        <label>Bonus ( Bazi sabablarga ko'ra oylikdan pul ayrish )</label>
+                        <div>
+
+                        <span class="badge btn-brand btn-sm" @click="edit_add_bonus(5000)"><i class="material-icons md-add"></i></span>
+                            <h5 class="d-inline"> [[edit_data.bonus]] </h5>
+
+                            <input type="hidden" v-model="edit_data.bonus" name="bonus">
+                        <button type="button" class="badge btn-danger btn-sm" :disabled="edit_data.bonus <= 0" @click="edit_minus_discount_bonus(5000)"><i class="material-icons md-minus"></i></button>
+                        </div>
+                        <hr>
+                        <label>Jarima ( bazi sabablarga ko'ra oylikdan kamaytirish )</label>
+                        <div>
+
+
+                        <span class="badge btn-brand btn-sm" @click="edit_add_reduce(5000)"><i class="material-icons md-add"></i></span>
+                            <h5 class="d-inline"> [[edit_data.reduce]] </h5>
+                            <input type="hidden" v-model="edit_data.reduce" name="reduce">
+                            <button type="button" class="badge btn-danger btn-sm" :disabled="edit_data.reduce <= 0" @click="edit_minus_discount_reduce(5000)"><i class="material-icons md-minus"></i></button>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6">
+
+                                       <label>Yopiladigan oy  </label>
+                        <input type="month" name="date" :value="edit_data.date" readonly placeholder="sana" required
+                               class="form-control">
+                        <label>Izoh kiritish</label>
+                        <textarea class="form-control" v-model="edit_data.desc" name="desc">
+                        </textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <hr>
+                        <button class="btn btn-brand btn-sm" id="edit_submit_button" type="submit"><i class="material-icons md-edit"></i> O'zgartirish</button>
+                        <button class="btn btn-danger btn-sm" @click="edit_card=false" type="button"><i class="material-icons md-close"></i> Chiqish</button>
+                    </div>
+
+                </div>
+
+                </form>
+            </div>
+                </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div style="overflow-x:auto;">
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Yopilgan oy</th>
+                            <th>To'lanadigan oylik miqdori</th>
+                            <th>Belgilangan oylik</th>
+                            <th>Bonus</th>
+                            <th>Jarima & pasaytirish</th>
+                            <th>Izoh</th>
+                            <th>Amaliyot sanasi </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for m in monthly %}
+                        <tr>
+                            <td>
+                                <a @click="edit_card_show({{m.id}}, {{m.salary_amount}}, {{m.amount}}, {{m.bonus}}, {{m.reduce}}, `{{m.description}}`, `{{m.date|date:'Y-m'}}` )" class="badge btn-sm btn-primary"><i class="material-icons md-edit"></i></a>
+                            </td>
+                            <td>
+                                {{m.date|date:"Y b"}}
+                            </td>
+                            <td>
+                                <h6 class="d-inline">[[money_format({{m.amount}})]]</h6> so'm
+                            </td>
+                            <td>
+                                <h6 class="d-inline">[[money_format({{m.salary_amount}})]]</h6> so'm
+                            </td>
+                            <td>
+                                <h6 class="d-inline">[[money_format({{m.bonus}})]]</h6> so'm
+
+                            </td>
+                            <td>
+                                <h6 class="d-inline">[[money_format({{m.reduce}})]]</h6> so'm
+                            </td>
+                            <th>
+                                {{m.description}}
+                            </th>
+                            <td>
+                                {{m.created_at|date:"d-m-Y H:i"}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+    {% include 'table/head.html' %}
+    <script src="{% static '' %}js/vue.js"></script>
+{% endblock %}
+{% block footer %}
+    {% include "table/footer.html" %}
+    <script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+                add_card: false,
+                edit_card: false,
+                salary_amount: {{user.salary}},
+                amount: {{user.salary}},
+                bonus: 0,
+                reduce: 0,
+                edit_data:{},
+                edit:{
+                    salary_amount: 0,
+                    amount: 0,
+                    bonus: 0,
+                    reduce: 0,
+                    desc: 0,
+                    pay_id: 0,
+                    date: '',
+                }
+            },
+            methods: {
+               edit_card_show:function(id, salary, amount, bonus, reduce, desc, date){
+               edited_data = {
+                    salary_amount: salary,
+                    amount: amount,
+                    bonus: bonus,
+                    reduce: reduce,
+                    desc: desc,
+                    pay_id: id,
+                    date: date,
+                }
+                this.edit_data = edited_data
+                this.edit_card = true
+                console.log(edited_data)
+               },
+               add_bonus:function(amount){
+                this.bonus += 5000
+                this.amount += 5000
+               },
+               discount_bonus:function(amount){
+                this.bonus -= 5000
+                this.amount -= 5000
+               },
+               add_reduce:function(amount){
+                this.reduce += 5000
+                this.amount -= 5000
+
+               },
+               discount_reduce:function(amount){
+                this.reduce -= 5000
+                this.amount += 5000
+               },
+
+
+               edit_add_bonus:function(amount){
+                this.edit_data.bonus += 5000
+                this.edit_data.amount += 5000
+               },
+               edit_minus_discount_bonus:function(amount){
+                this.edit_data.bonus -= 5000
+                this.edit_data.amount -= 5000
+               },
+               edit_add_reduce:function(amount){
+                this.edit_data.reduce += 5000
+                this.edit_data.amount -= 5000
+
+               },
+               edit_minus_discount_reduce:function(amount){
+                this.edit_data.reduce -= 5000
+                this.edit_data.amount += 5000
+               },
+
+              money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            },
+            },
+            watch: {
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Asosiy ombordagi mahsulotlar
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">{{warehouse_operation.id}} idli amaliyotdagi mahsulotlar ro'yxati</h2>
+
+            <div>
+                {% if request.META.HTTP_REFERER %}
+                            <a href="{{request.META.HTTP_REFERER}}" class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+                {% endif %}
+            </div>
+        </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div style="overflow-x:auto !important;">
+                            <table class="table" id="dataTable">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Mahsulot</th>
+                                    <th>Rangi</th>
+                                    <th>Razmeri</th>
+                                    <th>Soni</th>
+                                    <th>kirim narxlari</th>
+                                    <th>Jami Kirim narxi</th>
+                                    <th>Dona sotish narxi</th>
+                                    <th>Jami sotish narxi</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+
+                                {% for a in warehouse_operation.items %}
+                                <tr>
+                                    <td>
+                                        {{a.id}}
+
+                                    </td>
+                                    <td style="white-space: nowrap">{{a.product.name}}</td>
+                                    <td style="white-space: nowrap">{{a.product_variable.get_color_name}}</td>
+                                    <td style="white-space: nowrap">{{a.product_variable.get_measure_item_name}}</td>
+                                    <td style="            white-space: nowrap
+            ">{{a.amount}} ta
+                                    </td>
+                                    <td>
+                                        {% for b in a.item_details %}
+                                        <span class="badge " style="border:1px solid white">{{b.amount}} ta {{b.input_price_uzs}} so'mdan</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{a.total_input_price_uzs}} uzs</td>
+
+
+                                    <td>{{a.selling_price_uzs}} uzs</td>
+                                    <td>{{a.total_selling_price_uzs}} uzs</td>
+
+                                </tr>
+                                {% endfor %}
+
+
+                                </tbody>
+                                <thead>
+                                <tr>
+                                    <th colspan="4"><h6>Jami</h6></th>
+                                    <th><h6>{{warehouse_operation.items_total_amount}} ta </h6></th>
+                                    <th></th>
+                                    <th colspan="1"><h6>{{warehouse_operation.items_total_input_price_uzs}} so'm </h6></th>
+                                    <th></th>
+                                    <th colspan="1"><h6>{{warehouse_operation.items_total_selling_price_uzs}} so'm </h6></th>
+                                </tr>
+                                </thead>
+
+                            </table>
+
+                        </div>
+        </div>
+    </div>
+    </section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+
+{% include 'table/footer.html' %}
+    <script>
+        var table = $('#dataTable').DataTable({
+
+            paging: true,
+            pageLength: 30,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

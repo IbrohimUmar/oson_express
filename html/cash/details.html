@@ -1,0 +1,503 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchi : {{ d.first_name }} {{ d.last_name }}
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">To'lov haqida</h2>
+
+
+        <div>
+            <a href="{% url 'cash' %}" class="btn btn-brand btn-sm">Qaytish</a>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row gx-5">
+
+                <div class="col-lg-12">
+                    <section class="content-body p-xl-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="row gx-3">
+
+                                    <div class="col-md-8 m-auto">
+                                        <h6 class="text-center mt-2 mb-2">To'lov</h6>
+                                        <table class="table">
+                                            <tr>
+                                                <th><h5>To'lov id : </h5></th>
+                                                <td>#{{cash.id}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Turi : </h5></th>
+                                                <td>
+                                                    {% if cash.type == '1' %}
+                                                    <span class="badge badge-soft-success">Kirim</span>
+                                                    {% elif cash.type == '2' %}
+                                                    <span class="badge badge-soft-danger">Chiqim</span>
+                                                    {% elif cash.type == '3' %}
+                                                    <span class="badge badge-soft-warning">O'tkazma</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Kimdan : </h5></th>
+                                                <td>{{cash.from_user.first_name}} {{cash.from_user.last_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Kimga : </h5></th>
+                                                <td>{{cash.to_user.first_name}} {{cash.to_user.last_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Kategoriya : </h5></th>
+                                                <td><span class="badge badge-soft-success">{{cash.category.name}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>To'lov Miqdori : </h5></th>
+                                                <td><h6>[[money_format( {{cash.amount}} )]] uzs</h6></td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Buyurtmaga belgilangandan keyin qolgan miqdor : </h5></th>
+                                                <td><h6>[[money_format( {{cash.leave_amount}} )]] uzs</h6></td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Taxrirlangan sana : </h5></th>
+                                                <td><h6>{{cash.updated_at}}</h6></td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Kiritilgan sana : </h5></th>
+                                                <td><h6>{{cash.created_at}}</h6></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+
+                                    <div class="col-md-12">
+                                        <h5 class="text-center">To'lov sarflanishi kerak</h5>
+                                    </div>
+
+                                    <div class="row text-center">
+                                    <div class="col-md-3 mt-10 mb-2">
+                                        <article class="box bg-light">
+                                            <h6>Sotilgan : [[money_format({{statistic.total_order_sold_price}} )]] uzs</h6>
+                                            <small class="text-muted d-block ">Sotilgan buyurtmalar summasi</small>
+                                        </article>
+                                    </div>
+
+                                    <div class="col-md-3 mt-10 mb-2">
+                                        <article class="box bg-light">
+                                            <h6>Tannarx uchun : [[money_format({{statistic.total_order_input_price}})]] uzs</h6>
+                                            <small class="text-muted d-block ">Hozirza balansi daromadi
+                                                ayrilganida</small>
+                                        </article>
+                                    </div>
+                                    <div class="col-md-3 mt-10 mb-2">
+                                        <article class="box bg-light">
+                                            <h6>Sotuvchi ulushi : [[money_format({{statistic.total_seller_fee}})]] uzs</h6>
+                                            <small class="text-muted d-block ">Hozirza balansi daromadi
+                                                ayrilganida</small>
+                                        </article>
+                                    </div>
+                                    <div class="col-md-3 mt-10 mb-2">
+                                        <article class="box bg-light">
+                                            <h6>Operator ulushi : [[money_format({{statistic.total_operator_fee}})]] uzs</h6>
+                                            <small class="text-muted d-block ">Hozirza balansi daromadi
+                                                ayrilganida</small>
+                                        </article>
+                                    </div>
+                                    <div class="col-md-6 m-auto mt-10 mb-2">
+                                        <article class="box bg-light">
+                                            <h6>Qoldiq : [[money_format({{statistic.total_fee}})]] uzs</h6>
+                                            <small class="text-muted d-block ">Hozirza balansi daromadi
+                                                ayrilganida</small>
+                                        </article>
+                                    </div>
+</div>
+
+
+
+                                    <hr>
+
+
+                                    <h6 class="text-center">To'lov qilingan buyurtmalar</h6>
+                                    <h6 class="text-muted">Buyurtma soni : {{count}} ta</h6>
+
+                                    <br>
+
+
+
+
+
+                                    <div class="table-responsive">
+                                        <table class="table" id="dataTable">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>id</th>
+                                                <th>Sayt</th>
+                                                <th>Holati</th>
+
+                                                <th>To'lov</th>
+                                                <th>To'lov miqdori</th>
+                                                 <th>Mijoz</th>
+                                                 <th>Haydovchi</th>
+
+                                                <th>Mahsulot</th>
+
+
+                                                <th>Sotilgan narxi</th>
+                                                <th>Haydovchi daromadi</th>
+                                                <th>Operatorga(standard)</th>
+                                                <th>Admin to'lovi</th>
+                                                <th>Tannarx</th>
+                                                <th>Qoldiq</th>
+
+                                                <th>O'zgartirilgan sana</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for o in page_obj %}
+                                                 {% if o.order_payment_interest < 100 %}
+
+                                                <tr>
+
+                                                    <td>
+                                                        <a href="{% url 'order_details' o.order.id %}"
+                                                           class="btn  btn-brand rounded font-sm btn-sm"><i
+                                                                class="material-icons md-settings"></i></a>
+
+                                                        <a href="{% url 'order_print' o.order.id %}"
+                                                           class="btn  btn-brand rounded font-sm btn-sm"><i
+                                                                class="material-icons md-print"></i></a>
+
+                                                    </td>
+                                                    <td>
+                                                        #{{ o.order.id }}
+                                                        {% if o.order.operator_order_id %}<br> <span
+                                                            class="badge badge-soft-success">operator-id: {{o.order.operator_order_id}}</span>{% endif %}
+
+                                                    </td>
+
+                                                    <td>
+                                                        {{ o.order.get_site_display }} <br>
+                                                        {% if o.order.site_order_id %}<span
+                                                            class="badge badge-soft-success">Sayt-id: {{o.order.site_order_id}}</span>{% endif %}
+                                                    </td>
+
+
+                                                    <td>
+                                                        <h6>
+                                                            <span class="badge" style="border:1px solid white"> {{ o.order.get_status_display }}</span>
+                                                        </h6>
+                                                        {% if o.status == '0' %}
+                                                        <span class="badge badge-soft-info"> O'chirdi : {{o.responsible.first_name}} {{o.responsible.last_name}}</span>
+                                                        <br>
+                                                        Sababi : {{o.delete_desc}}
+                                                        {% endif %}
+                                                        {% if o.defective_product_order is not None %}
+                                                        <span class="badge badge-soft-info">Nosoz alishtirishga ID : {{o.defective_product_order.id}} </span>
+                                                        {% endif %}
+                                                    </td>
+
+
+                                                    <td>
+                                                        {% if o.order.payment_status == "1" %}
+                                                        <span class="badge badge-soft-danger">To'lov qilinmagan</span>
+
+                                                        {% elif o.order.payment_status == "2" %}
+                                                        <span class="badge badge-soft-warning">Qisman to'landi</span>
+                                                        {% elif o.order.payment_status == "3" %}
+                                                        <span class="badge badge-soft-success">To'landi</span>
+                                                        {% endif %}
+                                                        <br>
+                                                        <span class="badge badge-soft-warning">{{o.order_payment_interest_round}}% foiz shu to'lovdan ajratildi</span>
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.amount}})]]</h6>
+
+                                                    </td>
+
+
+
+                                                    <td>{{ o.order.customer_name }} <br>
+                                                        {{ o.order.customer_phone }}
+                                                    </td>
+
+                                                    <td>
+                                                        {% if o.order.driver %}
+                                                        {{ o.order.driver.first_name }} {{ o.order.driver.last_name }} <br>
+                                                        <small class="text-sm badge badge-soft-primary">{{ o.order.driver.username }}</small>
+                                                        {% else %}
+                                                        ------------
+                                                        {% endif %}
+                                                    </td>
+
+                                                    <td>
+
+                                                            {% for p in o.order.order_products %}
+                                                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                                                            {% endfor %}
+                                                                   <small>Jami : Soni :{{o.order.order_products_total_ordered_amount}} ta | Narxi:{{o.order.order_products_total_price}} so'm</small>
+
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.order_products_total_price}})]] </h6>
+                                                        <h6 class="text-primary" >[[money_format({{o.order_sold_price}})]] </h6>
+
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.driver_fee}})]] </h6>
+                                                        <h6 class="text-danger" >[[money_format({{o.order_driver_fee}})]] </h6>
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.operator_fee_standard}})]] </h6>
+                                                        <h6 class="text-primary" >[[money_format({{o.order_operator_fee}})]] </h6>
+
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.total_seller_fee}})]] </h6>
+                                                        <h6 class="text-primary" >[[money_format({{o.order_seller_fee}})]] </h6>
+
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.order_products_total_input_price}})]] </h6>
+                                                        <h6 class="text-primary" >[[money_format({{o.order_input_price}})]] </h6>
+
+                                                    </td>
+                                                    <td>
+                                                        <h6>[[money_format({{o.order.leave_fee_we_mark}})]] </h6>
+                                                        <h6 class="text-primary">[[money_format({{o.order_leave_fee_we_mark}})]] </h6>
+
+                                                    </td>
+                                                    <td>{{ o.order.updated_at|date:"Y-m-d H:i" }}</td>
+
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+
+                                                        <td>
+                                                            <a href="{% url 'order_details' o.order.id %}"
+                                                               class="btn  btn-brand rounded font-sm btn-sm"><i
+                                                                    class="material-icons md-settings"></i></a>
+
+                                                            <a href="{% url 'order_print' o.order.id %}"
+                                                               class="btn  btn-brand rounded font-sm btn-sm"><i
+                                                                    class="material-icons md-print"></i></a>
+
+                                                        </td>
+                                                        <td>
+                                                            #{{ o.order.id }}
+                                                            {% if o.order.operator_order_id %}<br> <span
+                                                                class="badge badge-soft-success">operator-id: {{o.order.operator_order_id}}</span>{% endif %}
+
+                                                        </td>
+
+                                                        <td>
+                                                            {{ o.order.get_site_display }} <br>
+                                                            {% if o.order.site_order_id %}<span
+                                                                class="badge badge-soft-success">Sayt-id: {{o.order.site_order_id}}</span>{% endif %}
+                                                        </td>
+
+
+                                                        <td>
+                                                            <h6>
+                                                                <span class="badge" style="border:1px solid white"> {{ o.order.get_status_display }}</span>
+                                                            </h6>
+                                                            {% if o.status == '0' %}
+                                                            <span class="badge badge-soft-info"> O'chirdi : {{o.responsible.first_name}} {{o.responsible.last_name}}</span>
+                                                            <br>
+                                                            Sababi : {{o.delete_desc}}
+                                                            {% endif %}
+                                                            {% if o.defective_product_order is not None %}
+                                                            <span class="badge badge-soft-info">Nosoz alishtirishga ID : {{o.defective_product_order.id}} </span>
+                                                            {% endif %}
+                                                        </td>
+
+
+                                                        <td>
+                                                            {% if o.order.payment_status == "1" %}
+                                                            <span class="badge badge-soft-danger">To'lov qilinmagan</span>
+
+                                                            {% elif o.order.payment_status == "2" %}
+                                                            <span class="badge badge-soft-warning">Qisman to'landi  {{o.order_payment_interest_round}}%</span>
+                                                            {% elif o.order.payment_status == "3" %}
+                                                            <span class="badge badge-soft-success">To'landi</span>
+
+                                                            {% endif %}
+                                                            <br>
+                                                            <span class="badge badge-soft-success">100% foiz shu to'lovdan</span>
+
+
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.amount}})]]</h6>
+
+                                                        </td>
+
+                                                    <td>{{ o.order.customer_name }} <br>
+                                                        {{ o.order.customer_phone }}
+                                                    </td>
+
+                                                    <td>
+                                                        {% if o.order.driver %}
+                                                        {{ o.order.driver.first_name }} {{ o.order.driver.last_name }} <br>
+                                                        <small class="text-sm badge badge-soft-primary">{{ o.order.driver.username }}</small>
+                                                        {% else %}
+                                                        ------------
+                                                        {% endif %}
+                                                    </td>
+
+                                                    <td>
+
+                                                            {% for p in o.order.order_products %}
+                                                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                                                            {% endfor %}
+                                                                   <small>Jami : Soni :{{o.order.order_products_total_ordered_amount}} ta | Narxi:{{o.order.order_products_total_price}} so'm</small>
+
+                                                    </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.order_products_total_price}})]] </h6>
+
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.driver_fee}})]] </h6>
+
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.operator_fee_standard}})]] </h6>
+
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.total_seller_fee}})]] </h6>
+
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.order_products_total_input_price}})]] </h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6>[[money_format({{o.order.leave_fee_we_mark}})]] </h6>
+                                                        </td>
+                                                        <td>{{ o.order.updated_at|date:"Y-m-d H:i" }}</td>
+
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- col .// -->
+                                </div>
+                                <!-- row.// -->
+                            </div>
+                            <!-- col.// -->
+                            <!-- col.// -->
+                        </div>
+                        <!-- row.// -->
+                    </section>
+                    <!-- content-body .// -->
+                </div>
+                <!-- col.// -->
+            </div>
+            <!-- row.// -->
+        </div>
+        <!-- card body end// -->
+    </div>
+    <!-- card end// -->
+</section>
+
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+<script src="{% static '' %}js/vue.js"></script>
+{% include "table/footer.html" %}
+
+<script>
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+            },
+
+        });
+
+
+        var table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

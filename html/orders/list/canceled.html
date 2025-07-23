@@ -1,0 +1,325 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Bekor qilingan buyurtmalar</h2>
+        <div>
+            <h5>Soni : {{ count }}</h5>
+        </div>
+    </div>
+    <div class="card mb-4">
+  <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <form method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>Qidiruv</h6>
+                                <input type="number" class="form-control" id="search"
+                                       placeholder="id, klient tel, haydovchi tel bo'yicha qidiruv" name="search" {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Dan :</label>
+                                <input type="date" class="form-control" id="from" {% if request.GET.from_date %} value="{{request.GET.from_date}}"{% endif %} name="from_date">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Gacha :</label>
+                                <input type="date" class="form-control" id="to" {% if request.GET.to_date %} value="{{request.GET.to_date}}"{% endif %} name="to_date">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Viloyat : </label>
+                                <select class="form-control" id="site" name="region">
+                                    <option value="0">Hammasi</option>
+                                    {% for r in regions %}
+<!--                                    <option value="{{r.id}}" {% if request.GET.region == r.id %}selected{% endif %}>-->
+                                    <option value="{{r.id}}" {% if request.GET.region|add:'0' == r.id %}selected{% endif %}>
+                                        {{r.name}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.site or request.GET.from or request.GET.to or request.GET.region %}
+                                 <a class="btn btn-danger" href="{% url 'canceled_list' %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <div class="card-body">
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Mahsulot</th>
+                        <th>Klient</th>
+                        <th>Haydovchi izohi</th>
+                        <th>Sayt</th>
+                        <th>Viloyati</th>
+                        <th>Haydovchi</th>
+                        <th>Buyurtma kelgan sana</th>
+                        <th>Haydovchiga mahsulot borgan sana</th>
+                        <th>Bekor bo'lgan sana</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in list_order %}
+                    <tr v-if='IsHidden({{o.id}})'>
+
+                        <td>
+                            #{{ o.id }}
+                            <br> <span class="badge badge-soft-danger">Bekor qilindi</span>
+                        </td>
+
+                        <td>
+                            {% for p in o.order_products %}
+                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                            {% endfor %}
+                        </td>
+                        <td>
+
+                            <h6>{{ o.customer_name }}
+                                <br> {{ o.customer_phone }}
+                                {% if o.customer_phone2 %}
+                                <br> {{ o.customer_phone2 }}
+                            </h6>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <h6 class="text-center">
+                                {% if o.driver_note != None %}{{ o.driver_note }}{% endif %}
+                            </h6>
+                        </td>
+                        <td>{{o.get_site_display}}</td>
+                        <td>
+                            {{ o.customer_region.name }}
+                        </td>
+                        <td>
+                            {{ o.driver.first_name }} {{ o.driver.last_name }} <br>
+                            {{ o.driver.username }}
+                        </td>
+                        <td>{{ o.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ o.driver_shipping_start_date|date:"Y-m-d" }}</td>
+                        <td>{{ o.updated_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mt-20">
+                <h5>Jami buyurtma soni : {{ count }} ta</h5> <br>
+
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <h5>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h5>
+                </div>
+ <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="badge btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="badge btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="badge btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="badge btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+<script src="{% static '' %}js/vue.js"></script>
+<script src="{% static '' %}js/axios.min.js"></script>
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+
+            data() {
+                return {
+                      toggle: false,
+                      SearchResult: [],
+                      Hidden_order_id : [],
+                }
+            },
+            methods: {
+                showConfirmation(url) {
+                  const vm = this;
+                  Swal.fire({
+                    title: 'Rostdanham nusxalamoqchimisiz?',
+                    text: "Ushbu buyurtmadan nusxa olsangiz u yangi buyurtmalar qatoriga qo'shiladi shu ma'lumotlar bilan sizning nomingizdan qo'shiladi agar sotilsa sizga belgilangan miqdordagi bonus balansingizga qo'shiladi",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Nusxala',
+                    cancelButtonText: 'Chiqish'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      // Confirm alındığında href'teki isteği gerçekleştir
+
+                      window.location.href = url;
+                    }
+                  });
+                },
+                IsHidden(order_id){
+                  var change = this.Hidden_order_id.filter(m => m == order_id)
+                  if (change.length >0){
+                    return false
+                  }
+                  return true
+                },
+
+                CancelledOrder(order_id, after_status) {
+                  vm = this
+                  return  Swal.fire({
+                    inputLabel: 'Yetkazilmoqda qilish uchun haydovchiga izoh yozing',
+                                  input: 'textarea',
+                                  showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Yetkazilmoqda qilish',
+                                  confirmButtonColor: '#3BB77E',
+                                  inputPlaceholder: 'izoh yozing...',
+                                  inputAttributes: {
+                                          'aria-label': 'Yetkazilmoqda qilish sababini yozing..'
+                                        },
+                                        inputValidator: (value) => {
+                                          return new Promise((resolve) => {
+                                            if (value === '') {
+                                              resolve("Iltimos oldin izoh kiriting")
+                                            }else{
+                                              resolve()
+                                            }
+                                          })
+                                        }
+                            }).then(function(result) {
+                              if (result.value) {
+                                axios.post('/operator/order/canceled/change/axios', {
+                                    order_id: order_id,
+                                    desc: result.value,
+                                  })
+                                  .then(function (response) {
+                                      console.log(response)
+                                     if(response.data.status == 200){
+                                                            vm.Hidden_order_id.push(order_id)
+                                           Swal.fire({
+                                                        title: "O'zgartirildi",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'success',
+                                                        timer: 2500
+                                                    })
+                                                    }else if (response.data.status == 256){
+                                                        Swal.fire({
+                                                        title: "bu buyurtmaning mahsuloti boshqa buyurtmaga berilgan",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'error',
+                                                                timer: 2500
+                                                    })
+
+                                                    }
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+                                  });
+
+
+                              }
+
+                            });
+                },
+
+
+              }
+
+        });
+
+
+            var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: false,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                } ,{
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+            }
+        });
+
+
+ var timer = 1000
+            $(".change_this_site_order").click(function () {
+        var product_url = $(this).closest('button');
+        $.ajax({
+            url: '/order-site-is-change',
+            data: {
+                'order_id': product_url.attr('order-id')
+            },
+            dataType: 'json',
+            error: function (data) {
+                console.log(data)
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: 'Xato buyruq',
+                    showConfirmButton: false,
+                    timer: timer
+                })
+            },
+            success: function (data) {
+                document.getElementById(product_url.attr('order-id')).disabled=true
+                document.getElementById(product_url.attr('order-id')).innerHTML ="O'zgartirildi"
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: "O'zgartirildi",
+                    showConfirmButton: false,
+                    timer: timer
+                })
+            },
+
+        });
+    });
+</script>
+{% endblock %}

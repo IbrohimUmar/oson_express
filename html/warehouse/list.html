@@ -1,0 +1,178 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    {{ region.name }} uchun kerekli mahsulotlar ro'yxati
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">Omborlar ro'yxati</h2>
+
+            <div>
+            </div>
+        </div>
+
+        {% if perms.admin.warehouse_has_view_1 or perms.admin.warehouse_has_view_2 %}
+        <div class="card mb-4">
+            <div class="card-body row">
+                <h3 class="mt-2 mb-2 text-center">Asosiy omborlar</h3>
+
+
+                {% if perms.admin.warehouse_has_view_1 %}
+                <div class="col-md-6 mt-2">
+                    <a >
+                        <div class="box text-center " style="border:1px solid #05a879; border-radius:10px;">
+                            <article class="icontext">
+                                <div class="text">
+                                   <img src="{% static '' %}svg/warehouse.svg" class="mt-2" height="60px" alt="">
+<!--                                    <i class="material-icons md-check"></i>-->
+                                    <h4>
+
+
+                                    Soz mahsulotlar ombori</h4>
+
+                                    <h6> <i class="material-icons md-perm_identity " style="vertical-align:bottom"></i> Ma'sul :
+                                        {{warehouse.0.responsible__first_name}} {{warehouse.0.responsible__last_name}}</h6>
+
+                                    <div style="border:0.5px solid white; border-radius:10px; padding:10px;">
+                                            <h6>Amaliyotlar</h6>
+                                            {% if  perms.admin.warehouse_operation_input_product_1 %}
+                                                <a class="mr-5" title="Kirim" href="{% url 'warehouse_operation_input_product' 1 %}">
+                                                    <img src="{% static '' %}svg/product_in.svg"  class="mt-2" height="60px" alt="Kirim">
+                                                </a>
+                                            {% endif %}
+
+                                               {% if  perms.admin.warehouse_operation_transit_product_1 %}
+                                               <a  class="mr-5" title="O'tkazma" href="{% url 'warehouse_operation_transit_product' 1 %}">
+                                                     <img src="{% static '' %}svg/product_transfer.svg" class="mt-2" height="60px" alt="O'tkazma">
+                                                        </a>
+                                            {% endif %}
+                                    </div>
+
+                              {% if  perms.admin.warehouse_residue_1 %}
+                                <a  href="{% url 'warehouse_residue' 1 %}" class="btn btn-brand btn-sm">Qoldiq mahsulotlar </a>
+                              {% endif %}
+
+                              {% if  perms.admin.warehouse_operation_history_1 %}
+                                <a  href="{% url 'warehouse_operation_history' 1 %}" class="btn btn-brand btn-sm">Amaliyotlar
+                                    {% if warehouse.0.operation_count > 0 %}
+                                    <span style="padding:0.35em 0.65em; border-radius:1.25rem; color:white; background-color:rgb(243 0 0 / 100%);font-size:11px;  font-weight:900" class="badge badge-soft-success">{{warehouse.0.operation_count}}</span>
+                                    {% endif %}
+                                    </a>
+
+                                <a  href="{% url 'warehouse_operation_history_driver' 1 %}" class="btn btn-brand btn-sm">Haydovchi amaliyotlari
+                                    </a>
+                                    
+                              {% endif %}
+                                </div>
+                            </article>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% if perms.admin.warehouse_has_view_2 %}
+                <div class="col-md-6 mt-2">
+                        <div class="box text-center " style="border:1px solid yellow; border-radius:10px;">
+                            <article class="icontext">
+                                <div class="text">
+                                   <img src="{% static '' %}svg/settings.svg" class="mt-2" height="60px" alt="">
+
+                                    <h4>Nosoz mahsulotlar ombori</h4>
+
+                                    <h6> <i class="material-icons md-perm_identity " style="vertical-align:bottom"></i> Ma'sul :
+                                        {{warehouse.1.responsible__first_name}} {{warehouse.1.responsible__last_name}}</h6>
+
+                                    <div style="border:0.5px solid white; border-radius:10px; padding:10px;">
+                                            <h6>Amaliyotlar</h6>
+<!--                                        <a class="mr-5" title="Kirim" href="{% url 'warehouse_operation_input_product' 2 %}">-->
+<!--                                            <img src="{% static '' %}svg/product_in.svg"  class="mt-2" height="60px" alt="Kirim">-->
+<!--                                        </a>-->
+<!--                                        <a  class="mr-5" title="Chiqim" href="#">-->
+<!--                                     <img src="{% static '' %}svg/product_out.svg" class="mt-2" height="60px" alt="Chiqim">-->
+<!--                                        </a>-->
+
+
+                                               {% if  perms.admin.warehouse_operation_transit_product_2 %}
+                                               <a  class="mr-5" title="O'tkazma" href="{% url 'warehouse_operation_transit_product' 2 %}">
+                                                     <img src="{% static '' %}svg/product_transfer.svg" class="mt-2" height="60px" alt="O'tkazma">
+                                                        </a>
+                                            {% endif %}
+
+<!--                                        <a  class="mr-5" title="O'tkazma" href="#">-->
+<!--                                     <img src="{% static '' %}svg/product_transfer.svg" class="mt-2" height="60px" alt="O'tkazma">-->
+<!--                                        </a>-->
+                                    </div>
+
+<!--                                <a  href="#" class="btn btn-brand btn-sm">Qoldiq mahsulotlar</a>-->
+
+
+                              {% if  perms.admin.warehouse_residue_2 %}
+                                <a  href="{% url 'warehouse_residue' 2 %}" class="btn btn-brand btn-sm">Qoldiq mahsulotlar </a>
+                              {% endif %}
+
+
+                                     {% if  perms.admin.warehouse_operation_history_2 %}
+                                <a  href="{% url 'warehouse_operation_history' 2 %}" class="btn btn-brand btn-sm">Amaliyotlar
+                                    {% if warehouse.1.operation_count > 0 %}
+                                    <span style="padding:0.35em 0.65em; border-radius:1.25rem; color:white; background-color:rgb(243 0 0 / 100%);font-size:11px;  font-weight:900" class="badge badge-soft-success">{{warehouse.1.operation_count}}</span>
+                                    {% endif %}
+                                    </a>
+                              {% endif %}
+
+                                </div>
+                            </article>
+                        </div>
+                </div>
+                {% endif %}
+                
+                
+                {% if perms.admin.warehouse_has_view_3 %}
+                <div class="col-md-6 mt-2">
+                        <div class="box text-center " style="border:1px solid yellow; border-radius:10px;">
+                            <article class="icontext">
+                                <div class="text">
+                                   <img src="{% static '' %}svg/settings.svg" class="mt-2" height="60px" alt="">
+
+                                    <h4>Qoldiq to'g'irlash ombori</h4>
+
+                                    <h6> <i class="material-icons md-perm_identity " style="vertical-align:bottom"></i> Ma'sul :
+                                        {{warehouse.2.responsible__first_name}} {{warehouse.2.responsible__last_name}}</h6>
+
+                                    <div style="border:0.5px solid white; border-radius:10px; padding:10px;">
+                                            <h6>Amaliyotlar</h6>
+<!--                                        <a class="mr-5" title="Kirim" href="{% url 'warehouse_operation_input_product' 2 %}">-->
+<!--                                            <img src="{% static '' %}svg/product_in.svg"  class="mt-2" height="60px" alt="Kirim">-->
+<!--                                        </a>-->
+<!--                                        <a  class="mr-5" title="Chiqim" href="#">-->
+<!--                                     <img src="{% static '' %}svg/product_out.svg" class="mt-2" height="60px" alt="Chiqim">-->
+<!--                                        </a>-->
+
+
+                                               {% if  perms.admin.warehouse_operation_transit_product_3 %}
+                                               <a  class="mr-5" title="O'tkazma" href="{% url 'warehouse_operation_transit_product' 3 %}">
+                                                     <img src="{% static '' %}svg/product_transfer.svg" class="mt-2" height="60px" alt="O'tkazma">
+                                                        </a>
+                                            {% endif %}
+                                    </div>
+                              {% if  perms.admin.warehouse_residue_3 %}
+                                <a  href="{% url 'warehouse_residue' 3 %}" class="btn btn-brand btn-sm">Qoldiq mahsulotlar </a>
+                              {% endif %}
+                                     {% if  perms.admin.warehouse_operation_history_3 %}
+                                <a  href="{% url 'warehouse_operation_history' 3 %}" class="btn btn-brand btn-sm">Amaliyotlar
+                                    {% if warehouse.3.operation_count > 0 %}
+                                    <span style="padding:0.35em 0.65em; border-radius:1.25rem; color:white; background-color:rgb(243 0 0 / 100%);font-size:11px;  font-weight:900" class="badge badge-soft-success">{{warehouse.3.operation_count}}</span>
+                                    {% endif %}
+                                    </a>
+                              {% endif %}
+
+                                </div>
+                            </article>
+                        </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endif %}
+    </section>
+{% endblock %}

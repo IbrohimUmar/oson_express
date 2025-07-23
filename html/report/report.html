@@ -1,0 +1,640 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h4 class="content-title">Hisobotlar </h4>
+
+                        <div>
+                            
+                            <div>
+                                <form method="get">
+                                
+                                <label>Yil</label>
+                                
+                                <select class="form-control" name="year" onchange="this.form.submit()">
+                                    <option value="2023" {% if year == '2023' %}selected{% endif %}>2023 yil</option>
+                                    <option value="2024" {% if year == '2024' %}selected{% endif %}>2024 yil</option>
+                                    <option value="2025" {% if year == '2025' %}selected{% endif %}>2025 yil</option>
+                                    <option value="2026" {% if year == '2026' %}selected{% endif %}>2026 yil</option>
+                                    <option value="2027" {% if year == '2027' %}selected{% endif %}>2027 yil</option>
+                                </select>
+                                    </form>
+                            </div>
+<!--                            <a href="{% url 'being_order_list' %}" class="btn btn-sm btn-brand">Qaytish</a>-->
+            </div>
+        </div>
+
+                <div class="card">
+            <div class="card-header">
+                <h6>Buyurtmalar bo'yicha</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th>Turi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'orderDetails')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Kelgan buyurtmalar soni</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_received_count)]]</td>
+                    </tr>
+
+                    <tr>
+                        <td>Sotilgan buyurtmalar soni</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_sold_count)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Sotilgan buyurtmalar summasi</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_sold_price)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Bekor qilingan buyurtmalar soni</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_cancelled_count)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Bekor qilingan buyurtmalar summasi</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_cancelled_price)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Mahsuloti yuborilgan buyurtma soni</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_shipped_count)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Mahsuloti yuborilgan buyurtma summasi</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_shipped_price)]]</td>
+                    </tr>
+
+                    </tbody>
+                    <thead>
+                    <tr>
+
+                    </tr>
+                    </thead>
+                </table>
+                </div>
+            </div>
+        </div>
+
+
+
+                <div class="card">
+            <div class="card-header">
+                <h6>Tovar summasi bo'yicha</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th>Turi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'productPriceDetails')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Ombordagi</td>
+                        <td v-for="r in reports">[[format_money(r.total_product_price_in_warehouse)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Haydovchilardagi</td>
+                        <td v-for="r in reports">[[format_money(r.total_product_price_in_drivers)]]</td>
+
+                    </tr>
+
+                    </tbody>
+                    <thead>
+                    <tr>
+                        <th>Jami</th>
+                        <th v-for="r in reports">[[format_money(r.total_product_price_in_warehouse + r.total_product_price_in_drivers)]]</th>
+<!--                        <td for="r in reports">[[r]]</td>-->
+
+                    </tr>
+                    </thead>
+                </table>
+                </div>
+            </div>
+        </div>
+
+
+                <div class="card">
+            <div class="card-header">
+                <h6>Qarzdorlik bo'yicha</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th class="text-center">Turi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'debtDetails')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Ta'minotchilardan qarzimiz :</td>
+                                                <td v-for="r in reports">[[format_money(r.total_debt)]]</td>
+
+                    </tr>
+                    <tr>
+                        <td>Haydovchilarning bizdan qarzi :</td>
+                                                <td v-for="r in reports">[[format_money(r.drivers_debts)]]</td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h6>Kirim summalar bo'yicha</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th class="text-center">Nomi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'inDetails')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(val, index) in cashIn">
+                        <td>
+                            <span v-if="val.name">[[val.name]]</span>
+                            <span v-else>Kategoriya tanlanmagan</span>
+                            </td>
+                        <td>[[format_money(val.jan)]]</td>
+                        <td>[[format_money(val.feb)]]</td>
+                        <td>[[format_money(val.mart)]]</td>
+                        <td>[[format_money(val.aprel)]]</td>
+                        <td>[[format_money(val.may)]]</td>
+                        <td>[[format_money(val.jun)]]</td>
+                        <td>[[format_money(val.jul)]]</td>
+                        <td>[[format_money(val.avg)]]</td>
+                        <td>[[format_money(val.sep)]]</td>
+                        <td>[[format_money(val.oct)]]</td>
+                        <td>[[format_money(val.now)]]</td>
+                        <td>[[format_money(val.dec)]]</td>
+                    </tr>
+                    </tbody>
+                    <thead>
+                    <tr style="border-top:1px solid white">
+     <th>Jami</th>
+                        <th v-for="(val, index) in getTotalAmountMonthBy(cashIn)" :key="index">
+                            [[format_money(val)]]
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h6>Chiqim summalar bo'yicha</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th>Turi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'outDetails')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(val, index) in cashOut">
+                         <td>
+                            <span v-if="val.name">[[val.name]]</span>
+                            <span v-else>Kategoriya tanlanmagan</span>
+                            </td>
+                        <td>[[format_money(val.jan)]]</td>
+                        <td>[[format_money(val.feb)]]</td>
+                        <td>[[format_money(val.mart)]]</td>
+                        <td>[[format_money(val.aprel)]]</td>
+                        <td>[[format_money(val.may)]]</td>
+                        <td>[[format_money(val.jun)]]</td>
+                        <td>[[format_money(val.jul)]]</td>
+                        <td>[[format_money(val.avg)]]</td>
+                        <td>[[format_money(val.sep)]]</td>
+                        <td>[[format_money(val.oct)]]</td>
+                        <td>[[format_money(val.now)]]</td>
+                        <td>[[format_money(val.dec)]]</td>
+                    </tr>
+                    </tbody>
+                    <thead>
+                    <tr style="border-top:1px solid white">
+     <th>Jami</th>
+
+                        <th v-for="(val, index) in getTotalAmountMonthBy(cashOut)" :key="index">
+                            [[format_money(val)]]
+                        </th>
+                    </tr>
+                    </thead>
+
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h6>Qoldiq</h6>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                        <th>Nomi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'cashBalance')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Oyning boshidagi</td>
+
+                        <td v-for="r in reports">[[format_money(r.total_cash_balance_beginning_month)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Sof pul oqimi</td>
+                        <td v-for="r in reports">[[format_money(r.month_cash_flow)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Oy oxiridagi qoldiq</td>
+                        <td v-for="r in reports">[[format_money(r.total_cash_balance)]]</td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header">
+                <h6>Katta balans</h6>
+                <span class="text-muted" style="font-size:12px;">
+                    Katta balansda nimalar ko'rinadi bu katta balans orqali jami qo'ldagi summa qo'shiladi,
+                    jami nasiya ayriladi,
+                    ombordagi tovar summasi va haydovchidagi tovar summasi qo'shiladi,
+                    jami haydovchilar to'lashi kerak bo'lgan summa qo'shiladi, natijada katta balans hosil bo'ladi bu balans orqali umumiy biznis o'sishi yoki minusga kirishini kuzatish mumkin
+
+
+
+                </span>
+            </div>
+            <div class="card-body">
+                <div style="overflow-x:auto !important;">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                    <tr style="border-bottom:1px solid white">
+                        <th>Turi</th>
+
+                        <th v-for="(val, index) in reports" :key="index">
+                        <a  class="badge btn-sm btn-brand" @click="dayCount(val.date, 'mainBalance')"><i class="material-icons md-add"></i>  [[getMonthName(val.date)]]</a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+        
+                                            <tr>
+                        <td>Jami haydovchilar qarzi</td>
+                                                <td v-for="r in reports">[[format_money(r.drivers_debts)]]</td>
+                    </tr>
+                    <tr>
+                        <td>Jami haydovchilar qo'lidagi mahsulotlar summasi</td>
+                        <td v-for="r in reports">[[format_money(r.total_product_price_in_drivers)]]</td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td>Yo'ldagi mahsulotlar summasi</td>
+                        <td v-for="r in reports">[[format_money(r.total_product_price_in_transition)]]</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ombor v2 dagi mahsulotlar summasi</td>
+                        <td v-for="r in reports">[[format_money(r.total_product_price_in_warehouse)]]</td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Hamma kassalardagi jami summa</td>
+                        <td v-for="r in reports">[[format_money(r.total_cash_balance)]]</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ta'minotchilardan qarzimiz</td>
+                                                <td v-for="r in reports">[[format_money(r.total_debt)]]</td>
+
+                    </tr>
+                        
+                        
+                    <tr>
+                        <th>Katta Balans</th>
+                        <td v-for="r in reports">[[format_money(r.main_balance)]]</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+               <div v-if="modal" :style="{ display: modal ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+
+        <div class="modal-content card" style="max-width:800px;width:95% !important; padding:0px;padding-bottom:0px;">
+  <!-- Modal content -->
+                <div class="modal-header">
+              <h4>[[modal_content.name]]</h4>
+
+      <span class="close" @click="modal = false">&times;</span>
+    </div>
+     <div class="modal-body">
+        <div class="row">
+        <div style="overflow-x:auto !important;">
+            
+            
+
+            
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nomi</th>
+
+                    <th v-for="m in modal_content.month_list">[[m]]</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                <tr v-for="i in modal_content.data">
+                    <td>[[i.name]]</td>
+
+
+                    <td v-for="a in i.data">[[format_money(a)]]</td>
+                    
+                    
+                </tr>
+
+                </tbody>
+
+            </table>
+</div>
+
+            <div class="col-md-12 text-center">
+          <button type="button" @click="modal=false" class="btn btn-danger btn-sm mt-3"><i class="material-icons md-cancel"></i> Chiqish</button>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+
+
+
+    </section>
+{% endblock %}
+{% block header %}
+
+<style>
+
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 100; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+        .table tr:nth-child(odd){background:#17cef20f}
+
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+
+
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 100; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+</style>
+    {% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+<script src="{% static '' %}js/vue.js"></script>
+<script src="{% static '' %}js/axios.min.js"></script>
+
+    <script>
+
+    axios.defaults.xsrfCookieName = "csrftoken"
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+    new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+        modal : false,
+        modal_content:{
+            name:"Buyurtmalar tarixi",
+            data : [ ],
+            month_list : [ ],
+        },
+        reports : {{data|safe}},
+        cashIn : {{cash_in|safe}},
+        cashOut :{{cash_out|safe}},
+
+        monthTranslations : {
+          'January': 'Yanvar',
+          'February': 'Fevral',
+          'March': 'Mart',
+          'April': 'Aprel',
+          'May': 'May',
+          'June': 'Iyun',
+          'July': 'Iyul',
+          'August': 'Avgust',
+          'September': 'Sentabr',
+          'October': 'Oktabr',
+          'November': 'Noyabr',
+          'December': 'Dekabr'
+        },
+        },
+    methods: {
+    dayCount: async function(dateStr, type){
+           self = this
+         await axios.post(`{% url "report_month_by_details" %}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }, 'date':dateStr, 'type':type}).then((response) => {
+                          const data = response.data;
+                           self.modal_content.name=data.name
+                           self.modal_content.data=data.data
+                           self.modal_content.month_list=data.month_list
+
+
+                          console.log(data)
+                          //this.data_for_filter = data.data
+
+                        })
+                        .catch((error) => {
+                            console.log(error.message)
+                        });
+        this.modal=true
+
+    },
+
+    getTotalAmountMonthBy(data){
+    const months = ['jan', 'feb', 'mart', 'aprel', 'may', 'jun', 'jul', 'avg', 'sep', 'oct', 'now', 'dec'];
+    const monthlyTotals = {};
+
+    for (const month of months) {
+      monthlyTotals[month] = data.reduce((total, item) => total + (item[month] || 0), 0);
+    }
+     return monthlyTotals
+    },
+
+
+    getMonthName(date){
+
+         var date = new Date(date);
+      var monthName = date.toLocaleString('default', { month: 'long' });
+      return this.monthTranslations[monthName];
+      },
+      
+      format_money: function(amount) {
+    if (amount != null) {
+        const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        return formattedNumber;
+    } else {
+        // amount null veya undefined ise başka bir değer veya işlem yapabilirsiniz.
+        return 'N/A';  // Örnek bir varsayılan değer
+    }
+    },
+    // format_money : function(amount){
+    //               const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    //             return formattedNumber;
+    //         },
+    }
+    })
+    </script>
+{% endblock %}

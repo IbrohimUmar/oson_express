@@ -1,0 +1,488 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">P&L</h2>
+        <div>
+            <a href="{% url 'driver_list' %}" class="btn btn-brand btn-sm"> Qaytish</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+<!--            <h5>Sana oralig'idagi statistika</h5>-->
+
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <form method="get">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label>Joriy davr uchun sana tanlang:</label>
+                                                        <input type="month" class="form-control" required name="month" value="{{dates}}">
+
+<!--                                <input type="date" class="form-control" id="from" {% if request.GET.date %} value="{{request.GET.date}}"{% else %}value="{{now}}"{% endif %} name="date">-->
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.from_date or request.GET.to_date %}
+                                 <a class="btn btn-danger" href="{% url 'driver_date_by_statistic' %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Nomlanishi</th>
+                        <th>Joriy davr uchun</th>
+                        <th>Oldingi oy uchun</th>
+                        <th>Oldingi oygacha bo'lgan davr uchun</th>
+                          <th>#</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Umumiy sotuv</td>
+                        <td>{{this_month_data.total_sold_price}} so'm</td>
+                        <td>{{previous_month.total_sold_price}} so'm</td>
+                        <td>{{two_months_ago_total.total_sold_price}} so'm</td>
+                    </tr>
+
+
+
+
+                      <tr>
+                        <td>Vozvrat</td>
+
+                        <td>[[money_format({{this_month_data.return_pay.total}})]] so'm</td>
+                        <td>[[money_format({{previous_month.return_pay.total}})]] so'm</td>
+                        <td>[[money_format({{two_months_ago_total.return_pay.total}})]] so'm</td>
+                        <td>
+                            <button class="btn btn-sm btn-brand" @click="modal4=!modal4">
+                                <i class="material-icons md-minus" v-if="modal4===true"></i>
+
+                                <i class="material-icons md-add" v-else></i>
+                            </button>
+                        </td>
+                    </tr>
+
+
+
+                    <tr v-if="modal4">
+
+                        <td>Tafsiloti</td>
+                        <td>
+                            {% for a in this_month_data.return_pay.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;">Qaytardi : {{a.from_user__first_name}} {{a.from_user__last_name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}                            {% endfor %}
+
+                        </td>
+                        <td>
+                            {% for a in previous_month.return_pay.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> Qaytardi : {{a.from_user__first_name}} {{a.from_user__last_name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for a in two_months_ago_total.return_pay.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;">Qaytardi : {{a.from_user__first_name}} {{a.from_user__last_name}}: [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+
+
+
+
+
+
+
+                    <tr>
+                        <td>Vozvrat qilingan summa</td>
+                        <td>0 so'm</td>
+                        <td>0 so'm</td>
+                        <td>0  so'm</td>
+                    </tr>
+                    <tr>
+                        <td>Umumiy tannarx xarajati</td>
+                        <td>{{this_month_data.total_input_price}} so'm</td>
+                        <td>{{previous_month.total_input_price}} so'm</td>
+                        <td>{{two_months_ago_total.total_input_price}} so'm</td>
+                         <td>
+                            <button class="btn btn-sm btn-brand" @click="modal1=!modal1">
+
+
+                                <i class="material-icons md-minus" v-if="modal1===true"></i>
+
+                                <i class="material-icons md-add" v-else></i>
+                            </button>
+                        </td>
+                    </tr>
+
+
+                                        <tr v-if="modal1" v-show="modal1">
+
+                        <td>Tafsiloti</td>
+                        <td>
+                            <span class="badge" style="border:1px solid;">Tovar kirim narxi : [[money_format({{this_month_data.input_price_details.input_price_total}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Admin to'lov : [[money_format({{this_month_data.input_price_details.seller_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Haydovchiga to'lov : [[money_format({{this_month_data.input_price_details.driver_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Operatorga to'lov : [[money_format({{this_month_data.input_price_details.operator_fee}})]] so'm</span> <br>
+
+                        </td>
+                        <td>
+                            <span class="badge" style="border:1px solid;">Mahsulotga to'lov : [[money_format({{previous_month.input_price_details.input_price_total}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Admin to'lov : [[money_format({{previous_month.input_price_details.seller_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Haydovchiga to'lov : [[money_format({{previous_month.input_price_details.driver_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Operatorga to'lov : [[money_format({{previous_month.input_price_details.operator_fee}})]] so'm</span> <br>
+                        </td>
+                        <td>
+                            <span class="badge" style="border:1px solid;">Mahsulotga to'lov : [[money_format({{two_months_ago_total.input_price_details.input_price_total}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Admin to'lov : [[money_format({{two_months_ago_total.input_price_details.seller_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Haydovchiga to'lov : [[money_format({{two_months_ago_total.input_price_details.driver_fee}})]] so'm</span> <br>
+                            <span class="badge" style="border:1px solid;">Operatorga to'lov : [[money_format({{two_months_ago_total.input_price_details.operator_fee}})]] so'm</span> <br>
+
+                        </td>
+
+                    </tr>
+
+
+
+
+                    <tr>
+                        <td>Yalpi foyda / Zarar</td>
+                        <td>{{this_month_data.total_fee}} so'm</td>
+                        <td>{{previous_month.total_fee}} so'm</td>
+                        <td>{{two_months_ago_total.total_fee}} so'm</td>
+                    </tr>
+
+
+                    <tr>
+                        <td>AP / Foyda</td>
+                        <td>{{this_month_data.op_profit}} so'm</td>
+                        <td>{{previous_month.op_profit}} so'm</td>
+                        <td>{{two_months_ago_total.op_profit}} so'm</td>
+                    </tr>
+                    <tr>
+                        <td>Yalpi foyda / Zarar marjasi</td>
+                        <td>{{this_month_data.gross_profit}}%</td>
+                        <td>{{previous_month.gross_profit}}%</td>
+                        <td>{{two_months_ago_total.gross_profit}}%</td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Ma'muriy xarajatlar</td>
+
+                        <td>[[money_format({{this_month_data.administrative.total}})]] so'm</td>
+                        <td>[[money_format({{previous_month.administrative.total}})]] so'm</td>
+                        <td>[[money_format({{two_months_ago_total.administrative.total}})]] so'm</td>
+                        <td>
+                            <button class="btn btn-sm btn-brand" @click="modal2=!modal2">
+
+
+                                <i class="material-icons md-minus" v-if="modal2===true"></i>
+
+                                <i class="material-icons md-add" v-else></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr v-if="modal2" v-show="modal2">
+
+                        <td>Tafsiloti</td>
+                        <td>
+                            {% for a in this_month_data.administrative.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}                            {% endfor %}
+
+                        </td>
+                        <td>
+                            {% for a in previous_month.administrative.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for a in two_months_ago_total.administrative.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+
+
+                      <tr>
+                        <td>Hissoblangan xarajatlar</td>
+
+                        <td>[[money_format({{this_month_data.estimated_fee.total}})]] so'm</td>
+                        <td>[[money_format({{previous_month.estimated_fee.total}})]] so'm</td>
+                        <td>[[money_format({{two_months_ago_total.estimated_fee.total}})]] so'm</td>
+                        <td>
+                            <button class="btn btn-sm btn-brand" @click="modal3=!modal3">
+                                <i class="material-icons md-minus" v-if="modal3===true"></i>
+
+                                <i class="material-icons md-add" v-else></i>
+                            </button>
+                        </td>
+                    </tr>
+
+
+
+                    <tr v-if="modal3">
+
+                        <td>Tafsiloti</td>
+                        <td>
+                            {% for a in this_month_data.estimated_fee.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.cash_flow_monthly_report__cash_category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}                            {% endfor %}
+
+                        </td>
+                        <td>
+                            {% for a in previous_month.estimated_fee.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.cash_flow_monthly_report__cash_category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for a in two_months_ago_total.estimated_fee.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> {{a.cash_flow_monthly_report__cash_category__name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td>Sof foyda</td>
+                        <td>{{this_month_data.net_profit}} so'm</td>
+                        <td>{{previous_month.net_profit}} so'm</td>
+                        <td>{{two_months_ago_total.net_profit}} so'm</td>
+                    </tr>
+
+                    <tr>
+                        <td>Boshqa kirim</td>
+                        <td>{{this_month_data.other_in.total}} so'm</td>
+                        <td>{{previous_month.other_in.total}} so'm</td>
+                        <td>{{two_months_ago_total.other_in.total}} so'm</td>
+                         <td>
+                            <button class="btn btn-sm btn-brand" @click="modal5=!modal5">
+                                <i class="material-icons md-minus" v-if="modal5===true"></i>
+                                <i class="material-icons md-add" v-else></i>
+                            </button>
+                        </td>
+                    </tr>
+
+
+                    <tr v-if="modal5">
+
+                        <td>Tafsiloti</td>
+                        <td>
+                            {% for a in this_month_data.other_in.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> Kimdan {{a.from_user__first_name}} {{a.last_user__first_name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}                            {% endfor %}
+
+                        </td>
+                        <td>
+                            {% for a in previous_month.other_in.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> Kimdan {{a.from_user__first_name}} {{a.last_user__first_name}} : [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for a in two_months_ago_total.other_in.details %}
+
+                            {% if a.total_amount is not None %}
+                            <span class="badge" style="border:1px solid;"> Kimdan {{a.from_user__first_name}} {{a.last_user__first_name}}: [[money_format({{a.total_amount}})]] so'm</span> <br>
+                            {% endif %}
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+
+
+                    <tr>
+                        <td>Dividend</td>
+                        <td>{{this_month_data.dividend_total}} so'm</td>
+                        <td>{{previous_month.dividend_total}} so'm</td>
+                        <td>{{two_months_ago_total.dividend_total}} so'm</td>
+                    </tr>
+                    <tr>
+                        <td>Risk fondi (sof foydadan 5%)</td>
+                        <td>{{this_month_data.risk_interest}} so'm</td>
+                        <td>{{previous_month.risk_interest}} so'm</td>
+                        <td>{{two_months_ago_total.risk_interest}} so'm</td>
+                    </tr>
+                    <tr>
+                        <td>Malaka oshirish fondi (sof foydadan 2%)</td>
+                        <td>{{this_month_data.education_interest}} so'm</td>
+                        <td>{{previous_month.education_interest}} so'm</td>
+                        <td>{{two_months_ago_total.education_interest}} so'm</td>
+                    </tr>
+                    <tr>
+                        <td>Taqsimlanmagan foyda</td>
+                        <td>{{this_month_data.not_distributed_profit}} so'm</td>
+                        <td>{{previous_month.not_distributed_profit}} so'm</td>
+                        <td>{{two_months_ago_total.not_distributed_profit}} so'm</td>
+                    </tr>
+
+
+<!--                    {% for d in driver %}-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <a href="{% url 'driver_about' d.id %}" class="btn btn-success btn-sm"><i class="material-icons md-edit"></i></a>-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {{ d.first_name }} {{ d.last_name }}-->
+<!--                            <br>-->
+<!--                            +{{ d.username }}-->
+<!--                        </td>-->
+<!--                        <td>{{ d.selling_count }}</td>-->
+<!--                        <td>{{ d.cancelled_count }}</td>-->
+<!--                        <td>{{ d.send_product_count }}</td>-->
+<!--                        <td>{{ d.call_back_count }}</td>-->
+<!--                        <td>{{ d.being_delivery_count }}</td>-->
+<!--                    </tr>-->
+<!--                    {% endfor %}-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+
+
+<script>
+
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+
+                modal1 : false,
+                modal2 : false,
+                modal3 : false,
+                modal4 : false,
+                modal5 : false,
+
+
+
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+              selectAll: {
+                        get: function (){
+                        return false},
+                        set: function (value) {
+                            if (value) {
+                                this.ordersCheck=this.ordersId
+                            }
+                        }
+                    },
+            },
+
+        });
+
+
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [{
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

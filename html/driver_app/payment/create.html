@@ -1,0 +1,42 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Yangi to'lov uchun so'rov yuborish</h4>
+            </div>
+            
+            <div>
+                <a href="{% url 'driver_app_payment_history' %}" class="btn btn-brand btn-sm">Qaytish</a>
+            </div>
+            
+        </div>
+
+        <form method="post" onsubmit="document.getElementById('#button_submit').disabled=true">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-body">
+                    <label>Kimga to'lov qildingiz</label>
+                    <select name="cashier" class="form-control" required>
+                        {% for i in request.user.driveruser.allowed_cashier.all %}
+                        <option value="{{i.id}}">{{i.first_name}} {{i.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <hr>
+                    <label>To'lov miqdori</label>
+                    <input type="number" class="form-control" required placeholder="Miqdori so'mda kiriting" name="amount">
+
+                    <hr>
+                    <label>Izoh</label>
+                    <textarea class="form-control" name="desc" placeholder="Qo'shimcha izohingizni kiriting"></textarea>
+                    <hr>
+                    <button class="btn btn-brand btn-sm" id="button_submit" type="submit"><i class="material-icons md-add"></i> Yuborish</button>
+                </div>
+            </div>
+        </form>
+
+    </section>
+    <br>
+    <br>
+{% endblock %}

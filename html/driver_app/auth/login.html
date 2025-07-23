@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Eltuvchi ro'yxatdan o'tish</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="Haydovchilar paneli"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="Eltuvchi ro'yxatdan o'tish"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="mahsulot.uz"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <script src="{% static 'js/sweetalert2@10.js' %}"></script>
+    <script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+    <script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+<body>
+
+<section class="content-main mt-80 mb-80">
+    <div class="card mx-auto card-login">
+        <div class="card-body">
+                        <h3 class="text-center"><img class="text-center mx-auto" src="{% static '' %}imgs/theme/fav.svg" class="mt-2" height="80px" alt=""><br> Elituvchi</h3>
+
+            <h6 class="text-center mb-4">Haydovchilar bo'limi</h6>
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                <div class="form-group  mb-10">
+                                                    <input type="text" class="js-phone-input form-control" required="true" id="phone_inputmask" name="phone" placeholder="Telefon raqamingiz" />
+                </div>
+                {% if messages_error %}
+                    <p class="text-center mt-2 mb-2 text-danger">Логин ёки парол нотўғри</p>
+                {% endif %}
+                <div class="form-group  mb-10 text-center">
+                    <button type="submit" class="btn btn-primary hover-up">Yuborish </button>
+                </div>
+            </form>
+            <h6 class="text-center"><a href="{% url 'admin_login' %}" class="text-center me-auto">Xodimlar bo'limiga kirish</a></h6>
+        </div>
+    </div>
+</section>
+        <script type='text/javascript'>$("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+
+<div style="padding:5px;">
+                        <div class="text-center mt-1" style="margin-bottom:2px;">
+                            <svg :id="'barcode' + order.barcode"></svg>
+                        </div>
+                         <span class="d-block coiny-class product-list-span" style="margin-bottom:1px;font-size:9px !important;" v-if="order.is_there_previous_order"
+                            >!Haydovchida bor id: #[[order.is_there_previous_order]]</span>
+                            
+                        <div style="border:1px solid black; border-radius:5px;">
+                            <table class="w-100 mr-auto m-auto text-center" style="border-style: hidden !important;">
+                                 <tr>
+                                    <th><i class="material-icons md-person barcode-material-icons"></i></th>
+                                    <!--                                <th>{{order.customer_name|slice:"30" }}{% if order.customer_name|length > 30 %}...{% endif %}</th>-->
+                                    <th>
+                                        <span v-if="order.customer_name.length <= 15">
+                                              [[ order.customer_name ]]
+                                            </span>
+                                            <span v-else>
+                                              [[ order.customer_name.substring(0, 15) ]]...
+                                            </span>
+                                        [[order.customer_phone]]
+
+                                    <span v-if="order.customer_phone2">
+                                              ,[[ order.customer_phone2 ]]
+                                            </span>
+                                            
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th><i class="material-icons md-place barcode-material-icons"></i></th>
+                                    <th>[[order.customer_region]], [[order.customer_district]], [[order.customer_street]]
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <h6 class="total-price-span text-center">Jami ------------------------- [[order.total_price]]
+                            so'm</h6>
+
+                        <span v-for="item in order.product_list">
+                        <span class="product-list-span" v-if="item.type ==='1'">
+                            [[item.product_name]]
+                            <span v-if="item.color">, [[item.color]]</span>
+                            <span v-if="item.measure_item">,[[item.measure_item]],</span>
+                            --- <span
+                                class="product-list-price-span">[[item.amount]] ta,[[item.price]] dan</span></span>
+
+                        <span class="product-list-span" v-if="item.type==='2'">
+                            [[item.product_name]]
+                            --- <span class="product-list-price-span">[[item.amount]] ta,[[item.price]] dan</span>
+                            <br>
+
+                            <span v-for="collection_item in item.collection_items"
+                                  class="badge product-list-collection-item-span" style="font-weight:900;color:black;">[[collection_item.product_name]]
+                                <span v-if="collection_item.color">,[[collection_item.color]],</span>
+                                <span v-if="collection_item.measure_item">,[[collection_item.measure_item]],</span>
+                            </span>
+
+                        </span>
+                    </span>
+
+                        <div class="text-center">
+                            <h6 class="mt-1 font-coiny" style="font-size:10px !important; color:black;"><i
+                                    class="material-icons md-headset_mic barcode-material-icons"></i> Call center:
+                                +998692261164</h6>
+                        </div>
+
+                        <div class="text-center">
+                            <h6 class=" font-coiny" style="font-size:10px !important; color:black;"><i class="material-icons barcode-material-icons md-schedule"></i> Sana: {{request.user.today }}, #ID:[[order.id]]</h6>
+                        </div>
+
+
+                    </div>

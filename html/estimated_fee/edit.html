@@ -1,0 +1,106 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Yangi hisoblanadigan xarajat p'zgartirish</h4>
+            </div>
+            <div>
+                <a href="{% url 'estimated_fee_list' %}" class="btn btn-brand">
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Ma'lutmotlarni to'ldiring</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-30 mt-10 order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Nomi</label>
+                        <input type="text" name="name" placeholder="To'lov nomi " {% if r %}value="{{r.name}}" {% endif %} required
+                               class="form-control">
+                        <label>Kategoriya</label>
+                        <select class="form-control" name="category" required>
+                            {% for c in category %}
+                            <option value="{{c.id}}" {% if r.category == i %}selected{% endif %}>{{c.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Miqdori</label>
+                        <input type="number" name="amount" {% if r %}value="{{r.amount}}" {% endif %} placeholder="Miqdorini kiriting"
+                               class="form-control" required>
+
+                        <label class="text-sm">To'lov aktivmi</label>
+                        <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active == "on" or r.is_active == True %} checked{% endif %}{% endif %}>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+        <h6 class="text-center">Yopilgan oylari ro'yxati</h6>
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Oy</th>
+                        <th>Yopilgan summa</th>
+                        <th>Yopilgan vaqtdagi to'lov miqdori</th>
+                        <th>Yopgan ma'sul</th>
+                    </tr>
+
+                    </thead>
+                    <tbody>
+                        {% for c in closed_reports %}
+
+                    <tr>
+                        <td>{{c.date|date:"Y-m"}}</td>
+                        <td>
+                            <h6>{{c.amount_uzs}} so'm</h6>
+                        </td>
+                        <td>
+                            <h6>{{c.marked_amount_uzs}} so'm</h6>
+                        </td>
+                        <td>
+                            {{r.responsible.first_name}} {{c.responsible.last_name}}
+                        </td>
+                    </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+
+</section>
+<script type='text/javascript'>
+    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});
+
+</script>
+
+{% endblock %}
+{% block header %}
+<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+{% endblock %}
+{% block footer %}
+{% endblock %}

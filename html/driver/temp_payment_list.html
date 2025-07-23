@@ -1,0 +1,752 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h3 class="content-title">Haydovchilar tasdiqlanmagan to'lovlari</h3>
+        <div>
+<!--            <h4>Jami buyurtma soni : {{ count }} ta</h4>-->
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div style="overflow-x:auto !important;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Haydovchi</th>
+                        <th>Kategoriya</th>
+                        <th>Qabul qiluvchi kassa</th>
+                        <th>Miqdori</th>
+                        <th>Izoh</th>
+                        <th>Yuborilgan sana</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in queryset %}
+                    <tr>
+                        <td>
+
+
+                            {% if o.status == '1' %}
+                            <span class="badge badge-soft-info">Tasdiqlanmagan</span>
+                            {% else %}
+                            <span class="badge badge-soft-danger">{{o.get_status_display}}</span>
+                            {% endif %}
+                            <br>
+
+                                                <form method="post" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{o.id}}" name="temp_id">
+                                                            <input type="hidden" value="check" name="type">
+                                                            <button
+
+                                                                    onclick="
+                                                    Swal.fire({
+                                                      title: 'Siz tasdiqlamoqchimisiz?',
+                                                      showDenyButton: true,
+                                                      showCancelButton: false,
+                                                      confirmButtonText: 'Xa',
+                                                      denyButtonText: `Qaytish`,
+                                                    }).then((result) => {
+                                                      /* Read more about isConfirmed, isDenied below */
+                                                      if (result.isConfirmed) {
+                                                           form.submit()
+                                                      }
+                                                    })"
+                                                                    class="btn btn-sm btn-success" type="button"><i class="material-icons md-check"></i> </button>
+<!--                                                            <a href=""  class="btn btn-sm btn-success"> <i class="material-icons md-check"></i> </a>-->
+                                                        </form>
+
+                            {% if o.status == '1' %}
+                                                        <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                   <input type="hidden" value="cancel" name="type">
+                                <input type="hidden" name="temp_id" value="{{o.id}}">
+                                <input type="hidden" name="desc" id="delete_note_{{o.id}}">
+                                <button class="btn  btn-warning rounded font-sm btn-sm" type="button" onclick="return Swal.fire({
+                                  title: 'Bekor qilishingiz sababi',
+                                  input: 'textarea',
+                                   showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                    confirmButtonColor: '#F30000',
+                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...'
+                            }).then(function(result) {
+                              if (result.value) {
+                                document.getElementById('delete_note_' + {{o.id}}).value = result.value
+                                form.submit();
+                              }
+
+                            })"><i class="material-icons md-cancel"></i></button>
+                            </form>
+                            {% endif %}
+
+                                                              <form method="post" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{o.id}}" name="temp_id">
+                                                            <input type="hidden" value="delete" name="type">
+                                                            <button
+
+                                                                    onclick="
+                                                    Swal.fire({
+                                                        icon: 'warning',
+                                                      title: 'Siz o\'chirmoqchimisiz?',
+                                                      showDenyButton: true,
+                                                      showCancelButton: false,
+                                                      confirmButtonText: 'Xa',
+                                                      denyButtonText: `Qaytish`,
+                                                    }).then((result) => {
+                                                      /* Read more about isConfirmed, isDenied below */
+                                                      if (result.isConfirmed) {
+                                                           form.submit()
+                                                      }
+                                                    })"
+                                                                    class="btn btn-sm btn-danger" type="button"><i class="material-icons md-delete"></i> </button>
+                                                        </form>
+                        </td>
+                        <td>
+                            {{ o.user.first_name }} {{o.user.last_name}} <br>
+                            +{{o.user.username}}
+                        </td>
+                        <td>
+                            {% if o.category %}
+                            <span class="badge badge-soft-primary">{{ o.category.name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if o.cashier %}
+                            {{ o.cashier.first_name }} {{ o.cashier.last_name }}
+                            <br> +{{o.cashier.username}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!--[[money_format(o.amount)]]-->
+                            {{ o.amount }}
+                        </td>
+                        <td>
+                            {{ o.desc }}
+                        </td>
+                        <td>
+
+                            {{ o.created_at }}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="pagination-area mt-20 mb-20">
+            <nav aria-label="Page navigation example">
+
+                <div class="mb-3 text-center">
+                    {% if queryset.has_next %}
+<!--                    <div>-->
+
+                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                           href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                    {% elif queryset.has_previous %}
+
+                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                           href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            <span class="m-auto">< Oldingi sahifaga qaytish </span> </a>
+<!--                    </div>-->
+
+                    {% endif %}
+<!--                </div>-->
+                </div>
+                <ul class="pagination justify-content-center">
+
+                   {% if queryset.has_previous %}
+
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> < </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page={{ queryset.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{queryset.previous_page_number}}</a>
+                    </li>
+                      {% endif %}
+
+
+
+                    <li class="page-item active">
+                        <span class="badge btn-brand page-link" href="#"> {{ queryset.number }} </span>
+                    </li>
+
+                   {% if queryset.has_next %}
+
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;" href="?page={{ queryset.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                        >{{queryset.next_page_number}}</a></li>
+                    <li class="page-item">
+                        <a class="badge page-link" style="background-color:#4d5561;"
+                                href="?page={{ queryset.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> >
+                        </a>
+                    </li>
+                    {% endif %}
+
+
+
+
+                </ul>
+            </nav>
+                <div>
+                                    <h6 class="text-center m-auto text-muted mt-2" style="font-size:10px;">Jami sahifalar soni : {{ queryset.paginator.num_pages }} ta</h6>
+
+                </div>
+
+        </div>
+
+
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+<style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+</style>
+{% endblock %}
+{% block footer %}
+<script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+<script src="{% static '' %}js/datatables/excel/dataTables.buttons.min.js"></script>
+<script src="{% static '' %}js/datatables/excel/jszip.min.js"></script>
+<script src="{% static '' %}js/datatables/excel/buttons.html5.min.js"></script>
+<script src="{% static '' %}js/vue.js"></script>
+<!--<script  src="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.js"></script>-->
+<!--<script src="https://unpkg.com/vue2-datepicker"></script>-->
+<!--<script src="https://unpkg.com/vue2-datepicker@3.11.1/index.js"></script>-->
+<!--<script src="https://unpkg.com/vue2-datepicker@1.6.2"></script>-->
+
+
+<script src="{% static '' %}js/axios.min.js"></script>
+<script>
+
+axios.defaults.xsrfCookieName = "csrftoken"
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: false,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+            }
+        });
+        
+           const v = new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+             //components: { Multiselect: window.VueMultiselect.default   },
+
+
+
+            data: {
+            in_modal:false,
+            out_modal:false,
+            transfer_modal:false,
+            filter_modal:false,
+            ifChanged :false,
+            data_for_filter : [],
+            cash_total_amount:0,
+            cashList : [],
+            total_item : 0,
+            pagination : 0,
+            start_data : '',
+            end_data : '',
+            search : '',
+            amount : '',
+
+                      loading: false, // Yükleme durumu
+                      error: null, // Hata mesajı
+                      page: 1, // Şu anki sayfa numarası
+                      has_next: true, // Sonraki sayfa var mı?
+                      has_previous:false,
+                        total_pages : 1, // jami sahifa soni
+                        total_pages : 0, // jami sahifa soni
+
+
+
+
+
+            cash_in_data:[],
+            cash_out_data:[],
+            cash_transfer_data:[],
+            filter : {
+                search:'',
+                type:'',
+                category:'',
+                user:'',
+                from_date:'',
+                to_date:'',
+            },
+            filtered : {
+                search:'',
+                type:'',
+                category:'',
+                user:'',
+                from_date:'',
+                to_date:'',
+            },
+            cash_transfer : {
+                from_user:'',
+                to_user:'',
+                amount:'',
+                desc:'',
+            },
+            cash_in : {
+                from_user:'',
+                to_user:'',
+                category:0,
+                amount:'',
+                desc:'',
+            },
+            cash_out : {
+                from_user:'{{request.user.id}}',
+                to_user: '',
+                category:0,
+                amount:'',
+                desc:'',
+            },
+            report : {
+            total_balance : 0,
+            cash_list : []
+            }
+
+            },
+    created() {
+                this.getCashList()
+                this.getReportData()
+            },
+            methods:{
+
+                fromUserLabel (option) {
+                 return `${option.first_name} +${option.username}`
+
+                },
+
+
+                getReportData:async function(){
+                         await axios.get(`{% url "cash_report_json_data" %}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }}).then((response) => {
+                          const data = response.data;
+                          console.log(data)
+                          this.report.total_balance=data.total_balance
+                          this.report.cash_list=data.cash_list
+                          //this.data_for_filter = data.data
+
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                        });
+                },
+
+                clearSearchAndFilter:async function () {
+                this.search=''
+                this.filtered={
+                search:'',
+                type:'',
+                category:'',
+                user:'',
+                from_date:'',
+                to_date:'',
+                }
+                this.filter=this.filtered
+                this.page=1
+
+
+                await this.getCashList()
+                },
+
+                searchKeywords:async function () {
+                await this.getCashList()
+                },
+
+                showFilterModel:async function () {
+                await this.getFilterData()
+                 this.filter_modal=true
+                },
+
+                filterByCashier:async function(cashier_id){
+                if (this.filtered.user===cashier_id){
+
+                this.filtered.user=''
+                }else{
+                this.filtered.user=cashier_id
+                }
+                this.page=1
+                await this.getCashList()
+                },
+
+
+
+                getFilterData:async function(){
+                         await axios.get(`{% url "cash_filter_json_data" %}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }}).then((response) => {
+                          const data = response.data;
+                          this.data_for_filter = data.data
+
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                        });
+                },
+
+                filterData:async function(){
+                this.filtered=this.filter
+                this.page=1
+                await this.getCashList()
+                                 this.filter_modal=false
+
+                },
+
+                cancelFilterData:async function(){
+                this.filter_modal=false
+
+                this.filtered={
+                search:'',
+                type:'',
+                category:'',
+                user:'',
+                from_date:'',
+                to_date:'',
+                }
+                this.filter=this.filtered
+                this.page=1
+                await this.getCashList()
+                },
+
+
+                getCashList:async function(){
+                      this.loading = true;
+                      this.error = null;
+                         await axios.get(`{% url "cash_json_data" %}?page=${this.page}&search=${this.search}&type=${this.filtered.type}&category=${this.filtered.category}&user=${this.filtered.user}&from_date=${this.filtered.from_date}&to_date=${this.filtered.to_date}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }}).then((response) => {
+                          const data = response.data;
+                          console.log(data)
+                          this.has_next = data.has_next;
+                          this.has_previous = data.has_previous;
+                          this.total_pages = data.num_pages;
+                          this.cashList = data.data
+                          this.loading = false;
+                          this.total_item = data.total_item;
+                          this.cash_total_amount = data.cash_total_amount;
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                        });
+                },
+                    goToNextPage() {
+                        if (this.has_next) {
+                            this.page++;
+                            this.getCashList();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToFirstPage() {
+                        if (this.has_previous) {
+                            this.page=1;
+                            this.getCashList();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToThisPage(number) {
+                            this.page=number;
+                            this.getCashList();
+                            window.scrollTo(0, 0);
+                        },
+                        goToLastPage() {
+                        if (this.has_next) {
+                            this.page= Number(this.total_pages);
+                            this.getCashList();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToPreviousPage() {
+                        if (this.has_previous) {
+                            this.page--;
+                            this.getCashList();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+
+
+
+                showCashTransferModal:async function(){
+                await this.getCashTransferData()
+                this.transfer_modal=true
+                },
+
+
+                getCashTransferData:async function(){
+                        this.cash_transfer_data= await axios.get('{% url "cash_transfer_data_json" %}').then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data['data'])
+                            return response.data['data']
+
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+                setCashTransferData:async function(){
+                   vm=this
+                        response= await axios.post('{% url "cash_transfer_data_json" %}', {"data":this.cash_transfer}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "Saqlandi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.transfer_modal=false
+                            vm.cash_transfer =  {
+                                    from_user:'',
+                                    to_user:'',
+                                    amount:'',
+                                    desc:'',
+                                    date:new Date().toISOString().slice(0, 16),
+                                }
+                             vm.getCashList()
+                            vm.getReportData()
+
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+
+
+
+                showCashOutModal:async function(){
+                await this.getCashOutData()
+                this.out_modal=true
+                },
+
+
+                getCashOutData:async function(){
+                        this.cash_out_data= await axios.get('{% url "cash_out_data_json" %}').then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data['data'])
+                            return response.data['data']
+
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+                setCashOutData:async function(){
+                   vm=this
+                        response= await axios.post('{% url "cash_out_data_json" %}', {"data":this.cash_out}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "Saqlandi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.out_modal=false
+                            vm.cash_out =  {
+                                    from_user:'',
+                                    to_user:'',
+                                    category:0,
+                                    amount:'',
+                                    desc:'',
+                                    date:new Date().toISOString().slice(0, 16),
+                                }
+                            vm.getCashList()
+                            vm.getReportData()
+
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    }).catch((error) => {
+                          console.log(error)
+                        });
+
+
+
+
+
+
+                return this.cashList
+                },
+
+
+
+                showCashInModal:async function(){
+                await this.getCashInData()
+                this.in_modal=true
+                },
+
+
+                getCashInData:async function(){
+                        this.cash_in_data= await axios.get('{% url "cash_in_data_json" %}').then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data['data'])
+                            return response.data['data']
+
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+                setCashInData:async function(){
+                   vm=this
+                        response= await axios.post('{% url "cash_in_data_json" %}', {"data":this.cash_in}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "Saqlandi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.in_modal=false
+                            vm.cash_in =  {
+                                    from_user:'',
+                                    to_user:'',
+                                    category:0,
+                                    amount:'',
+                                    desc:'',
+                                    date:new Date().toISOString().slice(0, 16),
+                                }
+                            vm.getCashList()
+                            vm.getReportData()
+
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+
+            money_format : function(amount){
+                
+                
+                  if (amount === null || amount === undefined) {
+                        return ""; // veya başka bir değer döndürebilirsiniz
+                }
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            },
+
+
+            input_format_money() {
+                  this.cash_in.amount = this.cash_in.amount.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            },
+            out_format_money() {
+                  this.cash_out.amount = this.cash_out.amount.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            },
+            transfer_format_money() {
+                  this.cash_transfer.amount = this.cash_transfer.amount.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            },
+
+            },
+            computed: {
+            },
+            watch : {
+             },
+        });
+
+
+</script>
+
+{% endblock %}

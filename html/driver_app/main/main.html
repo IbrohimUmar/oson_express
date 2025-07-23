@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+{% load static %}
+{% with request.resolver_match.url_name as u %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{{SITE_NAME}} - haydovchi paneli</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="Haydovchi paneli"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="{{SITE_NAME}} ro'yxatdan o'tish"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="{{SITE_NAME}}"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <link href="{% static '' %}css/additional_app.css" rel="stylesheet" type="text/css"/>
+
+    <script src="{% static 'js/sweetalert2@10.js' %}"></script>
+    <script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+    <script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+            {% block header %}{% endblock %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+    {% if request.user.theme == '2' %}
+<body class="dark">
+    {% else %}
+        <body>
+    {% endif %}
+
+
+{% if messages %}
+    {% for message in messages %}
+        <script>
+            Swal.fire({
+                customClass: {
+                    title: 'swal2-title'
+                },
+                position: 'center',
+                icon: '{{message.tags}}',
+                title: '{{message}}',
+                showConfirmButton: false,
+                timer: 2300
+            })
+        </script>
+
+    {% endfor %}
+{% endif %}
+<main>
+
+
+
+    <header class="main-header" style="padding-top:10px;min-height:10px;">
+        <div class="col-nav" style="margin-bottom:10px !important;">
+        <img src="{% static '' %}imgs/theme/fav.svg" height="40px" alt="">
+            <h4 class="text-center me-auto ml-2" style="margin-left: auto">
+            <a href="{% url 'driver_app_profile' %}" class="text-dark"><h3>{{SITE_NAME}}</h3></a>
+
+            </h4>
+
+            <ul class="nav">
+
+
+                        {% if request.user.type != "2" %}
+                    <li class="nav-item">
+                        <a  class="badge btn btn-brand" style="padding:6px;" type="submit"
+                            href="{% url 'home' %}">
+                            Qaytish
+                        </a>
+                    </li>
+                {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" onclick="axios.get('/change_color')" type="submit"
+                           id="change-color" href="#"> <i
+                                class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
+                       aria-expanded="false"> <i class="material-icons md-perm_identity md-36"></i></a>
+
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger"
+                           onclick="return Swal.fire({
+                                   title: 'Siz rostdanham chiqmoqchimisiz?',
+                                   showDenyButton: true,
+                                   showCancelButton: false,
+                                   confirmButtonText: 'Xa',
+                                   denyButtonText: `Qaytish`,
+                                   }).then((result) => {
+                                   /* Read more about isConfirmed, isDenied below */
+                                   if (result.isConfirmed) {
+                                   window.open('{% url 'logout' %}', '_self');
+                                   }
+                                   })"
+                        ><i class="material-icons md-exit_to_app"></i>Chiqish</a>
+                    </div>
+
+
+                </li>
+            </ul>
+        </div>
+    </header>
+    <!-- content-main end// -->
+    {% block content %}{% endblock %}
+<div class="header_navbar_collapse " style="display: block !importatn; border-top-right-radius: 25px;border-top-left-radius: 25px;
+border-bottom-left-radius:25px; border-bottom-right-radius:25px; margin-bottom:8px;
+ border:1px solid #515972; background-color:#05122cba;
+backdrop-filter: blur(10px);">
+    <ul class="header_navbar_collapse_nav" style="min-height: 51px;">
+
+
+
+
+
+            <li class="header_navbar_collapse_nav_item">
+            <div class="header_navbar_collapse_nav_item_pad">
+                <a class="badge {% if u == 'driver_app_profile' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_profile' %}"> <span
+                        class="material-icons md-perm_identity " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    Profilim
+                    </a>
+            </div>
+        </li>
+
+
+
+
+            <li class="header_navbar_collapse_nav_item">
+            <div class="header_navbar_collapse_nav_item_pad">
+                <a class="badge {% if u == 'driver_app_report_main' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_report_main' %}"> <span
+                        class="material-icons md-equalizer " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    Hisobot
+                    </a>
+            </div>
+        </li>
+
+
+
+                <li class="header_navbar_collapse_nav_item">
+            <div class="header_navbar_collapse_nav_item_pad">
+                <a class="badge {% if u == 'driver_app_payment_history' or u == 'driver_app_payment_create' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_payment_history' %}"> <span
+                        class="material-icons md-credit_card " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    To'lovlar
+                    </a>
+            </div>
+        </li>
+
+
+
+         <li class="header_navbar_collapse_nav_item">
+            <div class="header_navbar_collapse_nav_item_pad">
+                <a class="badge {% if u == 'driver_app_order_main' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_order_main' %}"> <span
+                        class="material-icons md-list_alt " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    Buyurtmalar
+                    </a>
+
+
+            </div>
+        </li>
+
+
+            <li class="header_navbar_collapse_nav_item">
+            <div class="header_navbar_collapse_nav_item_pad">
+                <a class="badge {% if u == 'driver_app_menu' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_menu' %}"> <span
+                        class="material-icons md-menu " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    Menyu
+                    </a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+<button
+        type="button"
+        class="btn btn-brand"
+        id="btn-back-to-top"
+>
+    <i class="material-icons md-arrow_upward"></i>
+</button>
+</main>
+<script src="{% static '' %}js/vendors/jquery-3.6.0.min.js"></script>
+<script src="{% static '' %}js/vendors/bootstrap.bundle.min.js"></script>
+<script src="{% static '' %}js/vendors/select2.min.js"></script>
+<script src="{% static '' %}js/vendors/perfect-scrollbar.js"></script>
+<script src="{% static '' %}js/back_to_top.js"></script>
+    <script src="{% static '' %}js/main.js?v=1.1" type="text/javascript"></script>
+<script src="{% static '' %}js/custom-chart.js" type="text/javascript"></script>
+<script src="{% static '' %}js/axios.min.js" type="text/javascript"></script>
+{% block footer %}{% endblock %}
+</body>
+</html>
+{% endwith %}

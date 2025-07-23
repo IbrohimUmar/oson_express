@@ -1,0 +1,251 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Hisoblanadigan xarajatlar uchun {{date}} oyini yopish</h4>
+        <div>
+
+
+
+
+
+                <a href="{% url 'estimated_fee_closed_month_list' %}" class="btn btn-brand btn-sm">
+                    <i class="material-icons md-left_arrow"></i> Qaytish
+                </a>
+
+<!--            <a href="{% url 'employee_list' %}" class="btn btn-sm btn-brand btn-sm">-->
+<!--                <i class="material-icons md-arrow_back"></i>-->
+<!--                Oddiy ro'yxatga qaytish-->
+<!--            </a>-->
+        </div>
+    </div>
+
+
+
+
+<!--    <div class="card mb-4">-->
+<!--        <div class="card-body">-->
+<!--            <form method="get">-->
+<!--                            <div class="row align-items-center">-->
+<!--                                <div class="col-md-5">-->
+<!--                                    <label>Yil va oy tanlang</label>-->
+
+<!--                                    <input type="month" class="form-control" name="date" value="{{date}}" onchange="this.form.submit()">-->
+
+<!--                                    </div>-->
+
+<!--                                <div class="col-md-2">-->
+<!--                                    <label>Yopish</label>-->
+<!--                                        <a href="{% url 'estimated_fee_closed_month_list' %}" class="btn btn-brand btn-sm">-->
+<!--                                            <i class="material-icons md-add"></i>-->
+<!--                                            Oyni yopish-->
+<!--                                        </a>-->
+
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+                                    <form method="get">
+
+                <div class="row align-items-center">
+                    <div class="col-md-4 col-12 mb-md-0 mb-3">
+                        <label>Qidiruv</label>
+
+    <input type="text" class="form-control" placeholder="nomi bo'yicha qidiruv" name="search"
+                                           {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                        <input type="hidden" name="year" value="{{year}}">
+
+                    </div>
+
+
+
+<!--                    <div class="col-md-4 col-12 me-auto mb-md-0 mb-3">-->
+<!--                        <label>Kategoriya bo'yicha filter</label>-->
+<!-- <select name="type" class="form-control">-->
+<!--                                        <option value="0" {% if request.GET.type == "0" %}selected{% endif %}>Hammasi</option>-->
+<!--                                        <option value="1" {% if request.GET.type == "1" %}selected{% endif %}>Admin</option>-->
+<!--                                        <option value="2" {% if request.GET.type == "2" %}selected{% endif %}>Haydovchi</option>-->
+<!--                                        <option value="3" {% if request.GET.type == "3" %}selected{% endif %}>Operator</option>-->
+<!--                                        <option value="4" {% if request.GET.type == "4" %}selected{% endif %}>Upakovkachi</option>-->
+<!--&lt;!&ndash;                                        <option value="5" {% if request.GET.type == "5" %}selected{% endif %}>Ta'minotchilar</option>&ndash;&gt;-->
+<!--                                    </select>-->
+<!--                    </div>-->
+
+                     <div class="col-md-4">
+                         <label>Qo'llash</label> <br>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                         {% if request.GET.search or request.GET.type  %}
+
+                                      <a href="{% url 'estimated_fee_closed_month_create' year month %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                                                    {% endif %}
+                                </div>
+
+
+                </div>
+                                        </form>
+                        <h6 class="text-muted">Soni : {{count}} ta</h6>
+                            <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+                                {% csrf_token %}
+            <div style="overflow-x:auto !important;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+<!--                        <th>#</th>-->
+                        <th>Nomi</th>
+                        <th>Kategoriyasi</th>
+                        <th>Oylik to'lov miqdori</th>
+                        <th>Holati</th>
+                        <th>Normasi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr style="border-bottom: 1px solid #ffffff38;">
+                        <td>
+                            {{o.name}}
+                        </td>
+                        <td>
+                           <span class="badge btn-sm" style="border:1px solid white;">{{ o.cash_category__name }}</span>
+                        </td>
+                        <td>
+                            <h6>[[money_format( {{o.amount}}) ]] uzs </h6>
+                        </td>
+                        <td>
+                            {% if o.closed_months %}
+                            <span class="badge badge-soft-success" style="padding:5px 14px;">Yopildi</span>
+                            {% else %}
+                            <span class="badge badge-soft-danger" style="padding:5px 14px;">Hali yopilmadi</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if o.closed_months %}
+                                   <h6>[[money_format( {{o.closed_months.amount}}) ]] uzs </h6>
+                            {% else %}
+                            <h6>
+                                <input type="hidden" class="form-control" required name="cash_flow" value="{{o.id}}">
+                                <input type="hidden" class="form-control" required name="marked_amount" value="{{o.amount}}">
+                                <input type="number" class="form-control" required name="amount" value="{{o.amount}}">
+                            </h6>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="3"></td>
+                        <td colspan="2"><button class="btn btn-brand btn-sm" id="submit_button" type="submit">
+                            <i class="material-icons md-add"></i>Ro'yhatdagilar uchun oyni yopish</button></td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+            </div>
+                            </form>
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+
+</style>
+{% endblock %}
+
+
+{% block footer %}
+{% include 'table/footer.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+<script>
+
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+                value_list:[],
+                modal1 : false,
+                modal2 : false,
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+            },
+            computed: {
+              selectAll: {
+                        get: function (){
+                        return false},
+                        set: function (value) {
+                            if (value) {
+                                this.ordersCheck=this.ordersId
+                            }
+                        }
+                    },
+            },
+
+        });
+
+
+
+</script>
+
+{% endblock %}

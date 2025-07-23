@@ -1,0 +1,230 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <div>
+            <h3>To'lov</h3>
+
+        </div>
+        <div>
+            <a href="{% url 'seller_app_payment_create' %}" class="btn btn-sm btn-brand"><i class="material-icons md-add"></i> Yangi qo'shish</a>
+        </div>
+
+    </div>
+
+
+
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-info-light"><i
+                                class="text-primary material-icons md-local_shipping"></i></span>
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Hold balans</h6>
+                            <span>{{ request.user.seller_data.hold|format_money }} uzs</span>
+                            <span class="text-sm"> Sizning ehtimoliy daromadingiz</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+               <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-info-light"><i
+                                class="text-primary material-icons md-payment"></i></span>
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Jami to'landi</h6>
+                            <span>{{ request.user.seller_data.total_payment_confirmed|format_money }} uzs</span>
+                            <span class="text-sm">Jami to'lab berildi</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-info-light"><i
+                                class="text-primary material-icons md-payments"></i></span>
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Depozit balansda</h6>
+                            <span>{{ request.user.seller_data.total_payment_new|format_money }} uzs</span>
+                            <span class="text-sm">Sizga to'lash jarayonidagi mablag' </span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-primary-light"><i
+                                class="text-primary material-icons md-monetization_on"></i></span>
+                        <div class="text">
+                            <h6 class="mb-1 card-title">Balans</h6>
+<!--                            <span>{{ request.user.balance }} so'm</span>-->
+                            <span>{{ request.user.seller_data.balance|format_money }} so'm</span>
+                            <span class="text-sm"> Jami to'plagan bonusingiz </span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+        </div>
+
+
+    <div class="card mb-4">
+
+        <header class="card-header">
+            <!--                <h5 class="card-title">Qidiruv</h5>-->
+            <div class="align-items-center">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h6>Qidiruv</h6>
+                            <input type="number" class="form-control" placeholder="id bo'yicha qidiruv" name="filter" {% if quary %}value="{{ quary }}" {% endif %}>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Holati</h6>
+
+                            <select class="form-control" name="status">
+                                <option value="None">---------</option>
+                                {% for i in statuses %}
+                                <option value="{{i.0}}"
+                                        {% if request.GET.status is not None and request.GET.status == i.0 %}selected{% endif %}>{{i.1}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <h6>Qo'llash</h6>
+                            <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                            </button>
+                            {% if  request.GET.status or request.GET.site or request.GET.filter %}
+                            <a href="{% url 'seller_app_payment_main' %}" class="btn btn-danger"
+                               type="submit"><i class="material-icons md-search_off"></i></a>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </header>
+
+        <div class="card-body">
+        <h6 class="text-muted">Soni : {{count}} ta</h6>
+
+            <div style="overflow-x:auto !important;">
+                <table class="table" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Turi</th>
+                        <th>Holati</th>
+                        <th>Karta raqami</th>
+                        <th>Miqdori</th>
+                        <th>Izoh</th>
+                        <th>Yaratilgan sana</th>
+                        <th>O'zgartirilgan sana</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                            #{{ o.id }}
+                            {% if o.operator_order_id %}<br> <span class="badge badge-soft-success">operator-id: {{o.operator_order_id}}</span>{% endif %}
+                        </td>
+                        <td>
+                            <h6>
+                                {{ o.get_type_display }}
+                            </h6>
+                        </td>
+                        <td>
+                            <h6>
+                                <span class="badge" style="border:1px solid white"> {{ o.get_status_display }}</span>
+                            </h6>
+                        </td>
+                        <td>
+                            {% if o.payment_card %}
+                                {{ o.payment_card }}
+                            {% else %}
+                                ----------------------
+                            {% endif %}
+                        </td>
+                        <td>{{ o.amount|format_money }} uzs
+                        </td>
+                        <td>{{ o.desc }}
+                        </td>
+                        <td>{{ o.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ o.updated_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row ">
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+<style>
+    .dtsp-name h6 {
+        color: black !important;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        white-space: nowrap
+    }
+
+    td {
+        white-space: nowrap
+    }
+</style>
+{% endblock %}
+
+

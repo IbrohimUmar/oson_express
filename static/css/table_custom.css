@@ -1,0 +1,27 @@
+
+
+    thead {
+    border-bottom:1px solid white;
+
+    }
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        white-space: nowrap;
+        text-align:center;
+    }
+    td {
+        white-space: nowrap;
+        text-align:center;
+    }
+    #dataTable tr:nth-child(odd){background:#3c4252}

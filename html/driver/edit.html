@@ -1,0 +1,113 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<style>
+    select[multiple]{
+        width: 380px;
+    height: 17.2em;
+    }
+</style>
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Haydovchini o'zgartirish</h4>
+            </div>
+            <div>
+                <a href="{% url 'driver_about' r.id %}" class="btn btn-brand">
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Haydovchini ma'lumotlarini o'zgartirish</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Haydovchi ismi</label>
+                        <input type="text" name="first_name" placeholder="Haydovchi ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
+                               class="form-control">
+
+                        <label>Haydovchi familiyasi</label>
+                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Haydovchi familiyasi"
+                               class="form-control">
+                        <label>Parol</label>
+                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+                               class="form-control">
+
+                        <label class="text-sm">Haydovchi aktivmi</label>
+                        <input type="checkbox" name="is_active" class="form-check" {% if r.is_active  %} checked{% endif %}>
+                        
+                        
+                                                                  <br>
+  <label for="allow_districts">To'lov qilishi mumkin bo'lgan kassalar:</label>
+  <select id="allowed_cashier" name="allowed_cashier" multiple row="3" class="form-control">
+
+                                      {% for d in cashier_list %}
+
+
+                                <option value="{{ d.user_id }}" {% if d.user in r.driveruser.allowed_cashier.all %}selected{% endif %}>{{ d.user.first_name }} {{ d.user.last_name }}</option>
+
+                                      {% endfor %}
+  </select>
+                        
+                        
+                        
+                    </div>
+                    <div class="col-md-6">
+
+                        <label>Haydovchi telefon raqami</label>
+                        <input type="text" name="username"  {% if r %}value="{{r.username}}" {% endif %}
+                               class="js-phone-input form-control" placeholder="Haydovchi telefon raqami">
+
+                            <label>Viloyatni ozgartirib bo'lmaydi</label>
+                        <input type="text" readonly value="{{r.region.name}}" class="form-control">
+                            <label>Tumanini tanlang</label>
+                            <select class="form-control" required name="district">
+                                {% for d in district %}
+                                <option value="{{ d.id }}" {% if r.district.id == d.id %}selected{% endif %}>{{ d.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                        <label>Haydovchi uchun maxsus beriladimi: </label> <br>
+<input type="checkbox" name="fee_is_special" {% if r.fee_is_special %} checked{% endif %}>
+                        <div id="text">
+
+                        <label>Mxsus daromad beriladigan bo'lsa miqdorini kiriting </label>
+                        <input type="number" class="form-control" name="special_fee_amount"  {% if r %}value="{{r.special_fee_amount}}" {% endif %}>
+                        </div>
+
+                        <br>
+  <label for="allow_districts">Ruxsat etilgan viloyatlarni tanlang:</label>
+  <select id="allow_districts" name="allow_districts" multiple row="3" class="form-control">
+
+                                      {% for d in district %}
+
+
+                                <option value="{{ d.id }}" {% if d in r.allow_districts.all %}selected{% endif %}>{{ d.name }}</option>
+
+                                      {% endfor %}
+  </select>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+{% endblock %}
+{% block footer %}
+{% endblock %}

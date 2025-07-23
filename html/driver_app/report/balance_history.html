@@ -1,0 +1,133 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<section class="content-main">
+
+    <div class="content-head">
+        <h4>Hisobot bo'limi</h4>
+
+    </div>
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+<!--                        <ol class="breadcrumb float-sm-right m-0">-->
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline active">Balans tarihi</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <div class="card mb-3">
+        <h6>
+            <div class="card-body">
+                <form method="get">
+                <div class="row mt-3 text-center">
+                    <div class="col-md-8 m-auto" style="padding-right:0px !important;">
+                        <label>Sana tanlang :</label>
+                        <div class="row">
+                            <input type="date" style="width:84%;display:inline" class="form-control d-inline" required
+                                   name="date" value="{{date|date:'Y-m-d'}}">
+                            <button class="btn btn-brand " style="width:15%;display:inline"><i
+                                    class="icon material-icons md-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            </form>
+            </div>
+        </h6>
+    </div>
+
+    {% for report in reports %}
+    <div class="card" style="border:1px solid white;">
+        <div class="card-header bg-brand-2" style="0.7rem 1.3rem">
+            <h6 class="text-center">Saqlangan sana : {{report.created_at}}</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-1">
+
+
+                <h5 class="text-center">{% if report.balance < 0 %}
+                    Oldindan to'lov
+                    {% else %}
+                    Qarzingiz
+                    {% endif %} : {{report.balance|format_money}} so'm</h5>
+
+                <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                    <h6>Balans tafsiloti</h6>
+
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Sotildilar summasi : {{ report.debt|format_money }} so'm</h6>
+                    <h6 class="badge btn-dark btn-sm ml-1 readonly">Daromadingiz : {{ report.total_fee|format_money }}
+                        so'm
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">To'ladingiz : {{ report.total_pay|format_money }} so'm
+                    </h6>
+
+                    <h6 class="badge btn-brand btn-sm mt-1 ml-1 readonly">Natija : {{ report.balance|format_money }}
+                        so'm {% if report.balance < 0 %}
+                        Oldindan to'lov
+                        {% else %}
+                        Qarzsiz
+                        {% endif %}
+                    </h6>
+                    <!--                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ user.order_status.call_back }} ta-->
+                    <!--                                                </h6>-->
+                </div>
+
+
+                <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                    <h6>Buyurtmalaringiz bo'yicha</h6>
+
+                    <h6 class="badge btn-dark btn-sm ml-1 readonly">Mahsulot yuborildi : {{ report.order_send_product_count }} ta
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda : {{ report.order_being_delivered_count }} ta
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Sotildi : {{ report.order_delivered_count }}
+                        ta</h6>
+
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Bekor qilindi ( Mahsulot haydovchida ) : {{ report.order_cancelled_driver_count }} ta
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Bekor qilindi ( Mahsuloti qaytarildi ) : {{ report.order_cancelled_returned_count }} ta
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi (
+                        Mahsuloti boshqa buyurtmaga berildi ) : {{ report.order_cancelled_given_other_order_count }} ta
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ report.order_call_back_count }} ta
+                    </h6>
+                </div>
+
+
+                <div class="col-md-12 text-center mt-2"
+                     style="border:1px solid black; border-radius:10px; padding:7px;">
+                    <h6>Mahsulot summasi bo'yicha</h6>
+
+                    <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda:
+                        {{report.order_being_delivered_selling_price|format_money}} so'm
+                    </h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi (
+                        Mahsuloti haydovchida ): {{report.order_cancelled_driver_selling_price|format_money}} so'm</h6>
+                    <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq :
+                        {{report.order_call_back_selling_price|format_money}} so'm
+                    </h6>
+                    <h6 class="mt-1 ml-1 readonly" style="font-size:11px;">Jami qo'lingizdagi mahsulotlar summasi :
+                        {{report.order_driver_hand_product_price|format_money}} so'm
+                    </h6>
+                </div>
+
+                <h5 class="badge btn-sm ml-1 readonly text-white" style="background-color:#da7713f0;">Sana :
+                    {{report.created_at}} </h5>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+</section>
+{% endblock %}

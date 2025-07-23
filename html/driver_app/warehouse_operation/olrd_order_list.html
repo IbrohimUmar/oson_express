@@ -1,0 +1,600 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <div>
+                <h3 class="content-title card-title">{{warehouse_operation.id}} id li amaliyot buyurtmalari</h3>
+                <small>
+
+                    {% if warehouse_operation.action == '7' %}
+                    <h6 class="text-muted"> Shu amaliyotda ombordan mahsulotlari chiqim qilingan buyurtmalar ro'yxati</h6>
+                    {% elif warehouse_operation.action == '6' %}
+                    <h6 class="text-muted"> Shu amaliyotda omborga mahsulotlari qaytarib olingan buyurtmalar ro'yxati</h6>
+
+                    {% endif %}
+
+                </small>
+
+            </div>
+        </div>
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+<!--                        <ol class="breadcrumb float-sm-right m-0">-->
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_warehouse_operation_list' %}">Amaliyotlar</a></li>
+                            <li class="breadcrumb-item d-inline active">Amaliyot buyurtmalari ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header class="card-header" style="border-radius:10px;">
+            <form method="get">
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <h6>Qidiruv</h6>
+                                <input type="number" class="form-control" id="search"
+                                       placeholder="barcide, id, klient tel bo'yicha qidiruv" name="search" {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Tuman bo'yicha :</label>
+                                    <select name="district" class="form-select">
+                                        <option value="0" {% if request.GET.district == 0 or request.GET.district == None %}selected{% endif %}>---------</option>
+
+                                        {% for p in district %}
+                                        <option value="{{p.id}}" {% if request.GET.district|add:'0' == p.id %}selected{% endif %}>{{p.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Holati bo'yicha :</label>
+                                    <select name="status" class="form-select">
+                                        <option value="0" {% if request.GET.status == 0 or request.GET.status == None %}selected{% endif %}>---------</option>
+
+                                        <option value="6" {% if request.GET.status|add:'0' == 6 %}selected{% endif %}>Qayta qo'ng'iroq</option>
+                                        <option value="3" {% if request.GET.status|add:'0' == 3 %}selected{% endif %}>Yetkazilmoqda</option>
+                                        <option value="4" {% if request.GET.status|add:'0' == 4 %}selected{% endif %}>Sotildi</option>
+                                        <option value="5" {% if request.GET.status|add:'0' == 5 %}selected{% endif %}>Bekoq qilindi (Mahsuloti qaytarilgan)</option>
+                                        <option value="55" {% if request.GET.status|add:'0' == 55 %}selected{% endif %}>Bekoq qilindi (Mahsuloti haydovchida)</option>
+                                        <option value="555" {% if request.GET.status|add:'0' == 555 %}selected{% endif %}>Bekoq qilindi (Mahsuloti boshqaga belgilangan)</option>
+                                    </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if  request.GET.product or request.GET.district or request.GET.search %}
+                                 <a class="btn btn-danger" href="{% url 'driver_app_warehouse_operation_order_list' warehouse_operation.id %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                 </form>
+        </header>
+
+
+        <h6 class="text-center mt-3 mb-3">Soni : {{count}} ta</h6>
+
+        {% for o in page_obj %}
+            <div class="card " style="border: 1px solid #adacac !important;"
+                 id="infinite-lists">
+
+<!--                <div class="card-header">   checkCheckedOrder({{o.id}})   -->
+
+<!--                    <div class="badge btn-light w-100">-->
+<!--                        <h6 class="text-center"><i class="material-icons md-cancel"></i> Tanlanmadi</h6>-->
+<!--                    </div>-->
+<!--                    <div class="badge btn-brand w-100">-->
+<!--                        <h6 class="text-center"><i class="material-icons md-check"></i> Tanlandi</h6>-->
+<!--                    </div>-->
+
+<!--                    <input type="checkbox" class="form-check" >-->
+<!--                </div>-->
+
+
+
+                <span class="badge badge-soft-success" v-if="checkCheckedOrder({{o.id}}) === true">Belgilandi</span>
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div class="col-md-12">
+                            <div class="text">
+                                <h4 style="display:inline;">{{ o.driver_fee }} so'm </h4>
+
+<!--                                    <span  class="badge {% if o.status == '5' %}badge-soft-danger{% else %}badge-soft-success{% endif %} bage-sm text-sm f-right">{{o.get_status_display}}   {% if o.status == '5' %}( {{o.get_cancelled_status_display}} ){% endif %}</span>-->
+                                <div v-if="IsStatusChange({{o.id}}) == 0" style="display: inline;">
+                                    <span  class="badge {% if o.status == '5' %}badge-soft-danger{% else %}badge-soft-success{% endif %} bage-sm text-sm f-right">{{o.get_status_display}}</span>
+                                  </div>
+                                  <div style="display: inline;" v-else>
+                                    <span  class="badge badge-soft-success bage-sm text-sm f-right">[[IsStatusChange({{o.id}}).name]]</span>
+                                  </div>
+
+                                <hr style="margin:0.9px;">
+
+                            {% if o.is_there_previous_order %}
+                          <span class="badge badge-soft-info mb-20 ">
+                                <i class="material-icons md-warning" style="vertical-align: unset;font-size:15px"></i> #{{o.is_there_previous_order.id}} -Shu buyurtmaning mahsulotini o'rniga belgilandi</span>
+                            {% endif %}
+                                <h5>
+                                <span class="text-sm f-right">#{{o.id}}</span>
+
+                                    <i class="fas fa-barcode"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Barcodi : {{ o.barcode }}<br>
+                                    <i class="fas fa-user"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz ismi : {{ o.customer_name }}<br>
+                                     <i class="material-icons md-phone"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i>  Mijoz tel : <a  href="tel: {{o.customer_phone}}" style="font-family:'Arial', sans-serif;;">{{ o.customer_phone }} <br></a>
+                                    {% if o.customer_phone2 %}
+                                    <span>
+                                         <i class="material-icons md-phone"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i>
+                                        Mijoz tel2 :<a href="tel: {{o.customer_phone2}}" style="font-family:'Arial', sans-serif;;"> {{ o.customer_phone2 }} </a><br></span>
+                                    {% endif %}
+                                    <i class="material-icons md-place"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Manzil : {{ o.customer_district }}. <br>
+                                    <i class="fas fa-comment"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Izoh : {{ o.customer_street }}. <br>
+
+                                   {% if o.operator_note %}
+                                         <i class="fas fa-headphones"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Operator izohi : {{ o.operator_note }}. <br>
+                                    {% endif %}
+                                     <i class="fas fa-clock"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Buyurtma sanasi : {{ o.order_date }}.<br>
+                                    <i class="fas fa-clock"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Topshirish sanasi : {{ o.delivered_date }}.
+                                    <br>
+                                    <i class="fas fa-clock"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Yetkazilmoqdaga o'tgan sanasi : {{ o.driver_shipping_start_date }}.
+                                    <br>
+                                </h5>
+                              <small class="mt-3">Mahsulot</small>
+                                        <table style="width:100%;">
+                                          <thead class="text-center">
+
+                                          <tr class="text-center">
+                                            <th class="text-center">Nomi</th>
+                                            <th class="text-center">Soni</th>
+                                            <th class="text-center">Narxi</th>
+                                          </tr>
+                                          </thead>
+                                            {% for p in o.order_products %}
+                                              <tr>
+                                            <td>{{p.product.name}}</td>
+                                            <td style="white-space: nowrap">{{p.amount}} ta</td>
+                                            <td>{{p.price}} so'm</td>
+                                          </tr>
+                                            {% endfor %}
+                                          <thead>
+                                              <tr>
+                                            <th>Jami</th>
+                                            <th>{{o.order_products_total_ordered_amount}} ta</th>
+                                            <th>{{o.order_products_total_price}} so'm</th>
+                                          </tr>
+                                          </thead>
+
+                                        </table>
+
+
+                                {% if o.defective_product_order %}
+                                <hr>
+                            <div class="mt-3 p-1" style="border: 1px solid red; border-radius:10px;">
+
+                              <h5 class="mt-3">Nosoz mahsulotlar</h5>
+                              <small>Mijoz qo'lidagi qaytarib olishingiz kerak bo'lgan nosoz masulotlar</small>
+                                        <table style="width:100%;">
+                                          <thead class="text-center">
+
+                                          <tr class="text-center">
+                                            <th class="text-center">Nomi</th>
+                                            <th class="text-center">Soni</th>
+                                          </tr>
+                                          </thead>
+                                            {% for p in o.defective_product_order_products %}
+                                              <tr>
+                                            <td>{{p.name}}</td>
+                                            <td style="white-space: nowrap">{{p.amount}} ta</td>
+                                          </tr>
+                                            {% endfor %}
+                                        </table>
+                            </div>
+                                {% endif %}
+
+                                    <small>Operator : +
+                                        <a href="tel: {{o.operator.username}}">{{o.operator.username}}</a>
+                                        </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <header class="card-header bg-info-light" style="padding: 0.6rem !important;">
+                    <form method="post" onsubmit="document.getElementById('#button_submit').disabled=true">
+                        <input type="hidden" name="id" value="{{o.id}}">
+                        {% csrf_token %}
+                        <div class="row align-items-center">
+                            <div class="col-lg-12 col-md-12 me-auto text-md-end" >
+
+                                {% if o.status != '4' and o.status != '5' %}
+                                <div style="display: inline;" v-if="IsStatusChange({{o.id}}) == 0">
+
+
+                                <button type="button" id="button_submit_cancel" @click="CancelledOrder({{o.id}}, {{o.status}})" class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
+                                  <i class="material-icons md-cancel"></i>
+                      </button>
+
+                      <button type="button" id="button_submit_call_back text-white" @click="CallBackOrder({{o.id}}, {{o.status}})" class="btn  btn-info" style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">
+                                  <span class="material-icons md-history  text-white"></span>
+                      </button>
+
+                      <button type="button" id="button_submit"  style="padding-left: 16px; padding-right: 18px" @click="DeliveredOrder({{o.id}}, {{o.status}})" class=" btn btn-brand"><i
+                              class="material-icons md-check"></i></button>
+                                </div>
+                                                                {% endif %}
+
+                                <a type="submit" href="tel: {{o.customer_phone}}" style="padding-left: 18px; padding-right: 18px"  class=" btn btn-brand"><i
+                                        class="material-icons md-call"></i></a>
+                            </div>
+                        </div>
+                    </form>
+                </header>
+
+
+
+            </div>
+    {% endfor %}
+
+
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+
+
+
+    </section>
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+    <script src="{% static '' %}js/vue.js"></script>
+    <script src="{% static '' %}js/axios.min.js"></script>
+   <style>
+   .material-icons{
+        vertical-align: middle;
+   }
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+    }
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+.select2-container{
+width:100% !important;
+}
+.select2-selection--single{
+
+    background-color: #1e2231 !important;
+    border: 1px solid #8d8e96;
+    border-radius: 5px !important;
+}
+.select2-search__field{
+border:2px solid #1e2231c7 !important;
+}
+
+.select2-selection__rendered {
+color:white !important;
+font-size:14px;
+font-weight:600;
+}
+
+ .select2-container--default{
+    background-color: #1e2231 !important;
+    border: 1px solid #8d8e96;
+    border-radius: 5px !important;
+    color:#fff;
+ }
+
+    .select2-container--open .select2-dropdown--below {
+        color: black !important;
+    }
+
+    .custom_select .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #3BB77E !important;
+    }
+
+    .select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results {
+        color: #3BB77E !important;
+    }
+
+    .select2-dropdown .select2-search--dropdown .select2-search__field {
+        border: 1px solid black;
+    }
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% endblock %}
+{% block footer %}
+<script>
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+        new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+
+            data() {
+                return {
+                       //search: '{{query}}',
+                       search: '',
+                      toggle: false,
+                      SearchResult: [],
+                      StatusChanged : [],
+                      checkedOrders : []
+                }
+            },
+            methods: {
+                checkCheckedOrder(order_id){
+                    checked = this.checkedOrders.filter(order => order === order_id)
+                    if (checked.length > 0){
+                        return true
+                    }
+                        return false
+                },
+                pushOrRemoveOrder(order_id){
+                      const index = this.checkedOrders.findIndex(item => item === order_id);
+                      if (index !== -1) {
+                        this.checkedOrders.splice(index, 1);
+                      } else {
+                        this.checkedOrders.push(order_id);
+                      }
+
+                },
+                formatNumber(number) {
+                  const lastFourDigits = number.slice(-4);
+                  const precedingDigits = number.slice(0, -4);
+                  return precedingDigits.replace(/(\d{3})(?=\d)/g, '$1 ') + ' ' + lastFourDigits;
+                },
+                IsStatusChange(order_id){
+                  var status_name = {3 : "Yetkazilmoqda", 4: 'Sotildi', 5: 'Bekor qilindi', 6:"Qayta qo'ng'iroq"}
+                  var change = this.StatusChanged.filter(m => m.order_id == order_id)
+                  if (change.length >0){
+                    return {'status':change[0].status,'name':status_name[change[0].status]}
+                  }
+                  return 0
+                },
+
+                CancelledOrder(order_id,after_status) {
+                  vm = this
+                  return  Swal.fire({
+                    inputLabel: 'Bekor qilishingiz sababi',
+                                  input: 'textarea',
+                                  showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                  confirmButtonColor: '#F30000',
+                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...',
+                                  inputAttributes: {
+                                          'aria-label': 'Bekor qilishingiz sababini yozing..'
+                                        },
+                                        inputValidator: (value) => {
+                                          return new Promise((resolve) => {
+                                            if (value === '') {
+                                              resolve("Iltimos oldin izoh kiriting")
+                                            }else{
+                                              resolve()
+                                            }
+                                          })
+                                        }
+                            }).then(function(result) {
+                              if (result.value) {
+                                axios.post('/driver-profile-change-order-status/', {
+                                    order_id: order_id,
+                                    next_status: 5,
+                                    after_status: after_status,
+                                    desc: result.value,
+                                  })
+                                  .then(function (response) {
+
+                                     if(response.data.status == 200){
+
+                                                          old = vm.StatusChanged.filter(m => m.order_id == order_id)
+                                                          if (old.length > 0){
+                                                          old[0].status=5
+                                                          }else{
+                                                          vm.StatusChanged.push({"order_id":order_id, 'status':5})
+                                                          }
+                                           Swal.fire({
+                                                        title: "O'zgartirildi",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'success',
+                                                        timer: 1500
+                                                    })
+                                                    }else{
+                                                        Swal.fire({
+                                                        title: "Xato buyruq qayta urinib ko'ring",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'error',
+                                                                timer: 1500
+                                                    })
+
+                                                    }
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+                                  });
+                              }
+                            });
+                },
+
+
+                CallBackOrder(order_id,after_status){
+                  vm = this
+                Swal.fire({
+                  inputLabel: "Necha kundan keyin qayta qo'g'iroq qilinadi",
+                      input: 'select',
+                      inputOptions: {
+                          '1': '1 kundan keyin',
+                        '3': '3 kundan keyin',
+                        '5': '5 kundan keyin',
+                        '10': '10 kundan keyin',
+                      },
+                      inputPlaceholder: 'Muddat tanlang',
+                      showCancelButton: true,
+
+                      cancelButtonText: 'Qaytish',
+                      cancelButtonColor: '#4f5d77',
+                      confirmButtonText: "O'zgartirish",
+                      inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                          if (value === '') {
+                            resolve("Iltimos oldin muddat tanlang")
+                          }
+                            resolve()
+                        })
+                      }
+                    }).then(function(result) {
+                              if (result.value) {
+                                axios.post('/driver-profile-change-order-status/', {
+                                    order_id: order_id,
+                                    next_status: 6,
+                                    after_status: after_status,
+                                    call_back_day: result.value,
+                                  })
+                                  .then(function (response) {
+                                     if(response.data.status == 200){
+
+                                                          old = vm.StatusChanged.filter(m => m.order_id == order_id)
+                                                          if (old.length > 0){
+                                                          old[0].status=6
+                                                          }else{
+                                                          vm.StatusChanged.push({"order_id":order_id, 'status':6})
+                                                          }
+                                           Swal.fire({
+                                                        title: "O'zgartirildi",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'success',
+                                                        timer: 1500
+                                                    })
+                                                    }else{
+                                                        Swal.fire({
+                                                        title: "Xato buyruq qayta urinib ko'ring",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'error',
+                                                                timer: 1500
+                                                    })
+
+                                                    }
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+                                  });
+
+
+                              }
+
+                            });
+
+                },
+
+                DeliveredOrder(order_id, after_status){
+                  vm=this
+                  return Swal.fire({
+                                                   icon:'warning',
+                                                    position: 'center',
+                                                  title: 'Siz buyurtmani sotildi qilmoqchimisiz?',
+                                                  showDenyButton: true,
+                                                  showCancelButton: false,
+                                                  confirmButtonText: 'Xa',
+                                                  denyButtonText: `Yo'q`,
+                                                }).then((result) => {
+                                                  if (result.isConfirmed) {
+                                                    axios.post('/driver-profile-change-order-status/', {
+                                                        order_id: order_id,
+                                                        next_status: 4,
+                                                        after_status: after_status,
+                                                      })
+                                                      .then(function (response) {
+                                                        if(response.data.status == 200){
+                                                          old = vm.StatusChanged.filter(m => m.order_id == order_id)
+                                                          if (old.length > 0){
+                                                          old[0].status=4
+                                                          }else{
+                                                          vm.StatusChanged.push({"order_id":order_id, 'status':4})
+                                                          }
+
+                                                              Swal.fire({
+                                                                            title: "O'zgartirildi",
+                                                                            showCancelButton: false,
+                                                                            showConfirmButton: false,
+                                                                            icon : 'success',
+                                                                            timer: 1500
+                                                                        })
+                                                                        }else{
+                                                                            Swal.fire({
+                                                                            title: "Xato buyruq qayta urinib ko'ring",
+                                                                            showCancelButton: false,
+                                                                            showConfirmButton: false,
+                                                                            icon : 'error',
+                                                                                    timer: 1500
+                                                                        })
+
+                                                                        }
+                                                      })
+                                                      .catch(function (error) {
+                                                        console.log(error);
+                                                      });
+                                                  }
+                                                })
+                },
+              },
+              watch: {
+              },
+
+        })
+
+</script>
+{% endblock %}

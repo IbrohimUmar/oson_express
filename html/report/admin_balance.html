@@ -1,0 +1,86 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+{% load humanize %}
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Admin balance bo'yicha statistika</h2>
+
+            </div>
+            <div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+
+                <div style="overflow-x:auto;">
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>Sayt</th>
+                            <th>Adminlar balansda (Kutilmoqda ayrilganda)</th>
+
+                            <th>Kutilyotgan to'lov miqdori</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        
+                            {% for i in by_site %}
+
+                            <tr>
+                                <td><h6>{{i.name}} </h6></td>
+                                <td>{{i.result.total_balance|intcomma}} uzs</td>
+                                <td>{{i.result.in_progress_balance|intcomma}} uzs</td>
+
+                            </tr>
+
+                            {% endfor %}
+                
+                        </tbody>
+                         <thead>
+                            <tr>
+                                <td><h6>Jami</h6></td>
+
+                                <td><h6>{{total_balance|intcomma}} uzs</h6></td>
+                                <td><h6>{{in_progress_balance|intcomma}} uzs</h6></td>
+
+                            </tr>
+                         </thead>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+        <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}

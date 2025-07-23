@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{{SITE_NAME}} internet magazin</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="Eltuvchi boshqaruv paneli"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="Eltuvchi bot"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="eltuvchi"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <script src="{% static '' %}js/vue.js"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+</head>
+<body style="background-color: #222736" class="dark">
+
+<section class="content-main">
+    {% if request.user.is_authenticated %}
+    <div class="content-header">
+        <a href="{% url 'home' %}" class="btn btn-sm btn-brand"><i class="material-icons md-arrow_back"></i> Qaytish </a>
+    </div>
+    {% endif %}
+
+    <div class="row mb-10">
+        <div class="col-md-6 m-auto card">
+            <form method="post">
+                {% csrf_token %}
+            <div class="card-header">
+                <h4>Buyurtma berish</h4>
+            </div>
+            <div class="card-body">
+                <h6>Ismingiz va familiyangiz</h6>
+                <input type="text" placeholder="Ismingiz va familiyangizni kiriting" name="customer_name" required maxlength="40" class="form-control">
+
+                <h6>Telefon raqamingiz</h6>
+                <input type="number" placeholder="telefon raqamingizni kiriting" required value="998" name="phone" maxlength="40" class="form-control">
+
+                <button type="submit" class="btn btn-sm btn-brand mt-10">Buyurtma berish</button>
+            </div>
+                </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{product.image.url}}" alt="">
+                </div>
+                <div class="col-md-6">
+                    <h3>{{product.name}}</h3>
+                    <hr>
+                    <h6>Narxi : {{product.sale_price}} uzs</h6>
+
+                    <hr>
+                    <h6>Bonus : {{product.seller_fee}} uzs</h6>
+                    <hr>
+                    <p>{{product.short}}</p>
+                </div>
+                <div class="col-md-12">
+                    <hr>
+                    {{product.desc|safe }}
+                </div>
+
+            </div>
+            <!--  row.// -->
+        </div>
+        <!--  card-body.// -->
+    </div>
+</section>
+
+<script>
+    var vue = new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+            password: {% if password %}"{{password}}"{% else %}""{% endif %},
+            passwordFieldType: "password",
+            phoneNumber: {% if login %}'{{login}}'{% else %}'+998'{% endif %},
+            error: false,
+            error_message: '',
+            check_box: false,
+        }, methods: {
+            validation_items() {
+
+            },
+            switchVisibility() {
+                this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
+            },
+
+            formatPhoneNumber() {
+                let formattedNumber = this.phoneNumber.replace(/\D/g, "");
+                this.phoneNumber = "+998" + formattedNumber.slice(3); // İlk üç haneli kısmı koru
+                if (this.phoneNumber.length > 16) {
+                    this.phoneNumber = this.phoneNumber.slice(0, 16);
+                }
+            },
+        }
+    });
+
+</script>
+</body>
+</html>

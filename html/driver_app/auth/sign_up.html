@@ -1,0 +1,104 @@
+{% extends 'driver_login/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main mt-80 mb-80">
+    <div class="row">
+        <div class="col-lg-5 mx-auto ">
+            <div class="card mx-auto ">
+                <div class="card-body">
+                    <h2 class="text-center">Eltuvchi bot</h2>
+                    <h4 class="card-title mt-10 text-center">Ma'lomotlarni to'ldiring</h4>
+                    <form method="post" class="text-center">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group  mb-10">
+                                     <label>Sms kod</label>
+                                    <input type="text" class="js-phone-input form-control" {% if re %}value="{{re.token}}"{% endif %} required id="phone_code"
+                                           name="token" placeholder="Sms kod"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Ismingiz</label>
+                                    <input type="text" required class="form-control" {% if re %}value="{{re.first_name}}"{% endif %} name="first_name"
+                                           placeholder="Ismingizni kiriting">
+                                    <input type="hidden" required class="form-control" name="phone" value="{{p}}">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Familiyangiz</label>
+                                    <input type="text" required class="form-control" {% if re %}value="{{re.last_name}}"{% endif %} name="last_name"
+                                           placeholder="Familiyangizni kiriting">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group  mb-5">
+                                    <label>Tug'ilgan sanangiz</label>
+                                    <input type="date" required class="form-control" {% if re %}value="{{re.birthday}}"{% endif %} name="birthday"
+                                           placeholder="Tug'ilgan sanangiz">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group  mb-5">
+                                    <label>Viloyatingiz</label>
+                                    <select name="region" required class="form-control" id="customer_region">
+                                        {% for r in r %}
+                                        <option value="{{r.id}}" {% if re %} {% if re.region == r.id %} selected{% endif %}{% endif %}>{{r.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group  mb-5">
+                                    <label>Tumaningiz</label>
+                                    <select name="districts" required class="form-control" id="customer_city">
+                                        {% for r in d %}
+                                        <option value="{{r.id}}" data-parent="{{r.region.id}}" {% if re %} {% if re.region == r.id %} selected{% endif %}{% endif %}>{{r.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group  mb-5">
+                            <label>MFY, uy raqami</label>
+                            <input type="text" required class="form-control" {% if re %}value="{{re.street}}"{% endif %} name="street" placeholder="Mfy uy raqami">
+                        </div>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <p class="text-center mt-2 mb-2 text-danger">{{message}}</p>
+                        {% endfor %}
+                        {% endif %}
+                        <div class="form-group  mb-10 text-center">
+                            <button type="submit" class="btn btn-primary hover-up">Yuborish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<script type='text/javascript'>$("#phone_code").inputmask({"mask": "999999"});</script>
+<script>
+    $(function () {
+        // ref to city selector
+        var $selectCity = $("select[name='region']");
+        // ref to region selector
+        var $regionSelect = $("select[name='districts']");
+        // get city startup value
+        var cityValue = $selectCity.val();
+        $regionSelect.val("");
+        // set selection on region select by hiding options
+        $regionSelect.find(`option[data-parent!=${cityValue}]`).hide();
+        //change listener to set region option based on city value
+        $selectCity.on("change", function (e) {
+            var value = e.target.value;
+            $regionSelect.val("");
+            $regionSelect.find(`option`).hide(); // hide all
+            $regionSelect.find(`option[data-parent=${value}]`).show();
+        });
+    });
+</script>
+{% endblock %}

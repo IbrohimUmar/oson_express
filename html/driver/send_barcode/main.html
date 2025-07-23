@@ -1,0 +1,449 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Haydovchi bekor bo'lgan buyurtmalariga barcode yuborish</h4>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Haydovchi tanlang</h6>
+                        <select name="driver" v-model="driver" class="form-select">
+                            <option value="0">--------------</option>
+                            <option :value="d.id" v-for="d in driver_list">[[d.first_name]] [[d.last_name]] [[d.username]]</option>
+                        </select>
+
+                    </div>
+                    <div class="col-md-2">
+
+                        <h6>Qo'llash</h6>
+                        <button class="btn  btn-brand" @click="loadOrders()" type="button"><i class="material-icons md-search"></i></button>
+
+                    </div>
+                </div>
+            </header>
+
+            <!--      Loading          -->
+             <div class="card-body" v-if="loading === true">
+                <div id="loading">
+                    <div class="text-center mt-20 mb-20 m-auto loader"></div>
+                    <h6 class="text-center">Bajarilmoqda...</h6>
+                </div>
+            </div>
+
+            <div class="card-body" v-show="driver != 0 && loading != true">
+                <div class="row">
+                    <div class="col-md-12 mb-10">
+
+                        <div class="box text-center " style="border:1px solid #05a879; border-radius:10px;">
+                            <h5>Belgilangan soni : [[checked_order_count]] ta</h5>
+                            <p class="text-muted">Haydovchi bekor qilgan buyurtmalar mahsuloti belgilangan mahsulot kutilmoqda soni</p>
+                            <button class="btn btn-sm btn-brand " :disabled="cancelled_order_count === 0" type="button" @click="checkedCancelledOrders()"><i class="material-icons md-add"></i> Yana o'xshash buyurtmalarni belgilash</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="box text-center " style="border:1px solid #a8a805; border-radius:10px;">
+                            <h5>Bekor qilindi soni : [[cancelled_order_count]] ta</h5>
+                            <p class="text-muted">Mahsuloti haydovchi qo'lidagi bekor qilingan buyurtma soni</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="box text-center " style="border:1px solid #a8a805; border-radius:10px;">
+                            <h5>Mahsulot kutilmoqda soni : [[new_order_count]] ta</h5>
+                            <p class="text-muted">Haydovchi viloyatiga kelgan yangi buyurtma soni</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="card" v-if="driver != 0 && loading === false && checked_order_count > 0">
+            <header class="card-header">
+                    <div class="row">
+                        <h5 class="mt-2 mb-2 text-center">Haydovchiga barcodi yuborilayotgan buyurtmalarni chop etish</h5>
+
+                            <div class="text-center">
+                                <h4 class="text-white badge text-center " style="border:1px solid white;">Jami buyurtma soni : [[total_order_count]] ta</h4>
+                                <h4 class="text-white badge text-center " style="border:1px solid white;">Shu sahifadagi buyurtma soni : [[order_count]] ta</h4>
+
+                            </div>
+                        <hr>
+                        <div class="col-md-3">
+                            <label>Sahifadagi chek uzunligi</label>
+                            <input type="number" v-model="order_length" style="min-width:200px;"
+                                   value="50" name=""
+                                   placeholder="Nomi bo'yicha qidiruv" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Qo'llash</h6>
+                            <button class="btn btn-brand " type="button" @click="loadOrders()"><i
+                                    class="material-icons md-search"></i></button>
+                        </div>
+
+
+                    </div>
+        </header>
+
+            <div class="card-body">
+                <div class="pagination-area mb-10">
+                    <nav aria-label="Page navigation example">
+                        <div class="mb-3 text-center">
+                            <div v-if="has_next">
+
+                                <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                                   @click="goToNextPage()">
+                                    <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                            </div>
+
+                        </div>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" v-if="has_previous">
+                                <a class="badge page-link" style="background-color:#4d5561;" @click="goToFirstPage()">
+                                    < </a>
+                            </li>
+                            <li class="page-item" v-if="has_previous && (page-2) !== (page-1) && (page-2) > 0">
+                                <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page-2)">[[page-2]]</a>
+                            </li>
+                            <li class="page-item" v-if="has_previous">
+                                <a class="badge page-link" style="background-color:#4d5561;" @click="goToPreviousPage()">[[page-1]]</a>
+                            </li>
+                            <li class="page-item active">
+                                <span class="badge btn-brand page-link" href="#"> [[page]]</span>
+                            </li>
+                            <li class="page-item" v-if="has_next===true">
+                                <a class="badge page-link" style="background-color:#4d5561;" @click="goToNextPage()"
+                                >[[page+1]]</a></li>
+
+                            <li class="page-item" v-if="has_next ===true && (page+2) < total_pages">
+                                <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page+2)"
+                                >[[page+2]]</a></li>
+                            <li class="page-item" v-if="has_next">
+                                <button type="button" class="badge page-link" style="background-color:#4d5561;"
+                                        @click="goToLastPage()"> >
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+            <div class="card-body" v-if="loading===true">
+                <div id="loading">
+                    <div class="text-center mt-20 mb-20 m-auto loader"></div>
+                    <h6 class="text-center">Bajarilmoqda...</h6>
+                </div>
+            </div>
+
+            <div class="card-body "  v-if="loading===false">
+
+                <button class="btn" style="background-color:#1d7f7a;" @click="print_div()" type="button" >
+                    <i class="material-icons md-print"></i> Chop etish
+                </button>
+
+                <div id="printableAreaMain">
+                <div id="printableArea" class="text-center mr-auto ml-auto m-auto" style="padding:0px !important;">
+                    <div class="example_box bg-white" v-for="(order, index) in order_list"
+                         style=" padding:0px !important;">
+                        {% include 'print/print_vue.html' %}
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    </form>
+</section>
+
+
+{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/loading.css' %}">
+<link rel="stylesheet" href="{% static 'css/print_all.css' %}">
+{% endblock %}
+{% block footer %}
+<!--<script src="{% static '' %}js/vue.js"></script>-->
+
+<div id="my_scripts">
+<script>
+    function printDivs(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+</script>
+    <script src="{% static '' %}js/vue.js"></script>
+
+</div>
+<script src="{% static 'js/axios.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+
+<script>
+    axios.defaults.xsrfCookieName = "csrftoken"
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+
+
+new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+
+
+
+        data: {
+                loading : false,
+                order_list :[],
+                order_length :10,
+
+                checked_order_count:0,
+                cancelled_order_count:0,
+                total_order_count:0,
+                order_count:0,
+                new_order_count:0,
+
+
+                error: null, // Hata mesajı
+
+                page: 1, // Şu anki sayfa numarası
+                has_next: true, // Sonraki sayfa var mı?
+                has_previous:false,
+                total_pages : 1, // jami sahifa soni
+
+        driver_list : {{drivers|safe}},
+        driver : 0,
+    },
+    methods: {
+            print_div(){
+
+
+                const printableContent = document.getElementById('printableAreaMain')
+                const printableScript = document.getElementById('my_scripts')
+                      const printWindow = window.open('', '', 'height=1000,width=1000')
+                      printWindow.document.write(`<html><head>
+                          <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+                          <link href="{% static '' %}css/print_all.css" rel="stylesheet" type="text/css"/>
+                              <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coiny&display=swap">
+
+                              <style>
+                              .check-print{
+                                    display:none !important;
+                                }
+                              </style>
+                      </head><body>  <div> <button class="btn btn-primary" onclick="printDivs('printableArea')" type="button">Chop etish</button></div> <div id="print_div">`);
+
+                      printWindow.document.write(printableContent.innerHTML)
+
+                                printWindow.document.write(`</div>`)
+
+                      printWindow.document.write(printableScript.innerHTML)
+
+                                printWindow.document.write(`</body></html></head>`)
+
+               printWindow.document.close();
+               // printWindow.print();
+
+                printWindow.addEventListener('afterprint', () => {
+                    printWindow.close();
+                });
+
+                    },
+                    generateBarcode: async function(barcode) {
+                    const barcodeElement = document.getElementById('barcode' + barcode);
+                            if (barcodeElement) {
+                                JsBarcode(barcodeElement, barcode.toString(), {
+                                    format: "EAN13",
+                                    width: 2,
+                                    height: 40,
+                                    margin: 0,
+                                    fontSize: 9.5,
+                                    textMargin: -1.5,
+                                    flat: true,
+                                    textAlign: "center",
+                                    fill: "rgba(0,0,0,0.5)",
+                                    fontOptions: 'bold'
+                                });
+                            } else {
+                                console.error("Barcode element with ID 'barcode" + barcode + "' not found.");
+                            }
+                },
+
+                loadOrders:async function() {
+                      this.loading = true;
+                      this.error = null;
+                      await axios.get(`{% url 'driver_send_barcode_main_api' %}?page=${this.page}&driver=${this.driver}&region=${this.selected_region}&product=${this.selected_product}&order_length=${this.order_length}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }})
+                        .then((response) => {
+                          const data = response.data;
+                          if (data.status == 200){
+                            //console.log('12312')
+                            console.log(data.data)
+                              this.has_next = data.has_next;
+                              this.has_previous = data.has_previous;
+                              this.total_pages = data.num_pages;
+                              this.order_list = data.data
+                              this.order_count = data.order_count
+                              this.total_order_count = data.total_order_count
+                              this.cancelled_order_count = data.cancelled_order_count
+                              this.checked_order_count = data.checked_order_count
+                              this.new_order_count = data.new_order_count
+
+
+                              //this.orders = data.data.slice().sort(() => Math.random() - 0.5);
+                              this.loading = false;
+
+                        setTimeout(() => {
+                                          this.order_list.forEach((item, index) => {
+                                            this.generateBarcode(item.barcode);
+                                          });
+                                        }, 500); // 2 saniye gecikme
+
+
+                            }else if(data.status == 404){
+
+                              this.error = data.message;
+                              this.loading = false;
+                              this.is_disable = true;
+                            }
+
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                          this.is_disable = true;
+
+                        });
+                    },
+                    goToNextPage() {
+                        if (this.has_next) {
+                            this.page++;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToFirstPage() {
+                        if (this.has_previous) {
+                            this.page=1;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToThisPage(number) {
+                            this.page=number;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        },
+
+                        goToLastPage() {
+                        if (this.has_next) {
+                            this.page= Number(this.total_pages);
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToPreviousPage() {
+                        if (this.has_previous) {
+                            this.page--;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+
+                checkedCancelledOrders: async function(){
+
+                        let self = this
+
+                    Swal.fire({
+                        title: "Bekor qilinganlariga barcode yubormoqchimisiz?",
+                        text:"Haydovchining mahsulotlari qo'lida bo'lgan bekor qilingan buyurtmalari o'rniga baykod yuborasizmi",
+                        showCancelButton: true,
+                        cancelButtonText: 'Yo\'q',
+                        confirmButtonText: 'Xa yuboraman',
+                        confirmButtonColor: 'question',
+                        icon:'question',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                                            self.loading = true;
+
+                                         axios.post(`{% url 'driver_send_barcode_main_api' %}`, {
+                                                                                                driver: this.driver,
+                                                                                              })
+                                                                                              .then(function (response) {
+                                                                                                if(response.data.status == 200){
+                                                                                                  }
+                                                                                                    Swal.fire({
+                                                                                                  position: 'center',
+                                                                                                  icon: 'success',
+                                                                                                  title: response.data.title,
+                                                                                                  showConfirmButton: false,
+                                                                                                  timer: 2000
+                                                                                                })
+
+                                                                                                self.loadOrders();
+                                                                                                        self.loading = false;
+
+
+
+                                                                                          })
+                                                                                          .catch(function (error) {
+                                                                                             self.loading = false;
+                                                                                            Swal.fire({
+                                                                                              icon: 'error',
+                                                                                              title: 'Oops...',
+                                                                                              text: `${error}`,
+                                                                                              footer: '<p>Muammo yuzaga keldi</p>'
+                                                                                            })
+
+                                                                                          });
+
+
+
+
+                        }else{
+                                                self.loading = false;
+
+                        }
+
+                        });
+                }
+
+},computed: {
+    },
+    watch: {
+    driver :function(){
+        if(this.driver){
+            this.loadOrders()
+        }
+    console.log(this.driver)
+    }
+
+
+    },
+    })
+
+
+</script>
+
+{% endblock %}

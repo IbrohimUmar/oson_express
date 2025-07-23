@@ -1,0 +1,925 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <div>
+                <h3 class="content-title card-title">{{warehouse_operation.id}} id li amaliyot buyurtmalari</h3>
+                <small>
+
+                    {% if warehouse_operation.action == '7' %}
+                    <h6 class="text-muted"> Shu amaliyotda ombordan mahsulotlari chiqim qilingan buyurtmalar ro'yxati</h6>
+                    {% elif warehouse_operation.action == '6' %}
+                    <h6 class="text-muted"> Shu amaliyotda omborga mahsulotlari qaytarib olingan buyurtmalar ro'yxati</h6>
+
+                    {% endif %}
+
+                </small>
+
+            </div>
+        </div>
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+<!--                        <ol class="breadcrumb float-sm-right m-0">-->
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_warehouse_operation_list' %}">Amaliyotlar</a></li>
+                            <li class="breadcrumb-item d-inline active">Amaliyot buyurtmalari ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <header class="card-header" style="border-radius:10px;">
+                    <div class="results">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Qidiruv</h6>
+                        <input type="number" placeholder="Qidiruv : barcode, mijoz tel, buyurtma id bo'yicha" style="border: 1px solid #adacac !important;margin-bottom:0px;"
+                               class="form-control" name="query" v-model="search" @blur="toggle = false" @focus="toggle = true">
+                            </div>
+                            <div class="col-md-4 mb-1">
+                                <h6>Tuman bo'yicha</h6>
+                                <select class="form-control" v-model="district">
+                                    <option value="0">--------</option>
+                                    {% for d in district %}
+                                    <option value="{{d.id}}">{{d.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-1">
+                                <h6>Buyurtmalar holati bo'yicha</h6>
+
+                                <select class="form-control" v-model="status">
+                                    <option value="0">-----------</option>
+                                    <option value="3">Yetkazilmoqda</option>
+                                    <option value="4">Sotildi</option>
+                                    <option value="6">Qayta qo'ng'iroq</option>
+                                    <option value="5">Bekor qilindi</option>
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-12">
+<!--                                <div class="col-6"></div>-->
+                                <div class="row">
+                                <button type="button" class="btn btn-sm btn-danger col-6 d-inline" @click="end_search()"><i class="fas fa-xmark"></i> Tozalash</button>
+
+                                <button type="button" class="btn btn-sm btn-brand col-6 d-inline" @click="filter()"><i class="fas fa-search"></i> Qo'llash</button>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+<!--                </div>-->
+<!--            </div>-->
+        </header>
+
+
+
+
+        <div class="card-body" v-if="loading===true">
+            <div id="loading">
+                <div class="text-center mt-20 mb-20 m-auto loader"></div>
+                <h6 class="text-center">Bajarilmoqda...</h6>
+            </div>
+        </div>
+
+
+<!--        seach result-->
+        <div v-if="loading === false">
+<!--            <h6 class="text-center mt-2 mb-2"><i class="material-icons md-search"></i> Qidiruv natijalari [[SearchResult.length]] ta topildi</h6>-->
+
+            <div class="mt-2 mb-2 text-center">
+                <h4 class="text-white badge text-center" style="border:1px solid white;">Buyurtma soni : [[total_order_count]] ta</h4>
+            </div>
+
+
+             <div class="card " style="border: 1px solid #adacac !important;" v-for="(o, index) in order_list" id="infinite">
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div class="col-md-12">
+                            <div class="text">
+
+                                <h4 style="display:inline;">[[ o.driver_fee ]] so'm </h4>
+
+                                  <div v-if="IsStatusChange(o.id) == 0" style="display: inline;">
+                                    <span v-if="o.status==5" class="badge badge-soft-danger bage-sm text-sm f-right">[[o.status_name]]</span>
+                                    <span v-else  class="badge badge-soft-success bage-sm text-sm f-right">[[o.status_name]]</span>
+
+
+                                  </div>
+                                  <div style="display: inline;" v-else>
+                                    <span  class="badge badge-soft-success bage-sm text-sm f-right">[[IsStatusChange(o.id).name]]</span>
+
+                                  </div>
+                                <br v-if="o.driver_is_bonus===1 && o.bonus != 0">
+                                    <span class="text-sm badge badge-soft-success" v-if="o.driver_is_bonus===1 && o.bonus != 0">Bugun yetib borsa : +[[o.bonus]] so'm</span>
+                                <hr>
+
+
+                          <span class="badge badge-soft-danger mb-2" v-show="o.is_delivered_date_over ===1 && o.status != 4 && o.status != 5">
+                                <i class="material-icons md-warning" style="vertical-align: unset;font-size:15px"></i>
+                              Topshirish vaqti o'tib ketti tezroq topshiring</span>
+
+
+                            {% if o.is_there_previous_order %}
+                          <span class="badge badge-soft-info mb-20 text-white">
+                                <i class="material-icons md-warning" style="vertical-align: unset;font-size:15px"></i> #{{o.is_there_previous_order.id}} -Shu buyurtmaning mahsulotini o'rniga belgilandi</span>
+                            {% endif %}
+                                <h5>
+                                <span class="text-sm f-right">#[[o.id]] </span>
+
+
+
+                                    <i class="material-icons md-barcode"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Barcod : [[ o.barcode ]]<br>
+
+<!--                                    <i class="material-icons md-perm_identity"-->
+<!--                                       style=" font-size:17px; vertical-align: text-bottom;"></i> -->
+                                    <i class="fas fa-user"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i>
+
+                                    Mijoz ismi : [[ o.customer_name ]]<br>
+                                     <i class="material-icons md-phone"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz tel : <a  :href="`tel:${o.customer_phone}`">[[ o.customer_phone ]] <br></a>
+
+
+                                    <span v-if="o.customer_phone2">
+                                     <i class="material-icons md-phone"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i>    Mijoz tel2 :<a :href="`tel:${o.customer_phone2}`">[[ o.customer_phone2 ]] </a><br></span>
+
+                                    <i class="material-icons md-place"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Manzil : [[ o.customer_district ]]. <br>
+                                   <i class="fas fa-comment"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mo'ljal : [[ o.customer_street ]]. <br>
+                                    <span v-if="o.operator_note">
+                                         <i class="fas fa-headphones"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Operator izohi :[[ o.operator_note ]] <br></span>
+                                         <i class="fas fa-clock"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Buyurtma sanasi : [[o.order_date ]].<br>
+                                         <i class="fas fa-clock"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Topshirish sanasi : [[ o.delivered_date ]].
+                                    <br>
+
+
+
+
+                                </h5>
+
+
+                                <div v-if="o.defective_product_order">
+                                     <hr>
+                                     <div class="mt-3 p-1" style="border: 1px solid red; border-radius:10px;">
+
+
+                              <div v-if="o.defective_order_details">
+                                                                <h5 class="mt-3 text-center">Alishtiriligan mahsulotlar</h5>
+
+                                <small class="mt-3 text-center">Alishtirilgandan so'ng sizga beriladigan [[o.defective_order_details.driver_fee]] so'm
+
+                                #[[o.defective_order_details.defective_sold_order]] id li buyurtma haydovchi daromadiga qo'shildi
+                                </small>
+
+
+
+                              </div>
+                               <div v-else>
+                              <h5 class="mt-3 text-center">Alishtirilishi kerak mahsulotlar</h5>
+                              <small>Mijoz qo'lidagi nosoz mahsulotlarni soz mahsulotlarga alishtirishingiz kerak  </small>
+                               </div>
+
+
+
+                                        <table style="width:100%;">
+                                          <thead class="text-center">
+
+                                          <tr class="text-center">
+                                            <th class="text-center">
+                                                <h6>Nomi</h6></th>
+                                            <th class="text-center">
+                                                <h6>Soni</h6></th>
+                                          </tr>
+                                          </thead>
+
+                                              <tr v-for="p in o.products">
+                                            <td>[[p.product__name]]</td>
+                                            <td style="white-space: nowrap">[[p.ordered_amount]] ta</td>
+                                          </tr>
+                                              <thead class="text-center">
+                                                  <tr>
+                                                <th class="text-center">
+                                                    <h6>Jami</h6></th>
+                                                <th class="text-center">
+                                                    <h6>
+                                                    [[o.order_products_total_ordered_amount]] ta</h6></th>
+                                              </tr>
+                                              </thead>
+                                        </table>
+
+                            </div>
+                                </div>
+
+                                <div v-else>
+
+                                  <small class="mt-3">Mahsulot</small>
+                                            <table style="width:100%;">
+                                              <thead class="text-center">
+
+                                              <tr class="text-center">
+                                                <th class="text-center">
+                                                    <h6>Nomi</h6>
+                                                    </th>
+                                                <th class="text-center">
+                                                    <h6>Soni</h6>
+                                                    </th>
+                                                <th class="text-center">
+                                                    <h6>Narxi</h6>
+                                                    </th>
+                                              </tr>
+                                              </thead>
+                                                  <tr v-for="p in o.products">
+                                                <td>
+                                                    [[p.product__name]]
+
+                                                    <span class="badge" style="border:1px solid white;"
+                                                    v-if="p.color">[[p.color]]</span>
+                                                    <span class="badge" style="border:1px solid white;"
+                                                    v-if="p.measure_item">[[p.measure_item]]</span>
+
+
+                                                    <div v-if="p.items">
+
+
+
+
+                                                  <span >Eslatma : </span>
+                                                     <span class="badge" style="border:1px solid white;"
+                                                    v-for="item in p.items" v-if="item.color || item.measure_item" >
+
+                                                         [[item.product__name]]
+
+
+
+                                                         <span v-if="item.measure_item">| [[item.measure_item]]</span>
+                                                         <span v-if="item.color">| [[item.color]]</span>
+
+
+                                                     </span>
+                                                    </div>
+
+
+
+                                                </td>
+                                                <td style="white-space: nowrap">[[p.total_quantity]] ta</td>
+                                                <td>[[p.price]] so'm</td>
+                                              </tr>
+                                              <thead class="text-center">
+                                                  <tr>
+                                                <th class="text-center"><h6>Jami</h6> </th>
+                                                <th class="text-center"><h6> [[o.total_product_quantity]] ta </h6></th>
+                                                <th class="text-center"><h6> [[o.total_product_price]] so'm</h6></th>
+                                              </tr>
+                                              </thead>
+
+                                            </table>
+                                </div>
+                                    <small>Operator : +
+                                        <a href="tel:${o.operator}">[[o.operator]]</a>
+                                        </small>
+                                <br>
+                                    <span v-if="o.status==='4'">To'lov holati :
+
+
+
+                                        <span class="badge " style="border:1px solid white;">[[o.payment_status_name]]</span>
+
+                                        </span>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <header class="card-header bg-info-light" style="padding: 0.6rem !important;">
+                    <form method="post" onsubmit="document.getElementById('#button_submit').disabled=true">
+                        <input type="hidden" name="id" value="{{o.id}}">
+                        {% csrf_token %}
+                        <div class="row align-items-center">
+                            <div class="col-lg-12 col-md-12 me-auto text-md-end">
+
+
+                                <button type="button"
+                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 3 || o.status == 6"
+                                        id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status, index)"
+                                        class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
+                                    <i class="material-icons md-cancel"></i>
+                                </button>
+
+
+                                <button type="button"
+                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 3"
+                                        id="button_submit_call_back" @click="CallBackOrder(o.id, o.status, index)"
+                                        class="btn text-white btn-info"
+                                        style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">
+                                    <span class="material-icons md-history  text-white"></span>
+                                </button>
+
+
+                                <button type="button"
+                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 6 || o.status == 5"
+                                        @click="ChangeOrderStatusBeingDelivered(o.id, o.status, index)" class="btn  btn-brand "
+                                        style="padding-left: 16px; padding-right: 18px">
+                                    <i class="fas fa-truck "></i>
+                                    <br>
+                                </button>
+
+                                <button type="button" style="padding-left: 16px; padding-right: 18px"
+                                        v-if="o.status == 6 || o.status == 3" @click="DeliveredOrder(o.id, o.status, index)"
+                                        class=" btn btn-brand"><i
+                                        class="material-icons md-check"></i></button>
+
+<!--                                <a :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/driver-app/order/print/' + o.id"-->
+<!--                                   target="_blank" class=" btn btn-brand"><i class="material-icons md-print"></i></a>-->
+
+                                <a type="submit" href="tel: {{o.customer_phone}}"
+                                   style="padding-left: 18px; padding-right: 18px" class=" btn btn-brand"><i
+                                        class="material-icons md-call"></i></a>
+                            </div>
+
+
+                            <br>
+                            <div>
+                            </div>
+
+
+                        </div>
+                    </form>
+                </header>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="pagination-area mb-10">
+                <nav aria-label="Page navigation example">
+                    <div class="mb-3 text-center">
+                        <div v-if="has_next">
+
+                            <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                               @click="goToNextPage()">
+                                <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                        </div>
+
+                    </div>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" v-if="has_previous">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToFirstPage()">
+                                < </a>
+                        </li>
+                        <li class="page-item" v-if="has_previous && (page-2) !== (page-1) && (page-2) > 0">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page-2)">[[page-2]]</a>
+                        </li>
+                        <li class="page-item" v-if="has_previous">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToPreviousPage()">[[page-1]]</a>
+                        </li>
+                        <li class="page-item active">
+                            <span class="badge btn-brand page-link" href="#"> [[page]]</span>
+                        </li>
+                        <li class="page-item" v-if="has_next===true">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToNextPage()"
+                            >[[page+1]]</a></li>
+
+                        <li class="page-item" v-if="has_next ===true && (page+2) < total_pages">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page+2)"
+                            >[[page+2]]</a></li>
+                        <li class="page-item" v-if="has_next">
+                            <button type="button" class="badge page-link" style="background-color:#4d5561;"
+                                    @click="goToLastPage()"> >
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="text-center">
+<!--                <h4 class="text-white badge text-center d-inline" style="border:1px solid white;">Jami buyurtma soni : [[total_order_count]] ta</h4>-->
+                <h4 class="text-white badge text-center d-inline" style="border:1px solid white;">Sahifa soni : [[num_pages]] ta</h4>
+            </div>
+
+        <br>
+
+
+
+    </section>
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+    <script src="{% static '' %}js/vue.js"></script>
+    <script src="{% static '' %}js/axios.min.js"></script>
+   <style>
+   .material-icons{
+        vertical-align: middle;
+   }
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+    }
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+.select2-container{
+width:100% !important;
+}
+.select2-selection--single{
+
+    background-color: #1e2231 !important;
+    border: 1px solid #8d8e96;
+    border-radius: 5px !important;
+}
+.select2-search__field{
+border:2px solid #1e2231c7 !important;
+}
+
+.select2-selection__rendered {
+color:white !important;
+font-size:14px;
+font-weight:600;
+}
+
+ .select2-container--default{
+    background-color: #1e2231 !important;
+    border: 1px solid #8d8e96;
+    border-radius: 5px !important;
+    color:#fff;
+ }
+
+    .select2-container--open .select2-dropdown--below {
+        color: black !important;
+    }
+
+    .custom_select .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #3BB77E !important;
+    }
+
+    .select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results {
+        color: #3BB77E !important;
+    }
+
+    .select2-dropdown .select2-search--dropdown .select2-search__field {
+        border: 1px solid black;
+    }
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% endblock %}
+{% block footer %}
+<script>
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+        new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+
+            data() {
+                return {
+                       search: '',
+                       district: 0,
+                       status: 0,
+                      toggle: false,
+                      warehouse_operation_id: {{warehouse_operation.id}},
+
+                      SearchResult: [],
+                      StatusChanged : [],
+                      order_list :[],
+                      num_pages :0,
+                        order_count :0,
+                        loading: false,
+                        total_order_count: 0,
+
+                            error: null, // Hata mesajı
+
+                            page: 1, // Şu anki sayfa numarası
+                            has_next: true, // Sonraki sayfa var mı?
+                            has_previous:false,
+                            total_pages : 1, // jami sahifa soni
+
+                }
+            },
+            created(){
+                this.loadOrders();
+            },
+            methods: {
+                 formatNumber(number) {
+                  const lastFourDigits = number.slice(-4);
+                  const precedingDigits = number.slice(0, -4);
+
+                  return precedingDigits.replace(/(\d{3})(?=\d)/g, '$1 ') + ' ' + lastFourDigits;
+    },
+                IsStatusChange(order_id){
+                  var status_name = {3 : "Yetkazilmoqda", 4: 'Sotildi', 5: 'Bekor qilindi', 6:"Qayta qo'ng'iroq"}
+                  var change = this.StatusChanged.filter(m => m.order_id == order_id)
+                  if (change.length >0){
+                    return {'status':change[0].status,'name':status_name[change[0].status]}
+                  }
+                  return 0
+                },
+
+                CancelledOrder(order_id,after_status, index) {
+                  vm = this
+                  return  Swal.fire({
+                    inputLabel: 'Bekor qilishingiz sababi',
+                                  input: 'textarea',
+                                  showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                  confirmButtonColor: '#F30000',
+                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...',
+                                  inputAttributes: {
+                                          'aria-label': 'Bekor qilishingiz sababini yozing..'
+                                        },
+                                        inputValidator: (value) => {
+                                          return new Promise((resolve) => {
+                                            if (value === '') {
+                                              resolve("Iltimos oldin izoh kiriting")
+                                            }else{
+                                              resolve()
+                                            }
+                                          })
+                                        }
+                            }).then(function(result) {
+                              if (result.value) {
+                                axios.post('{% url 'driver_app_order_api_edit' %}', {
+                                    order_id: order_id,
+                                    next_status: 5,
+                                    after_status: after_status,
+                                    desc: result.value,
+                                  })
+                                  .then(function (response) {
+
+                                     if(response.data.status == 200){
+                                            vm.statusUpdater(index, 5, "Bekor qilindi")
+
+                                           Swal.fire({
+                                                        title: "O'zgartirildi",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'success',
+                                                        timer: 1500
+                                                    })
+                                                    }else if(response.data.status == 404){
+
+                                                        Swal.fire({
+                                                            title: "O'zgartirishda xatolik yuz berdi",
+                                                            showCancelButton: false,
+                                                            showConfirmButton: false,
+                                                            icon : 'error',
+                                                                    timer: 1500
+                                                        })
+                                                   }else{
+                                                      Swal.fire({
+                                                                              title: "Diqqat!",
+                                                                              text: response.data['messages'],
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+
+                                                   }
+
+
+
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+
+                                                                        Swal.fire({
+                                                                              title: "Server error!",
+                                                                              text: error,
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+
+                                  });
+
+
+                              }
+
+                            });
+                },
+
+
+                CallBackOrder(order_id,after_status, index){
+                  vm = this
+                Swal.fire({
+                  inputLabel: "Necha kundan keyin qayta qo'g'iroq qilinadi",
+                      input: 'select',
+                      inputOptions: {
+                          '1': '1 kundan keyin',
+                        '3': '3 kundan keyin',
+                        '5': '5 kundan keyin',
+                        '10': '10 kundan keyin',
+                      },
+                      inputPlaceholder: 'Muddat tanlang',
+                      showCancelButton: true,
+
+                      cancelButtonText: 'Qaytish',
+                      cancelButtonColor: '#4f5d77',
+                      confirmButtonText: "O'zgartirish",
+                      inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                          if (value === '') {
+                            resolve("Iltimos oldin muddat tanlang")
+                          }
+                            resolve()
+                        })
+                      }
+                    }).then(function(result) {
+                              if (result.value) {
+                                axios.post('{% url 'driver_app_order_api_edit' %}', {
+                                    order_id: order_id,
+                                    next_status: 6,
+                                    after_status: after_status,
+                                    call_back_day: result.value,
+                                  })
+                                  .then(function (response) {
+                                     if(response.data.status == 200){
+
+                                            vm.statusUpdater(index, 6, "Qayta qo'ng'iroq")
+                                           Swal.fire({
+                                                        title: "O'zgartirildi",
+                                                        showCancelButton: false,
+                                                        showConfirmButton: false,
+                                                        icon : 'success',
+                                                        timer: 1500
+                                                    })
+                                                    }else{
+                                                   Swal.fire({
+                                                                              title: "Diqqat!",
+                                                                              text: response.data['messages'],
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+
+                                                    }
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+
+
+                                                                        Swal.fire({
+                                                                              title: "Server error!",
+                                                                              text: error,
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+                                  });
+
+
+                              }
+
+                            });
+
+                },
+
+                statusUpdater(index, next_status_id, status_name){
+
+                    this.$set(this.order_list, index, {
+                              ...this.order_list[index],
+                              status: next_status_id,
+                              status_name: status_name
+                            });
+                },
+
+
+
+                DeliveredOrder(order_id, after_status, index){
+                  vm=this
+                  return Swal.fire({
+                                                   icon:'warning',
+                                                    position: 'center',
+                                                  title: 'Siz buyurtmani sotildi qilmoqchimisiz?',
+                                                  showDenyButton: true,
+                                                  showCancelButton: false,
+                                                  confirmButtonText: 'Xa',
+                                                  denyButtonText: `Yo'q`,
+                                                }).then((result) => {
+                                                  if (result.isConfirmed) {
+                                                    axios.post('{% url 'driver_app_order_api_edit' %}', {
+                                                        order_id: order_id,
+                                                        next_status: 4,
+                                                        after_status: after_status,
+                                                      })
+                                                      .then(function (response) {
+                                                        if(response.data.status == 200){
+
+                                                            vm.statusUpdater(index, 4, 'Sotildi')
+
+
+
+                                                              Swal.fire({
+                                                                            title: "O'zgartirildi",
+                                                                            showCancelButton: false,
+                                                                            showConfirmButton: false,
+                                                                            icon : 'success',
+                                                                            timer: 1500
+                                                                        })
+                                                                        }else{
+                                                                        Swal.fire({
+                                                                              title: "Diqqat!",
+                                                                              text: response.data['messages'],
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+
+                                                                        }
+                                                      })
+                                                      .catch(function (error) {
+
+                                                                    Swal.fire({
+                                                                              title: "Server error!",
+                                                                              text: error,
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+                                                        console.log(error);
+                                                      });
+                                                  }
+                                                })
+                },
+
+                ChangeOrderStatusBeingDelivered(order_id, order_status, index){
+
+                  var title = 'Siz buyurtmani yetkazilmoqdaga olmoqchimisiz?'
+                  var text = ''
+                  if (order_status === '5'){
+                  title = 'Diqqat'
+                  text = "Siz rostdanham yetkazilmoqdaga olmoqchimisiz?"
+                  }
+
+                  vm=this
+                  return Swal.fire({
+                                                   icon:'question',
+                                                    position: 'center',
+                                                  title: title,
+                                                  text: text,
+                                                  showDenyButton: true,
+                                                  showCancelButton: false,
+                                                  confirmButtonText: 'Xa',
+                                                  denyButtonText: `Yo'q`,
+
+
+
+
+                                                }).then((result) => {
+                                                  if (result.isConfirmed) {
+                                                    axios.post('{% url 'driver_app_order_api_edit' %}', {
+                                                        order_id: order_id,
+                                                        next_status: 3,
+                                                      })
+                                                      .then(function (response) {
+                                                        if(response.data.status == 200){
+
+                                                           vm.statusUpdater(index, 3, "Yetkazilmoqda")
+                                                              Swal.fire({
+                                                                            title: "O'zgartirildi",
+                                                                            showCancelButton: false,
+                                                                            showConfirmButton: false,
+                                                                            icon : 'success',
+                                                                            timer: 1500
+                                                                        })
+                                                                        }else{
+                                                                        Swal.fire({
+                                                                              title: "Diqqat!",
+                                                                              text: response.data['messages'],
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+                                                                        }
+                                                      })
+                                                      .catch(function (error) {
+                                                                        Swal.fire({
+                                                                              title: "Server error!",
+                                                                              text: error,
+                                                                              icon: "error",
+                                                                              confirmButtonText:"Tushundim"
+                                                                            });
+                                                      });
+                                                  }
+                                                })
+                },
+
+
+                    loadOrders:async function() {
+                      this.loading = true;
+                      this.error = null;
+                      await axios.get(`{% url 'driver_app_order_api_list' %}?page=${this.page}&search=${this.search}&status=${this.status}&district=${this.district}&warehouse_operation_id=${this.warehouse_operation_id}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }})
+                        .then((response) => {
+                          const data = response.data;
+                          if (data.status == 200){
+                              this.has_next = data.has_next;
+                              this.has_previous = data.has_previous;
+                              this.total_pages = data.num_pages;
+                              this.order_list = data.data
+                              this.order_count = data.order_count
+                              //this.orders = data.data.slice().sort(() => Math.random() - 0.5);
+                              this.loading = false;
+                              this.total_order_count = data.total_order_count;
+                              this.num_pages = data.num_pages;
+
+                            }else if(data.status == 404){
+
+                              this.error = data.message;
+                              this.loading = false;
+                            }
+
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                          this.is_disable = true;
+
+                        });
+                    },
+
+
+                    end_search:function() {
+                    this.district=0
+                    this.status=0
+                    this.search=''
+                     this.loadOrders();
+                    },
+                    filter:function() {
+                     this.loadOrders();
+
+                    },
+                    goToNextPage() {
+                        if (this.has_next) {
+                            this.page++;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToFirstPage() {
+                        if (this.has_previous) {
+                            this.page=1;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToThisPage(number) {
+                            this.page=number;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        },
+
+                        goToLastPage() {
+                        if (this.has_next) {
+                            this.page= Number(this.total_pages);
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToPreviousPage() {
+                        if (this.has_previous) {
+                            this.page--;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+
+              },
+              watch: {
+              },
+
+        })
+
+</script>
+{% endblock %}

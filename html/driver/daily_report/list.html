@@ -1,0 +1,347 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+<!--    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">-->
+<!--        {% csrf_token %}-->
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Jami buyurtmalar bo'yicha statistika</h4>
+            </div>
+            <div>
+                {% if perms.admin.driver_daily_report_by_price %}
+                <a href="{% url 'driver_daily_report_by_price' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Summa bo'yicha
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <h5 class="text-center mb-10">Buyurtmalarni oy bo'yicha filterlash</h5>
+                    <div class="col-md-12 m-auto">
+            <form method="get">
+<!--                {% csrf_token %}-->
+
+                <div class="row">
+                    <div class="col-md-3">
+
+                        <label>Oy tanlang :</label>
+<!--                        <input type="month" class="form-control" name="to" value="{{to}}">-->
+                        <input type="month" class="form-control" required name="to" value="{{dates}}">
+                    </div>
+                    <div class="col-md-3">
+
+                        <label>Haydovchi tanlang :</label>
+                        <select name="driver" v-model="driver" class="form-select">
+                            <option value="0">----------</option>
+                            <option :value="d.id" v-for="d in driver_list">[[d.first_name]] [[d.last_name]]</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3" v-if="driver && driver != 0">
+
+                        <label>Tuman tanlang :</label>
+                        <select name="district" v-model="district" class="form-select">
+
+                         <option value="0">----------</option>
+                            <option :value="d.id" v-for="d in filteredDistrictList">[[d.name]]</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Filterlash</label><br>
+                        <button class="btn btn-brand"><i class="icon material-icons md-search"></i></button>
+                    </div>
+
+
+                </div>
+                <br>
+            </form>
+                    </div>
+                </div>
+         <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Sana</th>
+                        <th>Mahsulot yuborilgan soni</th>
+                        <th>Sotilgan soni</th>
+                        <th>Bekor qilngan soni</th>
+                        <th>O'zgartirish qilingan buyurtmalarda sotish foizi</th>
+
+                        <th>Yetkazilmoqdalar soni</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in data %}
+                    <tr>
+                        <td>{{d.date|date}}
+
+                            </td>
+
+
+                        <td>{{d.report.total_send_products_count}} ta</td>
+
+                        <td>{{d.report.total_sell_count}} ta</td>
+                        <td>{{d.report.total_cancelled_count}} ta</td>
+                        <td>{{d.report.sold_percentage}}%</td>
+
+                        
+                        
+                        <td>{{d.report.total_being_delivery_count}} ta</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    <thead>
+                    <tr>
+                       <td>Jami</td>
+                       <td>{{total_send_products}} ta</td>
+                       <td>{{total_sell}} ta</td>
+                       <td>{{total_cancelled}} ta</td>
+                         <td>{{total_sold_percentage}}%</td>
+
+                       <td>{{total_being_delivery}} ta</td>
+                   </tr>
+                    </thead>
+                </table>
+            </div>
+
+
+
+
+
+            </div>
+
+        </div>
+        <div class="card bg-white">
+    <div class="card-body">
+                  <div id="chart" style="color:black;">
+</div>
+
+    </div>
+</div>
+
+<!--    </form>-->
+</section>
+<!--<script type='text/javascript'>-->
+<!--    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});-->
+
+<!--</script>-->
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto);
+
+</style>
+
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+
+
+<script src="{% static '' %}js/vue.js"></script>
+
+<script>
+
+            new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+            driver_list : {{drivers|safe}},
+            driver : {% if request.GET.driver %}{{request.GET.driver}}{% else %}0{% endif %},
+            district_list : {{districts|safe}},
+            district : {% if request.GET.district %}{{request.GET.district}}{% else %}0{% endif %},
+
+
+
+
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+              filteredDistrictList: function () {
+                    if (this.driver != 0) {
+
+                        let driver_filter = this.driver_list.filter(d => d.id === Number(this.driver))[0]
+                        let region_id = driver_filter.region_id
+                        let allowed_district = driver_filter.allow_districts
+
+                        let result = this.district_list.filter(d => d.region_id === region_id && allowed_district.includes(d.id));
+                        return result
+                            } else {
+                                return []
+                            }
+                        },
+            },
+            // computed: {
+
+            //   filteredDistrictList: function () {
+            //         if (this.driver != 0) {
+
+            //             console.log(this.driver)
+
+            //             let region_id = this.driver_list.filter(d => d.id === Number(this.driver))[0].region_id
+            //             console.log('r id',region_id)
+            //             let result = this.district_list.filter(d => d.region_id === region_id);
+            //             return result
+            //                 } else {
+            //                     return []
+            //                 }
+            //             },
+
+
+            // },
+
+        });
+</script>
+
+<script>
+
+var options = {
+  chart: {
+    height: 350,
+    type: "area",
+              //stacked: false,
+
+    zoom: {
+            enabled: false
+    },
+  },
+  dataLabels: {
+    enabled: false
+  },
+        markers: {
+          size: 0,
+        },
+  series: [
+    {
+      name: "Sotilganlar",
+      //data: [45, 52, 38, 45, 19, 23, 2]
+      data: {{sold_orders_count|safe}}
+    },
+    {
+      name: "Bekor qilinganlar",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{canceled_orders_count|safe}}
+    },
+    {
+      name: "Mahsuloti yuborildi",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{send_product_orders_count|safe}}
+    },
+    {
+      name: "Yetkazilmoqdalar soni",
+      //data: [25, 32, 18, 65, 29, 13, 22]
+      data: {{being_delivery_count|safe}}
+    }
+  ],
+  fill: {
+    // type: "gradient",
+    // gradient: {
+    //   shadeIntensity: 1,
+    //   inverseColors: false,
+    //   opacityFrom: 0.7,
+    //   opacityTo: 0.9,
+    //   stops: [0, 90, 100]
+    // }
+  },
+ tooltip: {
+          y: [
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " (mins)"
+                }
+              }
+            },
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " per session"
+                }
+              }
+            },
+            {
+              title: {
+                formatter: function (val) {
+                  return val;
+                }
+              }
+            }
+          ]
+        },
+  title: {
+          text: 'Buyurtmalar buyicha',
+          align: 'left',
+          offsetX: 14
+        },tooltip: {
+          shared: true
+        },legend: {
+          position: 'top',
+          horizontalAlign: 'right',
+          offsetX: -10
+        },legend: {
+          tooltipHoverFormatter: function(val, opts) {
+            return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
+          }
+        },
+  xaxis: {
+    categories: {{days|safe}}
+
+  }
+};
+
+var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+chart.render();
+
+
+
+
+
+        var table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+{% endblock %}

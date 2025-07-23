@@ -1,0 +1,55 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Xodim : {{request.user.first_name}} {{request.user.last_name }}</h4>
+            </div>
+            <div>
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row  mt-20 mb-20">
+                    <div class="col-md-12">
+                        <h4 class="text-center">Profilim</h4>
+                            <div class="row">
+
+                                <div class="col-md-4 m-auto mt-10 mb-2">
+
+                                    <article class="box bg-light">
+                                        <h6>
+                                            Balansim : {{ request.user.balance_employee_uzs }} so'm</h6>
+                                        <small class="text-muted d-block ">Yopilgan oylardagi daromadim - olgan pulim</small>
+                                    </article>
+                                </div>
+                                <div class="col-md-4 m-auto mt-10 mb-2">
+                                    <article class="box bg-light">
+                                        <h6>
+                                            Jami oylik : {{ request.user.total_salary_employee_uzs }} so'm</h6>
+                                        <small class="text-muted d-block ">yopilgan oylardagi chiqgan jami oyligim</small>
+                                    </article>
+                                </div>
+
+                                <div class="col-md-4 m-auto mt-10 mb-2">
+
+                                    <article class="box bg-light">
+                                        <h6>
+                                            Jami olgan pulim : {{ request.user.total_payment_employee_uzs }} so'm</h6>
+                                        <small class="text-muted d-block ">Jami olgan pulim</small>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+</section>
+{% endblock %}

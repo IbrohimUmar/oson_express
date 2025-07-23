@@ -1,0 +1,98 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">To'lovlar ro'yxati : {{user.first_name}} {{user.last_name}}</h2>
+        <div>
+
+            <a href="{% url 'estimated_fee_payment_create' cash_flow.id %}" class="btn btn-brand btn-sm"><i class="material-icons md-add"></i> Yangi to'lov qo'shish</a>
+
+            <a href="{% url 'estimated_fee_list' %}" class="btn btn-sm btn-brand btn-sm">
+                <i class="material-icons md-arrow_back"></i>
+                 Qaytish
+            </a>
+
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="text-muted">Hisoblanadigan xarajat nomi  : {{cash_flow.name}}</h6>
+            <h6 class="text-muted">Soni : {{count}} ta</h6>
+            <form method="post">
+                {% csrf_token %}
+                <div style="overflow-x:auto;">
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                        <tr style="border-bottom:1px solid white">
+                            <th>#</th>
+                            <th>Sana</th>
+                            <th>Summa</th>
+                            <th>To'lagan kassa</th>
+                            <th>Kategoriya</th>
+                            <th>Izoh</th>
+                            <th>Ma'sul</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for o in page_obj %}
+                        <tr>
+                            <td>
+                                <a href="{{request.scheme}}://{{request.META.HTTP_HOST}}/admin/cash/cash/{{o.id}}/change/"
+                                   target="_blank" class="badge btn-sm badge-soft-success"><i
+                                        class="material-icons md-edit"></i></a>
+                            </td>
+                            <td><h6>
+                                {{o.created_at|date:"d-m-Y"}}</h6>
+                                <small>{{o.created_at|date:"H:i"}}</small>
+                            </td>
+                            <td style="white-space: nowrap"><h6 style="overflow-x:auto !important;" class="text-white">
+                                {{o.amount}} UZS</h6></td>
+                            <td>{{o.from_user.first_name}} +{{o.from_user.username}}</td>
+                            <td><span class="badge badge-soft-success">{{o.category.name}}</span></td>
+                            <td><i>{{o.desc}}</i></td>
+                            <td><i>{{o.responsible.first_name}} +{{o.responsible.last_name}}</i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            <div class="row ">
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<style>
+            #dataTable tr:nth-child(odd){background:#3c4252}
+
+
+</style>
+{% endblock %}

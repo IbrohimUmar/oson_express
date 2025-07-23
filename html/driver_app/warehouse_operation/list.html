@@ -1,0 +1,192 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <h4 class="content-title">Amaliyotlar</h4>
+        </div>
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline active">Amaliyotlar</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+
+            {% for i in page_obj %}
+            <div class="card " style="border: 1px solid #adacac !important;" id="infinite-lists">
+                {% if i.relation_order_is_close == True %}
+            <!--        LOCK        -->
+                <div style="background-color:#306354;">
+                   <div class="me-auto  text-center" style="border-bottom: 1px solid #adacac !important;padding:10px;">
+                                    <i class="material-icons md-lock"></i>
+                   </div>
+                </div>
+            {% else %}
+            <!--        UNLOCK        -->
+                <div style="background-color:rgb(255 204 19 / 36%);">
+                   <div class="me-auto  text-center" style="border-bottom: 1px solid #adacac !important;padding:10px;">
+                                    <i class="material-icons md-lock_open"></i>
+                   </div>
+                </div>
+            {% endif %}
+
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div>
+
+                            <div class="text">
+                                <h5 style="display:inline;">Sotuv foizi : {{i.relation_order_sold_percentage.sold_percentage}}%</h5>
+                                <h5  class=" bage-sm text-sm f-right">#{{i.id}}</h5>
+                                <hr>
+                            </div>
+
+                         <div class="text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
+                             <h6>Buyurtmalaringiz bo'yicha</h6>
+                             <hr class="m-1">
+
+                             {% with order_status_by=i.relation_order_status_by  %}
+
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ order_status_by.call_back }} ta
+                                                </h6>
+                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda : {{ order_status_by.being_delivered }} ta
+                                                </h6>
+                                            <h6 class="badge btn-brand btn-sm mt-1 ml-1 readonly">Sotildi : {{ order_status_by.delivered }} ta</h6>
+
+                                            <h6 class="badge btn-sm mt-1 ml-1 readonly" style="white-space:normal; background-color:#e22b2b85;">Bekor qilindi ( Mahsulot haydovchida ) : {{ order_status_by.canceled_driver }} ta
+                                                </h6>
+                                            <h6 class="badge  btn-sm mt-1 ml-1 readonly" style="white-space:normal; background-color:#e22b2b85;">Bekor qilindi ( Mahsuloti qaytarildi ) : {{ order_status_by.canceled_returned }} ta
+                                                </h6>
+                                            <h6 class="badge btn-sm mt-1 ml-1 readonly" style="white-space:normal; background-color:#e22b2b85;"> Bekor qilindi ( Mahsuloti boshqa buyurtmaga berildi ) : {{ order_status_by.canceled_given_other_order }} ta
+                                                </h6>
+                             {% endwith %}
+                                <hr class="m-1">
+                                            <h6>Jami buyurtmalar soni : {{ i.relations_order_count }} ta
+                                                </h6>
+                                        </div>
+
+
+
+                            <div class="text-center">
+                                <h5 class="badge btn-sm ml-1 readonly text-white m-auto" style="background-color:#da7713f0;">Mahsulotalr kelgan sana : {{ i.to_warehouse_confirm_date }}   </h5>
+                            </div>
+
+
+                               </div>
+
+
+                        <hr class="m-1">
+                        <div class="col-md-12 text-center mt-2">
+                            <a href="{% url 'driver_app_warehouse_operation_product_list' i.id %}" class="btn btn-sm btn-brand" style="background-color:#3b9fb7;">
+                                <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-widgets"></i> Mahsulotlar : {{i.items_total_amount}} ta</h6>
+                            </a>
+
+                            <a href="{% url 'driver_app_warehouse_operation_order_list' i.id %}" class=" btn btn-sm btn-brand">
+                                <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-shopping_basket"></i> Buyurtmalar : {{i.relations_order_count}} ta</h6>
+                            </a>
+                        </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+
+
+                                <div class="row mt-20 mb-20">
+{% if count > 0 %}
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <small >Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</small>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1" class="btn btn-brand text-white"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}"
+                                                               class="btn btn-brand text-white"><</a>
+                                                        {% endif %}
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}"
+                                                               class="btn btn-brand text-white"> ></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                                                               class="btn btn-brand text-white">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+                        {% else %}
+                        <h5 class="text-center">To'lov topilmadi!</h5>
+                        {% endif %}
+            </div>
+
+        </div>
+
+
+
+    </section>
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+    <script src="{% static '' %}js/vue.js"></script>
+    <script src="{% static '' %}js/axios.min.js"></script>
+   <style>
+   .material-icons{
+  vertical-align: middle;
+   }
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
+<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>-->
+
+{% endblock %}
+{% block footer %}
+<script>
+
+            new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+
+            data() {
+                return {
+                }
+            },
+            methods: {
+
+            },
+            });
+
+</script>
+{% endblock %}

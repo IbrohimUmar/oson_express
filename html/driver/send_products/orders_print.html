@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Buyurtmalarni chop etish | Eltuvchi</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="Elituvchi bot boshqaruv paneli"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="Eltuvchi"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="eltuvchi"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <link href="{% static '' %}css/print.css" rel="stylesheet" type="text/css"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+</head>
+<body>
+<div class="row">
+    <div class="col-6 text-center">
+        <h3>Standart Barcodelar</h3>
+
+        <input type="button" class="btn btn-primary" target="_blank" onclick="printDiv('printableArea')"
+               value="Printernad chiqarish!"/>
+        <a href="{% url 'order_give_products' d.id output.id %}" class="btn btn-primary">Qaytish</a>
+
+        <div id="printableArea">
+
+            {% for order in order %}
+                {% if order.is_order_printable %}
+                    {% include 'print/print.html' %}
+                <br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-6 text-center">
+        <h3>Razmerga to'g'ri kelmaganlar</h3>
+        <p>Harbirini alohidadan chiqarish kerak</p>
+        <div>
+            {% for order in order %}
+            {% if order.is_order_printable == False %}
+                {% include 'print/no_printable.html' %}
+            <br>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <script>
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+
+    </script>
+</body>
+</html>

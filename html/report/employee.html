@@ -1,0 +1,262 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Xodimlar hisoboti</h2>
+        <div>
+        </div>
+    </div>
+    <form method="get">
+
+    <div class="card">
+        <div class="card-body">
+<!--            <h5>Sana oralig'idagi statistika</h5>-->
+
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label>Joriy davr uchun sana tanlang:</label>
+                                <input type="month" class="form-control" required name="month" value="{{dates}}">
+
+<!--                                <input type="date" class="form-control" id="from" {% if request.GET.date %} value="{{request.GET.date}}"{% else %}value="{{now}}"{% endif %} name="date">-->
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.from_date or request.GET.to_date %}
+                                 <a class="btn btn-danger" href="{% url 'report_employee' %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        <div class="card mb-4">
+        <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8 col-12 me-auto mb-md-0 mb-3">
+
+                            <div class="row">
+                                <div class="col-8">
+                                    <label>Qidiruv</label>
+                                    <input type="text" class="form-control" placeholder="id, tel, ism bo'yicha qidiruv" name="search"
+                                           {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                                </div>
+
+<!--                                {% if request.GET.search %}-->
+<!--                                    <div class="col-2">-->
+<!--                                        <a href="{% url 'operator_management_list' %}" class="btn btn-danger"-->
+<!--                                           type="submit"><i class="material-icons md-search_off"></i></a>-->
+<!--                                    </div>-->
+<!--                                {% endif %}-->
+                                <div class="col-md-4">
+                                                                        <label>Qo'llash</label> <br>
+
+                                                                    {% if request.GET.search %}
+
+                                      <a href="{% url 'report_employee' %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                                                    {% endif %}
+
+
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+
+                    </div>
+
+                </div>
+                        <h6 class="text-muted">Xodimlar soni : {{count}} ta</h6>
+
+
+
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                          <th>Xodim</th>
+                          <th>Tel</th>
+                        <th>Tur</th>
+
+                        <th>Oylik miqdori</th>
+                        <th>Oy boshi</th>
+                        <th>Debit (To'lov)</th>
+                        <th>Kredit</th>
+                        <th>Oy oxiri</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in statistic %}
+                    <tr>
+<!--                        <td>-->
+<!--                            <a href="{% url 'operator_management_edit' o.id %}" class="btn btn-brand btn-sm">-->
+<!--                                <i class="material-icons md-edit"></i> O'zgartirish</a>-->
+
+<!--                            <a href="{% url 'operator_payment_list' o.id %}" class="btn btn-brand btn-sm">-->
+<!--                                <i class="material-icons md-payment"></i> To'lov</a>-->
+<!--                            <a href="{% url 'operator_management_details' o.id %}" class="btn btn-brand btn-sm">-->
+<!--                                <i class="material-icons md-payment"></i> Hisobot</a>-->
+<!--                        </td>-->
+                        <td>
+                            {{ o.first_name }} {{o.last_name}}
+                        </td>
+                        <td>
+                            +{{ o.username }}
+                        </td>
+                        <td>
+                            <span class="badge" style="border:1px solid white;">{{ o.type }}</span>
+                        </td>
+                        <td>
+                            <h6>{{o.monthly}} uzs</h6>
+                        </td>
+                        <td>
+                            <h6>{{o.first_day_balance}} uzs</h6>
+                        </td>
+                        <td>
+                            <h6>{{o.pay_amount}} uzs</h6>
+                        </td>
+                        <td>
+                            <h6>{{o.difference_result}} uzs</h6>
+                        </td>
+                        <td>
+                            <h6>{{o.last_day_balance}} uzs</h6>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+
+    </form>
+
+
+
+
+
+
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script src="{% static '' %}js/vue.js"></script>
+
+<script>
+
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+
+                product_price_modal : false,
+                send_product_price : false,
+                balance_modal : false,
+
+            },
+            methods:{
+                 money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            }
+
+            },
+            computed: {
+              selectAll: {
+                        get: function (){
+                        return false},
+                        set: function (value) {
+                            if (value) {
+                                this.ordersCheck=this.ordersId
+                            }
+                        }
+                    },
+            },
+
+        });
+
+
+
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [{
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

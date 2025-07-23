@@ -1,0 +1,309 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Haydovchi : {{ d.first_name }} {{ d.last_name }} , {{ d.region.name }}
+{% endblock %}
+{% block content %}
+
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Haydovchi : {{ d.first_name }} {{ d.last_name }}</h2>
+            {% include "driver/top_button.html" %}
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row gx-5">
+                    <aside class="col-lg-3 border-end">
+                        <nav class="nav nav-pills flex-lg-column mb-4">
+                            {% include 'driver/header.html' %}
+                        </nav>
+                    </aside>
+                    <div class="col-lg-9">
+                        <section class="content-body p-xl-4">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="row gx-3">
+
+                                        <div class="col-md-12 mt-10">
+                                            <h5 class="text-center">Haydovchi Buyurtmalar bo'yicha</h5>
+                                        </div>
+                                        <div class="col-md-12 text-center">
+                                            
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda
+                                                : {{ d.order_status.wait }} ta
+                                            </h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot yuborildi
+                                                : {{ d.order_status.send_products }} ta
+                                            </h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda
+                                                : {{ d.order_status.being_delivered }} ta
+                                            </h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi
+                                                : {{ d.order_status.delivered }} ta</h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi
+                                                : {{ d.order_status.canceled }} ta
+                                            </h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq
+                                                : {{ d.order_status.call_back }} ta
+                                            </h6>
+                                        </div>
+
+
+                                        <!-- col .// -->
+                                    </div>
+                                    <!-- row.// -->
+                                </div>
+                                <!-- col.// -->
+                                <!-- col.// -->
+                            </div>
+                            <hr class="my-5">
+                            <div class="row">
+                                <header class="card-header">
+                                    <h5 class="card-title">Xolat vo'yciha bo'yicha filter</h5>
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8 col-12 me-auto mb-md-0 mb-3">
+
+                                            <form method="get">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <select class="form-control" name="status" onchange="this.form.submit()">
+                                                            <option value="0" {% if request.GET.status == None %}selected{% endif %}>
+                                                                Hammasi
+                                                            </option>
+
+                                                            <option value="1" {% if request.GET.status == '1' %}selected{% endif %}>
+                                                                Mahsulot kutilmoqda
+                                                            </option>
+                                                            <option value="2" {% if request.GET.status == '2' %}selected{% endif %}>Mahsulot yuborildi</option>
+                                                            <option value="3" {% if request.GET.status == '3' %}selected{% endif %}>
+                                                                Yetkazilmoqda
+                                                            </option>
+                                                            <option value="4" {% if request.GET.status == '4' %}selected{% endif %}>
+                                                                Sotildi
+                                                            </option>
+                                                            <option value="5" {% if request.GET.status == '5' %}selected{% endif %}>Bekor
+                                                                qilindi (Jami)
+                                                            </option>
+                                                            
+                                                            
+                                                            
+                                                            <option value="55" {% if request.GET.status == '55' %}selected{% endif %}>Bekor
+                                                                qilindi (Mahsuloti haydovchida)
+                                                            </option>
+                                                            <option value="555" {% if request.GET.status == '555' %}selected{% endif %}>Bekor
+                                                                qilindi (Mahsuloti qaytarib olindi)
+                                                            </option>
+                                                            
+                                                            <option value="5555" {% if request.GET.status == '5555' %}selected{% endif %}>Bekor
+                                                                qilindi (Mahsuloti boshqa buyurtmaga belgilandi)
+                                                            </option>
+                                                            
+                                                            
+                                                            <option value="6" {% if request.GET.status == '6' %}selected{% endif %}>Qayta
+                                                                qo'ng'iroq
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+
+<!--                                        <div class="col-md-2">-->
+<!--                                            <form method="get">-->
+<!--                                                {% csrf_token %}-->
+
+<!--                                                <input type="hidden" name="two_day" value="t">-->
+<!--                                                <button class="btn btn-brand" type="submit"><i-->
+<!--                                                        class="material-icons md-list_alt"></i> 2-kunlik buyurtmalar-->
+<!--                                                </button>-->
+<!--                                            </form>-->
+
+<!--                                        </div>-->
+                                    </div>
+                                </header>
+                                <h5 class="text-center mt-4">Haydovchining buyurtmalari tarixi</h5>
+                                <div class="table-responsive">
+                                                        <a href="?excel=True{% for key, value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}" class="badge btn-sm btn-brand">Excel variantini olish</a>
+
+                                         <table class="table dataTable" id="dataTable">
+                                        <thead>
+                                        <tr>
+                                            <th>id</th>
+                                            <th>Holati</th>
+                                            <th>Mahsulot</th>
+                                            <th>Mijoz ismi</th>
+                                            <th>Mijoz tel</th>
+                                            <th>Tumani</th>
+                                            <th>Soni</th>
+                                            <th>Narxi</th>
+                                            <th>Yo'l kirasi</th>
+                                            <th>Bonus</th>
+                                            <th>Amaliyot</th>
+                                            
+                                            <th>Buyurtma kelgan sana</th>
+                                            <th>Haydovchi olgan sana</th>
+                                             <th>Toshirish sanasi</th>
+                                             <th>So'ngi o'zgartirish sanasi</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for o in order %}
+                                            <tr>
+                                                <td>
+                                                    {% if perms.admin.order_details %}
+                                                    <h6><a href="{% url 'order_details' o.id %}"
+                                                           class="btn btn-brand btn-sm"><i
+                                                            class="material-icons md-edit"></i></a> #{{ o.id }}
+                                                            
+                                                            </h6>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+
+
+                                                    {% if o.status == '2' and o.is_send_barcode == True %}
+                                                    <h6>Barcodi Yuborildi</h6>
+                                                    {% else %}
+                                                    
+                                                    
+                                                    
+                                                    <h6>{{ o.get_status_display }}</h6>
+                                                    
+                                                    {% if o.status == '5' %}
+                                                    <span class="badge" style="border:1px solid;">{{o.get_cancelled_status_display}}</span>
+                                                    {% endif %}
+                                                    
+                                                    {% endif %}
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    </td>
+                                                <td><h6>{% for p in o.order_products %}
+                                {{p.product.name}},{{p.price}}, {{p.product_variable}} </span> <br>
+                            {% endfor %}</h6></td>
+                                                <td><h6>{{ o.customer_name }}</h6></td>
+                                                <td><h6>{{ o.customer_phone }} <br>
+                                                    {% if o.customer_phone2 %}
+                                                        {{ o.customer_phone2 }}
+                                                    {% endif %}
+                                                </h6></td>
+                                                <td><h6>{{ o.customer_district.name }}</h6></td>
+                                                <td><h6>{{ o.order_products_total_ordered_amount }}</h6></td>
+                                                <td><h6>{{ o.order_products_total_price }}</h6></td>
+                                                <td><h6>{{ o.driver_fee }}</h6></td>
+                                                <td><h6>{{ o.driver_bonus_amount_won }}</h6></td>
+                                                
+                                                <td>
+                                                    
+                                                    {% for i in o.send_product_relation %}
+                                                <div>    
+                                                <span class="badge" style="border:1px solid white;">
+                                                 Amaliyot id : {{i.warehouse_operation_id}}
+                                                </span> <br>
+                                                So'ngi o'zgartirish : {{i.warehouse_operation.updated_at}}
+                                                </div>
+                                                {% endfor %}
+                                                
+                                                
+                                                
+                                                </td>
+                                                
+                                                <td><h6>{{ o.created_at }}</h6></td>
+                                                <!--<td><h6>{{ o.send_product_relation }}</h6></td>-->
+                                                <td><h6 {% if o.is_delivered_date_over_for_driver_accept_product %}class="text-danger"{% endif %}>
+                                                    {% if o.driver_shipping_start_date %}
+                                                    {{ o.driver_shipping_start_date }}
+                                                    {% else %}
+                                                    Hali yetib bormagan
+                                                    {% endif  %}
+                                                </h6>
+                                                <td><h6>{{ o.delivered_date }} </h6></td>
+
+                                                </td>
+
+                                                <td><h6>{{ o.updated_at }} </h6></td>
+
+                                                </td>
+
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+
+                                <div class="row mt-20">
+
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <h5>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h5>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-primary btn-round btn-sm"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-primary btn-round btn-sm"><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-primary btn-round btn-sm">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-primary btn-round btn-sm">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+            </div>
+
+                            </div>
+
+                            <!-- row.// -->
+                        </section>
+
+                        <!-- content-body .// -->
+                    </div>
+
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}

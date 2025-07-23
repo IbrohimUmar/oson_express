@@ -1,0 +1,226 @@
+{% extends 'operator_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+    <h3>Buyurtmalarim</h3>
+
+            <a class="mt-1 mb-1 badge {% if request.GET.status == '1' %}btn-brand{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}?status=1">Yangi : {{statistic.taked_new_order}} ta</a>
+            <a class="mt-1 mb-1 badge {% if request.GET.status == '6' %} btn-brand{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}?status=6">Qayta qo'ng'iroq : {{statistic.call_back}} ta</a>
+            <a class="mt-1 mb-1 badge {% if request.GET.status == None %} btn-brand{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}">Jami : {{statistic.total_order}} ta</a>
+
+
+        </div>
+    </div>
+    <div id="loading" style="display:none">
+        <div class="text-center mt-20 mb-20 m-auto loader"></div>
+        <h4 class="text-center">Bajarilmoqda...</h4>
+    </div>
+
+    <div id="take_order_card">
+
+        {% for o in order %}
+        <form method="post" onsubmit="submitForm()">
+            {% csrf_token%}
+            <div class="card m-auto mb-15" style="border: 1px solid #adacac !important; max-width: 800px;"
+                 id="order_{{o.id}}">
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div class="col-md-12">
+                            <div class="text">
+                                <h6 style="font-size:13px;" class="d-inline"><i class="material-icons md-hourglass_top"
+                                                                                style="    vertical-align: bottom;    font-size: 19px;"></i>
+                                    Keldi {{ o.created_at|timesince }} oldin </h6>
+
+                                {% if o.status == '9' %}
+                                <span class="text-sm f-right badge badge-soft-success">{{o.get_status_display}} </span>
+                                {% else %}
+                                <span class="text-sm f-right badge badge-soft-warning">{{o.get_status_display}} </span>
+                                {% endif %}
+
+                                <hr style="margin: 5px;">
+                                <h6>
+                                    <span style="-webkit-user-select: all; -moz-user-select: all; -ms-user-select: all; user-select: all">#ID : {{o.id}}</span>
+                                    <br>
+                                    <i class="material-icons md-perm_identity"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz ismi :
+                                    {{o.customer_name}}<br>
+                                    <i class="material-icons md-phone"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz tel :
+                                    <span style="-webkit-user-select: all; -moz-user-select: all; -ms-user-select: all; user-select: all">{{o.customer_phone}}</span>
+
+                                    <a href="tel: {{o.customer_phone}}" class="badge btn-sm btn-brand">
+                                        <i class="material-icons md-phone"></i>
+                                    </a>
+                                    <br>
+
+                                    <i class="material-icons md-place"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Manzil : {% if o.customer_region %} {{o.customer_region.name}} {% else %} ------- {% endif %}
+
+
+                                    <br>
+                                    <div style="padding:15px ; background-color:#141731; border-radius:10px;">
+                                        <h6 class="text-center"><i class="material-icons md-shopping_basket"
+                                                                   style=" font-size:17px; vertical-align: text-top;"></i>
+                                            Mahsulot </h6>
+                                        <hr style="margin: 3px;">
+
+                                        {% for p in o.order_products %}
+                                        <div style="border:1px solid white; border-radius:10px; padding:5px;">
+                                            <small class="d-block">Nomi : {{p.product.name}}</small>
+                                            <small class="d-block">Soni : {{p.total_quantity}} ta</small>
+                                            <small class="d-block">Narxi : {{p.unit_price}} so'm</small>
+
+                                            {{p.is_delivery_free}}
+                                            {% if p.is_delivery_free is True %}
+                                            <small class="d-block">Yo'l kira : Bepul</small>
+                                            {% else %}
+                                            <small class="d-block">Yo'l kira : Pullik</small>
+                                            {% endif %}
+
+                                            <!--                                            {{p.product.short}}-->
+                                            <span onclick="Swal.fire({
+                                                  icon: 'info',
+                                                  title: 'Mahsulot haqida',
+                                                  html: `{{p.product.short|safe}}`,
+                                                })"
+                                                  class=" badge badge badge-soft-info btn-sm">Mahsulot haqida qo'shimcha ma'lumot</span>
+
+                                        </div>
+                                        {% endfor %}
+                                        <hr style="margin: 3px;">
+                                        <small class="d-block"><span style="color:#3bb77e;">Mahsulotlar narxi</span> :
+                                            {{o.order_products_total_unit_price}} so'm</small>
+                                        <small class="d-block"><span style="color:#3bb77e;">Yo'l kira</span> :
+                                            {{o.toll_exists}} so'm</small>
+                                        <small class="d-block"><span style="color:#3bb77e;">Jami to'lov</span> :
+                                            {{o.total_product_price}} so'm</small>
+
+                                    </div>
+                                    <hr style="margin: 3px;">
+                                    <input type="hidden" name="id" value="{{o.id}}">
+
+                                    <i class="material-icons md-message"
+                                       style="    vertical-align: bottom;    font-size: 19px;"></i> Sizning izohingiz
+
+                                    <select class="form-select" name="status_description">
+                                        <option value="0">--------</option>
+                                        {% for i in descriptions %}
+                                        <option value="{{i.id}}" {% if o.note == i.description %}selected{% endif %}>
+                                            {{i.description}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <p class="text-muted"
+                                       style="font-size:10px !important; line-height:11px !important;">
+                                        Yozgan izohingiz mijozlarga va adminlarga ko'rinadi shu bois tushunarli va
+                                        batafsil yozishga harakat qiling.</p>
+                                </h6>
+
+
+                                <hr style="margin: 4px;">
+                                <div class="mb-1 row m-2">
+                                    <a class="badge col-6 m-auto ml-4" href="{% url 'operator_app_order_details' o.id %}"
+                                       style="background-color:#00abcd;padding: 7px;font-size: 14px;"><i
+                                            class="material-icons md-local_shipping"
+                                            style="font-size: 15px;vertical-align: text-bottom;"></i> Qabul qilish
+                                        </a>
+                                    <button type="submit" class="badge m-auto btn-brand col-6" style="padding: 7px;font-size: 14px;">
+                                        <i
+                                                style="font-size: 15px;vertical-align: text-bottom;"
+                                                class="material-icons md-check"></i> Izohni saqlash
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        {% endfor %}
+
+
+        <div class="pagination-area mt-20 mb-50">
+
+            <nav aria-label="Page navigation example">
+                <div class="mb-3 text-center">
+                    {% if order.has_next %}
+
+                    <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                       href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                    {% endif %}
+
+                </div>
+
+                <ul class="pagination justify-content-center">
+                    {% if order.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            << </a>
+                    </li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ order.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{  order.previous_page_number }}</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ order.number }}</a></li>
+
+                    {% if order.has_next %}
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
+                        order.next_page_number }}</a></li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            >> </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+</section>
+{% endblock %}
+
+{% block header %}
+<style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+{% block footer %}
+<script>
+    function submitForm() {
+                 document.getElementById('take_order_card').style.display = 'none';
+                 document.getElementById('loading').style.display = 'block';
+
+     }
+
+
+</script>
+{% endblock %}
