@@ -13,3 +13,4 @@
 /store/migrations
 /report/migrations
 /warehouse/migrations
+/staticfiles
