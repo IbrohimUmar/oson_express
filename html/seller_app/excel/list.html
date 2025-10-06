@@ -1,0 +1,141 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">Excel fayllar ro'yxati</h2>
+            <div>
+            </div>
+        </div>
+        <div class="card mb-4">
+
+
+        <header class="card-header">
+        </header>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="dataTable">
+                        <thead>
+                        <tr>
+                           <th>Nomi</th>
+                            <th>Fayl</th>
+                            <th>Sana</th>
+                            <th>#</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for e in files %}
+                        <tr>
+
+                            <td>
+                               <h6> {{e.nomi}}</h6>
+                            </td>
+
+                            <td>
+
+                               <h6> <a href="{{e.file.url}}"><i class="fas fa-file" ></i> {{e.file}}</a> </h6>
+                            </td>
+
+
+                            <td>
+                               <h6> {{e.created_at}}</h6>
+                            </td>
+
+
+                            <td>
+
+                                                            <a href="{{e.file.url}}" download class="btn d-inline  btn-brand">
+                                                            <i class="fas fa-download"></i>Yuklash</a>
+                                 <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="file_id" value="{{e.id}}">
+                                    <input type="hidden" name="action" value="DELETE">
+                                    <button type="submit" onclick="return confirm('Siz o\'chirmoqchimisiz')" class="btn btn-danger "><i class="fa-solid fa-trash"></i> O'chirish
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+
+<!--                    {% for i in excel_files %}-->
+<!--                        <tr>-->
+<!--                            <td><a href="{% static '' %}excel/{{i}}">{{i}}</a></td>-->
+<!--                            <td><a href="{% static '' %}excel/{{i}}" class="btn btn-sm btn-brand">Yuklash</a></td>-->
+<!--                            -->
+<!--                            <td>-->
+<!--                                <form method="post">-->
+<!--                                    {% csrf_token %}-->
+<!--                                    <input type="hidden" name="file_name" value="static/excel/{{i}}">-->
+<!--                                    <input type="hidden" name="action" value="DELETE">-->
+<!--                                    <button type="submit" onclick="return confirm('Siz o\'chirmoqchimisiz')" class="btn btn-danger btn-sm"><i class="material-icons md-delete"></i> O'chirish-->
+<!--                                    </button>-->
+<!--                                </form>-->
+<!--                                -->
+<!--                        </tr>-->
+<!--                        {% endfor %}-->
+
+
+                                                  </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+            <script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+
+    <script>
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+            }
+        });
+
+
+    </script>
+
+{% endblock %}

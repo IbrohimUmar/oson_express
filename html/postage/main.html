@@ -1,0 +1,128 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Agentlar ro'yxati
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h3 class="content-title">Fileallar ro'yxati</h3>
+
+            <div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline active">Fileallar ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            {% for w in logistic_branches %}
+                {% if w.perms %}
+                    <div class="col-md-12 mt-2">
+                        <div class="card mb-4">
+                            <div class="card-body row">
+        <!--                        <h3 class="mt-2 mb-2 text-center">Elituvchi ombori</h3>-->
+
+                                {% if perms.admin.has_view %}
+
+                                        <div class="box text-center " style="border:1px solid #05a87945; border-radius:10px;">
+                                                <div class="text">
+                                                   <img src="{% static '' %}svg/warehouse1.svg" class="mt-2" height="170px" alt="">
+                <!--                                    <i class="material-icons md-check"></i>-->
+                                                    <h3 class="mt-2  text-center">{{w.name}}</h3>
+                                                    <p class="text-muted">
+                                                      <i class="fas fa-location-dot"></i>  {{w.region.name}}, {{w.district.name}}, {{w.address}}
+                                                    </p>
+        <!--                                            <h4>-->
+
+
+
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-sm-12 col-lg-6 m-auto mt-1" >
+                                                            <div class="m-0 " style="border:0.5px solid #1a8d74; border-radius:10px; padding:10px;">
+                                                            <h4>
+
+                                                                <i class="fa-solid fa-user fa-lg"></i>
+                                                                <br>
+                                                                Seller</h4>
+
+                                                                {% if w.perms.seller_history %}
+                                                                <a href="{% url 'postage_branch_seller_history' w.id %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-history"></i>
+                                                                    Amaliyotlar tarixi</a>
+                                                                {% endif %}
+<!--                                                                <a href="" class="btn btn-sm btn-brand">-->
+<!--                                                                    <i class="fa-solid fa-plus"></i>-->
+<!--                                                                    Pochta olish</a>-->
+
+
+<!--                                                                <a href="" class="btn btn-sm btn-warning">-->
+<!--                                                                    <i class="fa-solid fa-rotate-left"></i>-->
+<!--&lt;!&ndash;                                                                    <i class="fas fa-return"></i>&ndash;&gt;-->
+<!--                                                                    Pochta Qaytarish</a>-->
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 col-sm-12 col-lg-6 m-auto mt-1" >
+                                                            <div class="m-0 " style="border:0.5px solid #1a8d74; border-radius:10px; padding:10px;">
+                                                            <h4>
+                                                                <i class="fa-solid fa-car-side fa-lg"></i>
+                                                                <br>
+                                                                Haydovchi</h4>
+
+                                                                {% if w.perms.seller_history %}
+                                                                <a href="{% url 'postage_branch_driver_history' w.id %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-history"></i>
+                                                                    Amaliyotlar tarixi</a>
+                                                                {% endif %}
+<!--                                                                <a href="" class="btn btn-sm btn-brand">-->
+<!--                                                                    <i class="fa-solid fa-plus"></i>-->
+<!--                                                                    Pochta berish</a>-->
+<!--                                                                <a href="" class="btn btn-sm btn-warning">-->
+<!--                                                                    <i class="fa-solid fa-rotate-left"></i>-->
+<!--&lt;!&ndash;                                                                    <i class="fas fa-return"></i>&ndash;&gt;-->
+<!--                                                                    Pochta Qaytarish</a>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mt-2">
+                                                        {% if w.perms.residue %}
+                                                        <a class="btn btn-outline-success btn-sm" href="{% url 'postage_branch_residue' w.id %}" style="border:1px solid #1a8d74;">
+                                                            <i class="icon material-icons md-widgets"></i>
+                                                           <h6>Filealdagi pochtalar</h6>
+                                                        </a>
+                                                        {% endif %}
+
+
+                                                        {% if w.perms.order_warehouse_action_history and w.type == '1' %}
+                                                        <a class="btn btn-outline-success btn-sm" href="{% url 'warehouse_order_warehouse_action_history' w.id %}" style="border:1px solid #1a8d74;">
+                                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                                           <h6> Buyurtmalar amaliyotlari</h6>
+                                                        </a>
+                                                        {% endif %}
+
+
+                                                    </div>
+                                                </div>
+                                        </div>
+
+                                </div>
+                                {% endif %}
+                            </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+

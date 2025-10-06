@@ -3,15 +3,12 @@ import json
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Sum, Q
-from django.db.models.functions import Coalesce
+from django.db.models import Q
 from django.http import JsonResponse
 
-from config.warehouse.services.warehouse_operation_item_details_manager import WarehouseOperationItemDetailsManager
-from config.warehouse.services.warehouse_operation_item_manager import WarehouseOperationItemManager
 from order.models import Order, OrderProduct
 from user.models import User
-from warehouse.models import WarehouseOperation, WarehouseOperationAndOrderRelations, WarehouseOperationItemDetails
+from warehouse.models import WarehouseOperation, WarehouseOperationAndOrderRelations
 
 from order.services.order_warehouse_operation import OrderWarehouseOperationsService
 

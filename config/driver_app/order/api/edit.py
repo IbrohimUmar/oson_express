@@ -12,9 +12,9 @@ import datetime
 from django.http import JsonResponse
 from order.models import DefectiveOrderDriverFee
 from order.services.order_warehouse_operation import InsufficientStockError
+from services.handle_exception import handle_exception
 from services.order.history import save_order_status_history
 
-from warehouse.models import WarehouseOperationItemDetails
 
 def update_order_status(order, new_status):
     order.status = new_status
@@ -39,23 +39,23 @@ def driver_app_order_api_edit(request):
                             'message': f"Hato skannerlangan type {type(body['barcode'])}, val {body}",
                         })
                     barcode = body['barcode']
-                    order = Order.objects.filter(status__in=[3, 4, 5, 6], barcode=barcode, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5, 6], barcode=barcode, transcation_lock=False, driver_id=request.user.id)
 
                 elif body.get("order_id", None):
                     order_id = body['order_id']
-                    order = Order.objects.filter(status__in=[3, 4, 5, 6], id=order_id, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5, 6], id=order_id, transcation_lock=False, driver_id=request.user.id)
                 else:
                     order = None
+
                 if order:
                     order = order.first()
                     order_status = int(order.status)
-                    if order.cancelled_status != '1':
-                        return JsonResponse({'status': 404,
-                                             'messages': "Bu bekor qilingan buyurtmani o'zgartirish mumkun emas chunki mahsulotlari haydovchida emas"})
 
                     if body['next_status'] == 3:
                         if order_status in [4, 6, 5]:
                             order.status = 3
+                            order.driver_status = '1'
+                            order.driver_status_changed_at=datetime.datetime.now()
                             order.save()
                             save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan yetkazilmoqdaga olindi",
                                                       request.user,
@@ -65,6 +65,8 @@ def driver_app_order_api_edit(request):
                     if body['next_status'] == 4:
                         if order_status in [3, 6, 5]:
                             order.status = 4
+                            order.driver_status = '2'
+                            order.driver_status_changed_at=datetime.datetime.now()
                             order.save()
                             save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan sotildiga olindi",
                                                       request.user,
@@ -74,6 +76,8 @@ def driver_app_order_api_edit(request):
                     if body['next_status'] == 5:
                         if order_status in [3, 6, 4]:
                             order.status = 5
+                            order.driver_status = '3'
+                            order.driver_status_changed_at=datetime.datetime.now()
                             OrderComment.objects.create(order=order, user=request.user, message=body['desc'])
                             order.save()
                             save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan bekor qilindi",
@@ -84,6 +88,8 @@ def driver_app_order_api_edit(request):
                     if body['next_status'] == 6:
                         if order_status in [3, 5, 4]:
                             order.status = 6
+                            order.driver_status = '4'
+                            order.driver_status_changed_at=datetime.datetime.now()
                             order.save()
                             save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan qayta qo'ng'iroqga olindi",
                                                       request.user,
@@ -93,6 +99,7 @@ def driver_app_order_api_edit(request):
                 return JsonResponse({'status': 404, 'messages': "Bu buyurtma topilmadi"})
 
         except IntegrityError as e:
+            handle_exception(e)
             return JsonResponse({'status': 404, 'messages': f"Saqlashda xatolik mavjud {e}"})
 
     return JsonResponse({'status': 404, 'messages': "faqat post qabol qilinadi"})

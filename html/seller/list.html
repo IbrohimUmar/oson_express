@@ -3,87 +3,70 @@
 {% block content %}
 <section class="content-main" id="app">
     <div class="content-header">
-        <h2 class="content-title">Sotuvchilar ro'yxati</h2>
+        <h3 class="content-title">Sellerlar ro'yxati</h3>
         <div>
+            {% if perms.admin.seller_create %}
+            <a href="{% url 'seller_create' %}" class="btn btn-sm btn-brand">Yangi qo'shish</a>
+            {% endif %}
         </div>
     </div>
-    <div class="card mb-4">
-        <div class="card-body">
-            <a href="{% url 'seller_create' %}" class="btn btn-brand"><i class="material-icons md-add"></i> Yangi sotuvchi qo'shish</a>
-            <a href="{% url 'seller_payment_list' %}" class="btn btn-brand"><i class="material-icons md-payment"></i> To'lovlar</a>
+
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline active">Sellerlar ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Qidiruv</h5>
-                <div class="row align-items-center">
-                    <div class="col-md-8 col-12 me-auto mb-md-0 mb-3">
-                        <form method="get">
-                            <div class="row">
-                                <div class="col-8">
-                                    <input type="text" class="form-control" placeholder="id, tel, ism bo'yicha qidiruv" name="search"
-                                           {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
-                                </div>
+                  <form method="get">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 col-sm-8 col-10 mb-md-0">
+                                        <input type="text" class="form-control" placeholder="id, tel, ism bo'yicha qidiruv" name="search"
+                                               {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                                    </div>
+                                    <div class="col-md-4 col-2">
+                                        <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                        </button>
+                                        {% if request.GET %}
 
-<!--                                {% if request.GET.search %}-->
-<!--                                    <div class="col-2">-->
-<!--                                        <a href="{% url 'operator_management_list' %}" class="btn btn-danger"-->
-<!--                                           type="submit"><i class="material-icons md-search_off"></i></a>-->
-<!--                                    </div>-->
-<!--                                {% endif %}-->
-                                <div class="col-md-4">
-                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
-                                    </button>
-                                                                    {% if request.GET.search %}
-                                      <a href="{% url 'seller_list' %}" class=" btn btn-danger"
+                                        <a href="" class=" btn btn-danger"
                                            type="submit"><i class="material-icons md-search_off"></i></a>
-                                                                    {% endif %}
+
+                                        {% endif %}
+                                    </div>
                                 </div>
+                            </form>
 
-                            </div>
 
-                        </form>
-                    </div>
-
-                </div>
-                        <h6 class="text-muted">Jami sotuvchilar soni : {{count}} ta</h6>
-                        <h6 class="text-muted">Aktiv sotuvchilar soni : {{active_count}} ta</h6>
-
+            <h6 class="text-muted">Jami sellerlar soni : {{count}} ta</h6>
             <div style="overflow-x:auto;">
                 <table class="table table-hover" id="dataTable">
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Id</th>
                         <th>Fio</th>
                         <th>Tel</th>
-                        <th>Kartasi</th>
                         <th>Aktivmi</th>
+                        <th>#</th>
+
                     </tr>
                     </thead>
                     <tbody>
                     {% for o in page_obj %}
                     <tr>
                         <td>
-                            <a href="{% url 'seller_edit' o.id %}" class="btn btn-brand btn-sm">
-                                <i class="material-icons md-edit"></i> O'zgartirish</a>
-                        </td>
-                        <td>
-                            #{{ o.id }}
-                        </td>
-                        <td>
                             {{ o.first_name }} {{o.last_name}}
                         </td>
                         <td>
                             +{{ o.username }}
-                        </td>
-                        <td>
-                            {% if o.payment_card %}
-                            {{ o.payment_card }}
-                            {% else %}
-                            --------
-                            {% endif %}
                         </td>
                         <td>
                             {% if o.is_active == True %}
@@ -92,14 +75,27 @@
                             <span class="material-icons md-cancel badge-soft-danger"></span>
                             {% endif %}
                         </td>
+
+                        <td>
+                            {% if perms.admin.seller_product_list %}
+                            <a href="{% url 'seller_product_list' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="fa-solid fa-boxes-stacked"></i>Mahsulotlari</a>
+                            {% endif %}
+                            {% if perms.admin.seller_edit %}
+                            <a href="{% url 'seller_edit' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-edit"></i> O'zgartirish</a>
+                            {% endif %}
+                            {% if perms.admin.seller_details %}
+                            <a href="{% url 'seller_edit' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-payment"></i> Hisobot</a>
+                            {% endif %}
+                        </td>
+
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
-
-
-
                                         <div class="row ">
  <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
                 </div>
@@ -119,12 +115,14 @@
                                                                class="btn btn-sm btn-brand ">>></a>
                                                         {% endif %}
                                                     </span>
-
                 </div>
                                         <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
-
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block header %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
 {% endblock %}

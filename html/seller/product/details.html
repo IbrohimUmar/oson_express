@@ -1,0 +1,341 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Mahsulotni o'zgartirish</h4>
+            </div>
+            <div>
+                <a href="{% url 'seller_product_list' product.seller.id %}" class="btn btn-sm btn-brand">
+
+                    <i class="fa-solid fa-arrow-left"></i>  Qaytish
+                </a>
+            </div>
+        </div>
+
+    <div class="card">
+
+        <div class="card-body">
+            <h1 class="text-center"><i class="fas fa-truck"></i></h1>
+            <h5 class="text-center">Yetkazib berish summasi </h5>
+            <form method="post">
+                {% csrf_token %}
+                <table class="table" >
+                    <tbody>
+                    <tr>
+                        <th>
+                            <h6>Seller uchun belgilangan standart yerkazib berish hizmat narxi</h6>
+                        </th>
+                        <td><h6>{{seller.special_fee_amount}} so'm</h6></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <h6>Bu mahsulot o'lchami qanday</h6>
+                        </th>
+                        <td>
+                            <select name="size_type" v-model="size_type" class="form-control" required>
+                                <option value="1">Standart o'lchamda</option>
+                                <option value="2">Gabariti katta mahsulot qo'chimcha yo'l kira hissoblanadi</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr v-if="size_type == 2">
+                        <th><h6>Katta gabaritli mahsulotlar uchun qo‘shimcha yetkazib berish summasini kiriting</h6></th>
+                        <td>
+                            <input type="number" name="diff_delivery_price" class="form-control" value="{{product.size_based_delivery_extra}}" required placeholder="Qo‘shimcha summa">
+                        </td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+                <div class="text-center">
+                    <input type="hidden" name="action" value="size_type_change">
+                    <button class="btn btn-brand btn-sm" type="submit"><i class="fas fa-edit"></i> O'zgartirish</button>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+
+
+
+        <div class="card">
+            <header class="card-header">
+                <h4>Seller qo'shgan mahsuloti</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                    <div class="text-center">
+                        {% if product.approval_status != '2' %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="confirm">
+                                <input type="hidden" name="product_id" value="{{product.id}}">
+                                    <button class="btn  btn-brand rounded font-sm btn-sm" value="cancel" name="action" type="button" onclick="return Swal.fire({
+                                      title: 'Siz rostdanham tasdiqlamoqchimisiz',
+                                       showCancelButton: true,
+                                      cancelButtonText: 'Qaytish',
+                                      cancelButtonColor: '#4f5d77',
+                                      confirmButtonText: 'Tasdiqlash',
+                                }).then(function(result) {
+                                  if (result.value) {
+                                    form.submit();
+                                  }
+                                })"><i class="fa-solid fa-check"></i>  Tasdiqlash</button>
+
+                            </form>
+                        {% endif %}
+
+                        <form method="post" onsubmit="document.getElementById('submit_button').disabled=true" class="d-inline" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="comment" id="delete_note">
+                                    <input type="hidden" name="product_id" value="{{product.id}}">
+                                    <input type="hidden" name="action" value="cancel">
+                                    {% if product.approval_status != '3' %}
+                                <button class="btn  btn-danger rounded font-sm btn-sm" type="button" onclick="return Swal.fire({
+                                  title: 'Bekor qilishingiz sababi',
+                                  input: 'textarea',
+                                   showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                    confirmButtonColor: '#F30000',
+                                  inputPlaceholder: 'Bekor qilishingiz sababini yozing...'
+                            }).then(function(result) {
+                              if (result.value) {
+                                document.getElementById('delete_note').value = result.value
+                                form.submit();
+                              }
+                            })"><i class="fa-solid fa-xmark"></i>  Bekor qilish</button>
+                                    {% endif %}
+                                </form>
+                    </div>
+                <div class="row mb-50 mt-20 order-info-wrap">
+
+                    <table class="table">
+                        <tr>
+                            <th><h6>Surati</h6></th>
+                            <td>
+                                <a target="_blank" href="{{product.image.url}}">
+                                <img src="{{product.image.url}}" style="width:200px;" alt="">
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Nomi</h6></th>
+                            <td>{{product.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><h6>Turi</h6></th>
+                            <td>
+                                {% if product.is_collection %}
+                                Mahsulotlar to'plami
+                                {% else %}
+                                Donali mahsulot
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Nomi</h6></th>
+                            <td>{{product.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><h6>Admin tasdiqi holati</h6></th>
+                            <td>{{product.get_approval_status_display}}</td>
+                        </tr>
+                        {% if product.approval_status_updated_at %}
+                        <tr>
+                            <th><h6>Admin tasdiqi o'zgargan sana</h6></th>
+                            <td>{{product.approval_status_updated_at}}</td>
+                        </tr>
+                        {% endif %}
+                        {% if product.approval_status_updated_by %}
+                        <tr>
+                            <th><h6>Admin tasdiqi o'zgartirgan admin</h6></th>
+                            <td>{{product.approval_status_updated_by.full_name}}</td>
+                        </tr>
+
+                        {% endif %}
+
+                        <tr>
+                            <th><h6>Sotuvdami</h6></th>
+                            <td>
+                                {% if product.is_active %}
+                                <span class="badge badge-soft-success">Sotuvda</span>
+                                {% else %}
+                                <span class="badge badge-soft-danger"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th><h6>Bonus turi</h6></th>
+                            <td>{{product.get_bonus_type_display}}</td>
+                        </tr>
+
+                        {% if product.bonus_type != '0' %}
+                        <tr>
+                            <th><h6>Bonus </h6></th>
+                            <td>{{product.get_sale_discount_type_title}}</td>
+                        </tr>
+                        {% endif %}
+
+
+                        {% if product.is_collection is False and product.colors.all %}
+                        <tr>
+                            <th><h6>Ranglari </h6></th>
+                            <td>
+                                {% for i in product.colors.all %}
+                                <span class="badge" style="border:1px solid white;">{{i.name}}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+
+
+
+                        {% if product.is_collection is False and product.measure is not None %}
+                        <tr>
+                            <th><h6>Tanlangan o'lchov birligi </h6></th>
+                            <td>
+                                {{product.measure.name}}
+                            </td>
+                        </tr>
+                        {% endif %}
+
+                        {% if product.is_collection is False and product.measure_item.all %}
+                        <tr>
+                            <th><h6>Tanlangan o'lchov birliklari </h6></th>
+                            <td>
+                                {% for i in product.measure_item.all %}
+                                <span class="badge" style="border:1px solid white;">{{i.name}} {{i.measure.short_name}}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th><h6>Sotuv narxi </h6></th>
+                            <td>
+                                {{product.sale_price}} uzs
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Marketolog to'lovi</h6></th>
+                            <td>
+                                {{product.seller_fee}} uzs
+                            </td>
+                        </tr>
+
+
+                    </table>
+
+                    <div>
+                        <h5>Mahsulot haqida batafsil</h5>
+                        <div style="background-color: #ffebcd1a; padding: 10px; border-radius: 10px;">
+                        <p>{{product.desc|safe}}</p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    <div class="card">
+        <div class="card-body" style="">
+
+                        <h5>Chat</h5>
+
+            <div class="container py-4" style="border:0.1px solid #597d8f;border-radius:10px; ">
+              <div class="chat-container d-flex flex-column">
+                <div class="chat-box d-flex flex-column">
+                     {% regroup product.approval_notes.all|dictsort:"created_at" by created_at.date as day_list %}
+                      {% for day in day_list %}
+                        <!-- Sana ajratuvchi -->
+                        <div class="date-separator text-center my-3 text-muted">
+                          <small>{{ day.grouper|date:"j F Y" }}</small>
+                        </div>
+                        {% for note in day.list %}
+                          <div class="message {% if note.user == request.user %}right{% else %}left{% endif %}">
+                            {% if note.user != request.user %}
+                              <strong style="color:#3391d4;">{{ note.user.full_name }} ({{note.user.get_type_display}})</strong><br>
+                            {% endif %}
+                            {{ note.note }}
+                            <div class="message-time  text-muted">{{ note.created_at|time:"H:i" }}</div>
+                          </div>
+                        {% endfor %}
+                      {% endfor %}
+                </div>
+              </div>
+
+              <div class="chat-footer mt-3">
+                <form method="post" onsubmit="document.getElementById('comment_submit').disabled=true">
+                    {% csrf_token %}
+                  <div class="input-group">
+                    <input type="text" name="comment" required class="form-control" placeholder="Xabar yozing...">
+                    <button class="btn btn-primary" id="comment_submit" type="submit">Yuborish</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<script src="{% static '' %}js/vue.js"></script>
+<style>
+            .table tr:nth-child(odd){background:#3c4252}
+.comment-box {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .message {
+        padding: 10px 15px;
+        border-radius: 20px;
+        margin-bottom: 10px;
+        max-width: 80%;
+    }
+
+    .message.left {
+        background-color: #454e6a;
+        text-align: left;
+        border-top-left-radius: 0;
+    }
+
+    .message.right {
+        background-color: #176772;
+        text-align: right;
+        border-top-right-radius: 0;
+        margin-left: auto;
+    }
+
+    .message-info {
+        font-size: 0.75rem;
+        color: gray;
+    }
+</style>
+{% endblock %}
+{% block footer %}
+<script>
+    var vue = new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+            size_type :{{product.size_type}},
+        }, methods: {
+
+        }
+    });
+
+</script>
+{% endblock %}

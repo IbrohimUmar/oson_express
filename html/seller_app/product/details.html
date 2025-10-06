@@ -1,106 +1,291 @@
-<!DOCTYPE html>
-
+{% extends 'seller_app/main/main.html' %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <title>{{SITE_NAME}} internet magazin</title>
-    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-    <meta name="description" content="Eltuvchi boshqaruv paneli"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta property="og:title" content="Eltuvchi bot"/>
-    <meta property="og:type" content="text/css"/>
-    <meta property="og:url" content="eltuvchi"/>
-    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
-    <script src="{% static '' %}js/vue.js"></script>
+{% load custom_filters %}
 
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
-</head>
-<body style="background-color: #222736" class="dark">
-
-<section class="content-main">
-    <div class="content-header">
-        <a href="{% url 'seller_app_product_list' %}" class="btn btn-sm btn-brand"><i class="material-icons md-arrow_back"></i> Qaytish </a>
-    </div>
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <img src="{{product.image.url}}" alt="">
-                </div>
-                <div class="col-md-6">
-                    <h4>{{product.name}}</h4>
-                    <hr>
-                    <h6>Narxi : {{product.sale_price}} uzs</h6>
-
-                    <hr>
-                    <h6>Bonus : {{product.seller_fee}} uzs</h6>
-
-                    {% if product.colors %}
-                    <hr>
-                    <h6>Mavjud ranglari :
-
-                        {% for c in product.colors.all %}
-                        <span class="badge" style="border:1px solid white;">
-                            {{c.name}}
-                        </span>
-                        {% endfor %}</h6>
-                    {% endif %}
-                    {% if product.measure %}
-                    <hr>
-                    <h6>{{product.measure.short_name}} :
-
-                        {% for c in product.measure_item.all %}
-                        <span class="badge" style="border:1px solid white;">
-                            {{c.name}} {{product.measure.short_name}}
-                        </span>
-                        {% endfor %}</h6>
-                    {% endif %}
-                    <hr>
-                    <div>
-
-                    {{product.desc|safe }}
-                    </div>
-                </div>
-
+{% block content %}
+<section class="content-main" id="app">
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Mahsulotni o'zgartirish</h4>
             </div>
-            <!--  row.// -->
+            <div>
+                <a href="{% url 'seller_app_product_list' %}" class="btn btn-sm btn-brand">
+
+                    <i class="fa-solid fa-arrow-left"></i>  Qaytish
+                </a>
+            </div>
         </div>
-        <!--  card-body.// -->
+
+
+
+
+    <div class="card">
+
+        <div class="card-body">
+            <h1 class="text-center"><i class="fas fa-truck"></i></h1>
+            <h5 class="text-center">Yetkazib berish summasi </h5>
+            <form method="post">
+                {% csrf_token %}
+                <table class="table" >
+                    <tbody>
+                    <tr>
+                        <th>
+                            <h6>Standart yetkazib berish xizmati narxi</h6>
+                        </th>
+                        <td><h6>{{seller.special_fee_amount|format_money}} so'm</h6></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <h6>Mahsulot o‘lchami</h6>
+                        </th>
+                        <td>
+                            <h6>{{product.get_size_type_display}}</h6>
+                        </td>
+                    </tr>
+                    {% if product.size_type == '2' %}
+                    <tr>
+                        <th><h6>Katta gabaritli mahsulotlar uchun stahdard narx ustiga qo'shiladigan narx</h6></th>
+
+                        <td>
+                            <h6>{{product.size_based_delivery_extra|format_money}} uzs</h6>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <th>
+                            <h6>Umumiy yetkazib berish narxi</h6>
+                        </th>
+                        <td>
+                            <h6>{{product.total_delivery_price|format_money}} uzs</h6>
+                        </td>
+
+                    </tr>
+
+
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+
+    </div>
+
+        <div class="card">
+            <header class="card-header">
+                <h4>Mahsulot ma'lumotlari</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+
+
+                <div class="row mb-50 mt-20 order-info-wrap">
+
+                    <table class="table">
+                        <tr>
+                            <th><h6>Surati</h6></th>
+                            <td>
+                                <a target="_blank" href="{{product.image.url}}">
+                                <img src="{{product.image.url}}" style="width:200px;" alt="">
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Nomi</h6></th>
+                            <td>{{product.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><h6>Turi</h6></th>
+                            <td>
+                                {% if product.is_collection %}
+                                Mahsulotlar to'plami
+                                {% else %}
+                                Donali mahsulot
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Nomi</h6></th>
+                            <td>{{product.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><h6>Admin tasdiqi holati</h6></th>
+                            <td>{{product.get_approval_status_display}}</td>
+                        </tr>
+                        {% if product.approval_status_updated_at %}
+                        <tr>
+                            <th><h6>Admin tasdiqi o'zgargan sana</h6></th>
+                            <td>{{product.approval_status_updated_at}}</td>
+                        </tr>
+                        {% endif %}
+                        {% if product.approval_status_updated_by %}
+                        <tr>
+                            <th><h6>Admin tasdiqi o'zgartirgan admin</h6></th>
+                            <td>{{product.approval_status_updated_by.full_name}}</td>
+                        </tr>
+
+                        {% endif %}
+
+                        <tr>
+                            <th><h6>Sotuvdami</h6></th>
+                            <td>
+                                {% if product.is_active %}
+                                <span class="badge badge-soft-success">Sotuvda</span>
+                                {% else %}
+                                <span class="badge badge-soft-danger"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th><h6>Bonus turi</h6></th>
+                            <td>{{product.get_bonus_type_display}}</td>
+                        </tr>
+
+                        {% if product.bonus_type != '0' %}
+                        <tr>
+                            <th><h6>Bonus </h6></th>
+                            <td>{{product.get_sale_discount_type_title}}</td>
+                        </tr>
+                        {% endif %}
+
+
+                        {% if product.is_collection is False and product.colors.all %}
+                        <tr>
+                            <th><h6>Ranglari </h6></th>
+                            <td>
+                                {% for i in product.colors.all %}
+                                <span class="badge" style="border:1px solid white;">{{i.name}}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+
+
+
+                        {% if product.is_collection is False and product.measure is not None %}
+                        <tr>
+                            <th><h6>Tanlangan o'lchov birligi </h6></th>
+                            <td>
+                                {{product.measure.name}}
+                            </td>
+                        </tr>
+                        {% endif %}
+
+                        {% if product.is_collection is False and product.measure_item.all %}
+                        <tr>
+                            <th><h6>Tanlangan o'lchov birliklari </h6></th>
+                            <td>
+                                {% for i in product.measure_item.all %}
+                                <span class="badge" style="border:1px solid white;">{{i.name}} {{i.measure.short_name}}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th><h6>Sotuv narxi </h6></th>
+                            <td>
+                                {{product.sale_price}} uzs
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><h6>Marketolog to'lovi</h6></th>
+                            <td>
+                                {{product.seller_fee}} uzs
+                            </td>
+                        </tr>
+
+
+                    </table>
+
+                    <div>
+                        <h5>Mahsulot haqida batafsil</h5>
+                        <div style="background-color: #ffebcd1a; padding: 10px; border-radius: 10px;">
+                        <p>{{product.desc|safe}}</p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    <div class="card">
+        <div class="card-body" style="">
+
+                        <h5>Chat</h5>
+
+            <div class="container py-4" style="border:0.1px solid #597d8f;border-radius:10px; ">
+              <div class="chat-container d-flex flex-column">
+                <div class="chat-box d-flex flex-column">
+                     {% regroup product.approval_notes.all|dictsort:"created_at" by created_at.date as day_list %}
+                      {% for day in day_list %}
+                        <!-- Sana ajratuvchi -->
+                        <div class="date-separator text-center my-3 text-muted">
+                          <small>{{ day.grouper|date:"j F Y" }}</small>
+                        </div>
+                        {% for note in day.list %}
+                          <div class="message {% if note.user == request.user %}right{% else %}left{% endif %}">
+                            {% if note.user != request.user %}
+                              <strong style="color:#3391d4;">{{ note.user.full_name }} ({{note.user.get_type_display}})</strong><br>
+                            {% endif %}
+                            {{ note.note }}
+                            <div class="message-time  text-muted">{{ note.created_at|time:"H:i" }}</div>
+                          </div>
+                        {% endfor %}
+                      {% endfor %}
+                </div>
+              </div>
+
+              <div class="chat-footer mt-3">
+                <form method="post" onsubmit="document.getElementById('comment_submit').disabled=true">
+                    {% csrf_token %}
+                  <div class="input-group">
+                    <input type="text" name="comment" required class="form-control" placeholder="Xabar yozing...">
+                    <button class="btn btn-primary" id="comment_submit" type="submit">Yuborish</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+        </div>
     </div>
 </section>
+{% endblock %}
+{% block header %}
+<script src="{% static '' %}js/vue.js"></script>
+<style>
+            .table tr:nth-child(odd){background:#3c4252}
+.comment-box {
+        max-width: 600px;
+        margin: auto;
+    }
 
-<script>
-    var vue = new Vue({
-        el: "#app",
-        delimiters: ["[[", "]]"],
-        data: {
-            password: {% if password %}"{{password}}"{% else %}""{% endif %},
-            passwordFieldType: "password",
-            phoneNumber: {% if login %}'{{login}}'{% else %}'+998'{% endif %},
-            error: false,
-            error_message: '',
-            check_box: false,
-        }, methods: {
-            validation_items() {
+    .message {
+        padding: 10px 15px;
+        border-radius: 20px;
+        margin-bottom: 10px;
+        max-width: 80%;
+    }
 
-            },
-            switchVisibility() {
-                this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
-            },
+    .message.left {
+        background-color: #454e6a;
+        text-align: left;
+        border-top-left-radius: 0;
+    }
 
-            formatPhoneNumber() {
-                let formattedNumber = this.phoneNumber.replace(/\D/g, "");
-                this.phoneNumber = "+998" + formattedNumber.slice(3); // İlk üç haneli kısmı koru
-                if (this.phoneNumber.length > 16) {
-                    this.phoneNumber = this.phoneNumber.slice(0, 16);
-                }
-            },
-        }
-    });
+    .message.right {
+        background-color: #176772;
+        text-align: right;
+        border-top-right-radius: 0;
+        margin-left: auto;
+    }
 
-</script>
-</body>
-</html>
+    .message-info {
+        font-size: 0.75rem;
+        color: gray;
+    }
+</style>
+{% endblock %}

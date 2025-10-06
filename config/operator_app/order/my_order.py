@@ -47,6 +47,5 @@ def operator_app_my_order(request):
     order_object = Paginator(order, 25)
     page_number = request.GET.get('page')
     order = order_object.get_page(page_number)
-
     return render(request, 'operator_app/order/my_order.html',
                   {"order": order, "statistic": statistic, "o": request.user, "descriptions": descriptions})

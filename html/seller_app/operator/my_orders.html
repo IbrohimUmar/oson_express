@@ -1,0 +1,128 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h3 class="content-title text-center">{{ request.user.first_name }} {{ request.user.last_name }} bugun qo'shgan buyurtmalaringiz</h3>
+            <div>
+                            <h4>Jami buyurtma soni : {{ count }} ta</h4>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div style="overflow-x:auto;"  class="table-responsive">
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                        <tr>
+                           <th>#</th>
+                            <th>id</th>
+                            <th>Sayt</th>
+                            <th>Holati</th>
+                            <th>Ismi</th>
+                            <th>Tel</th>
+                            <th>Viloyati</th>
+                            <th>Tumani</th>
+                            <th>Mahsulot</th>
+                            <th>Sana</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for o in order %}
+                            <tr
+                                    {% if o.check_order  %}style="background-color: #484700"{% endif %}>
+                              <td>
+                                  {% if o.driver == None and o.status != '0' %}
+                               <a href="{% url 'seller_app_operator_edit_order' o.id %}" class="btn  btn-brand "><i class="material-icons md-edit"></i></a>
+                                  {% endif %}
+                        </td>
+                                <td>
+                                    #{{ o.id }}
+                                </td>
+                                <td><span class="badge badge-soft-primary">{{ o.get_site_display }}</span></td>
+                                <td>{{ o.get_status_display }}
+
+
+                                    {% if o.status == '0' %}
+                                    <br>
+                                   <span class="badge badge-soft-info"> O'chirdi : {{o.responsible.first_name}} {{o.responsible.last_name}}</span>
+                                    <br>
+
+                                    Sababi : {{o.delete_desc}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ o.customer_name }}
+                                </td>
+                                <td>
+                                    {{ o.customer_phone }} <br>
+                                     {{ o.customer_phone2 }}
+                                </td>
+                                <td>
+                                    {{ o.customer_region.name }}
+                                </td>
+                                <td>
+                                    {{ o.customer_district.name }}
+                                </td>
+                                <td>
+
+                                     {% for p in o.order_products %}
+                                <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.ordered_amount}}ta, {{p.price}} so'm</span> <br>
+                            {% endfor %}
+                                    <small>Jami : {{o.order_products_total_ordered_amount}} ta, {{o.order_products_total_price}} So'm</small>
+
+                                </td>
+                                <td>{{ o.created_at|date:"Y-m-d" }}</td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+
+{% block header %}
+{% include 'table/head.html' %}
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 25,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [ {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

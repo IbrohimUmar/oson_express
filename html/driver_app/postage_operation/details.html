@@ -1,0 +1,259 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Amaliyot haqida</h4>
+    </div>
+
+
+    <div class="card" style="margin-bottom:8px;">
+        <div class="card-body" style="padding:16px; ">
+            <div class="row">
+                <div class="col-sm-12">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                        <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_postage_operation_history' %}">Amaliyotlar</a>
+                        </li>
+                        <li class="breadcrumb-item d-inline active">Amaliyot haqida</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+<!--            <h5 class="mb-0">Pochta turi: {{ postage.get_action_display }}</h5>-->
+                    <h5 class="mb-0">Pochta ID: {{ postage.id }}</h5>
+            <span class="badge" style="border:1px solid white;">
+            {{ postage.get_action_display }}
+        </span>
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+
+                    <h4>Yuboruvchi</h4>
+                    <div style="border:1px solid white; border-radius:10px; padding:5px;">
+
+
+                    {% if postage.from_logistic_branch is not None %}
+                    <h6 class="mb-1"><strong class="text-muted">Yuboruvchi:</strong> {{ postage.from_logistic_branch.name }}</h6>
+                    <h6 class="mb-1"><strong class="text-muted">Yuboruvchi kim:</strong> Fileal</h6>
+                    <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                        <span class="badge {% if postage.from_user_status == '2' %}badge-success{% elif postage.from_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ postage.get_from_user_status_display }}
+                        </span>
+                    </h6>
+                        <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                           {% if postage.from_user_status_changed_at %} {{postage.from_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                    {% else %}
+
+                    <h6 class="mb-1"><strong class="text-muted">FISH:</strong> {{ postage.from_user.full_name }}</h6>
+                    <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> {{postage.from_user.get_type_display}}</h6>
+                    <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                        <span class="badge {% if postage.from_user_status == '2' %}badge-success{% elif postage.from_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ postage.get_from_user_status_display }}
+                        </span>
+                    </h6>
+                        <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                           {% if postage.from_user_status_changed_at %} {{postage.from_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                    {% endif %}
+                        </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <h4>Qabul qiluvchi</h4>
+                    <div style="border:1px solid white; border-radius:10px; padding:5px;">
+
+
+                    {% if postage.to_logistic_branch is not None %}
+                    <h6 class="mb-1"><strong class="text-muted">Nomi:</strong> {{ postage.to_logistic_branch.name }}</h6>
+                    <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> Fileal</h6>
+                    <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                        <span class="badge {% if postage.to_user_status == '2' %}badge-success{% elif postage.to_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ postage.get_to_user_status_display }}
+                        </span>
+                    </h6>
+                        <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                           {% if postage.to_user_status_changed_at %} {{postage.to_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                    {% else %}
+
+                    <h6 class="mb-1"><strong class="text-muted">FISH:</strong> {{ postage.to_user.full_name }}</h6>
+                    <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> {{postage.to_user.get_type_display}}</h6>
+                    <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                        <span class="badge {% if postage.to_user_status == '2' %}badge-success{% elif postage.to_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ postage.get_to_user_status_display }}
+                        </span>
+                    </h6>
+                        <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                           {% if postage.to_user_status_changed_at %} {{postage.to_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                    {% endif %}
+
+                        </div>
+
+
+    <!--                <p class="mb-1"><strong>Yuboruvchi:</strong> {{ postage.from_user }}</p>-->
+    <!--                <p class="text-muted small">Holati:-->
+    <!--                    <span class="badge {% if postage.from_user_status == '2' %}badge-soft-success{% elif postage.from_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">-->
+    <!--                        {{ postage.get_from_user_status_display }}-->
+    <!--                    </span>-->
+    <!--                </p>-->
+
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+                    <h6 class="mb-1 text-sm text-muted"><strong>Yaratilgan:</strong> {{ postage.created_at|date:"Y-m-d H:i" }}</h6>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="mb-1  text-sm text-muted"><strong>Yangilangan:</strong> {{ postage.updated_at|date:"Y-m-d H:i" }}</h6>
+                </div>
+                <div class="col-12">
+                    <p class="mb-0">
+                        <h6 class="badge badge-dark text-dark">Pochta soni : {{ postage.postage_details_count }} ta</h6>
+                    </p>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Alt kısımda PostageDetails listesi -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Pochtalar ro'yxati</h5>
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Barcode</th>
+                    <th>Yuboruvchi skannerladimi</th>
+                    <th>Qabul qiluvchi sakannerladimi</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for detail in queryset %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ detail.order.barcode }}</td>
+                    <td>
+                        {% if detail.scan_from_user %}
+                        <span class="badge badge-soft-success">Tasdiqlangan</span>
+                        {% else %}
+                        <span class="badge badge-soft-warning">Tasdiqlanmagan</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if detail.scan_to_user %}
+                        <span class="badge badge-soft-success">Tasdiqlangan</span>
+                        {% else %}
+                        <span class="badge badge-soft-warning">Tasdiqlanmagan</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Ma'lumot yo'q</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination-area mt-3">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        {% if queryset.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ queryset.previous_page_number }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ queryset.number }}</span>
+                        </li>
+                        {% if queryset.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ queryset.next_page_number }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+<br>
+<br>
+{% endblock %}
+
+
+{% block header %}
+
+<style>
+    .card {
+        border-radius: 0.75rem;
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1rem 1.5rem;
+    }
+    .card-body {
+        padding: 1.5rem;
+    }
+    .card-footer {
+        border-radius: 0 0 0.75rem 0.75rem;
+        padding: 0.75rem 1.5rem;
+    }
+    .badge-soft-success {
+        background-color: #e6f4ea;
+        color: #28a745;
+    }
+    .badge-soft-danger {
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+    .badge-soft-warning {
+        background-color: #fff3cd;
+        color: #ffc107;
+    }
+    p.mb-1 {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    .text-muted.small {
+        font-size: 0.85rem;
+    }
+</style>
+{% load compress %}
+{% compress css %}
+<link href="{% static 'css/table_custom.css' %}" rel="stylesheet" type="text/css">
+{% endcompress %}
+{% endblock %}

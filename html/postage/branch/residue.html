@@ -1,0 +1,169 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+Asosiy ombordagi mahsulotlar
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h3 class="content-title">{{logistic_branch.name}}dagi qoldiq pochtalar ro'yxati</h3>
+
+        <div>
+            <a href="{% url 'postage_main' %}" class="btn btn-md rounded font-sm hover-up"><i
+                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+        </div>
+    </div>
+
+
+    <div class="card" style="margin-bottom:8px;">
+        <div class="card-body" style="padding:16px; ">
+            <div class="row">
+                <div class="col-sm-12">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                        <li class="breadcrumb-item d-inline"><a href="{% url 'postage_main' %}">Fileallar ro'yxati</a>
+                        </li>
+                        <li class="breadcrumb-item d-inline active">Fileal Qoldiq pochtalar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row">
+                                <div class="col-md-3">
+                                    <h6>Qidiruv</h6>
+                                    <input type="text" class="form-control" placeholder="Qidiruv..." name="search">
+                                </div>
+                                <div class="col-md-3">
+                                    <h6>Holati</h6>
+                                    <select name="status" class="form-control">
+                                        <option value="0">-----</option>
+                                        <option value="13" {% if request.GET.status == '13' %}selected{% endif %}>Filealda</option>
+                                        <option value="14" {% if request.GET.status == '14' %}selected{% endif %}>Haydovchi filealga qaytardi</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6>Seller</h6>
+                                    <select name="seller" class="form-control">
+                                        <option value="0">-----</option>
+                                        {% for s in seller %}
+                                        <option value="{{s.id}}" {% if request.GET.seller|add:'0' == s.id %}selected{% endif %}>{{s.first_name}} {{s.last_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <h6>Qo'llash</h6>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i></button>
+                                    {% if request.GET %}
+                                      <a href="{% url 'postage_branch_residue' logistic_branch.id %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+            </form>
+            <h6 class="text-muted badge mt-1 mb-1" style="border:1px solid #adb5bd;">Soni : {{queryset_count}} ta</h6>
+            <div style="overflow-x:auto;">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Barcodi</th>
+                        <th>Holati</th>
+                        <th>Seller</th>
+                        <th>Mijoz</th>
+                        <th>Summasi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                            #{{o.id}}
+                        </td>
+                        <td>
+                            <h6>
+                                {{ o.barcode }}
+                            </h6>
+                        </td>
+                        <td>
+                            <span class="badge badge-dark">{{o.get_status_display}}</span>
+                        </td>
+                        <td>
+                            <h6>
+                                {{o.seller.full_name}}
+                            </h6>
+                        </td>
+
+                        <td>
+                            {{o.customer_name}} <br>
+                            +{{o.customer_phone}}
+                        </td>
+
+                        <td>
+                            <h6>
+                                {{o.total_product_price}} uzs
+                            </h6>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="row ">
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+<style>
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        white-space: nowrap
+    }
+
+    td {
+        white-space: nowrap
+    }
+</style>
+
+{% endblock %}

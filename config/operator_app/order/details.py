@@ -8,6 +8,7 @@ from config.operator_app.permission import check_work_hours
 from django.http import JsonResponse
 
 from order.services.crud_service import OrderCrudService
+from services.handle_exception import handle_exception
 from services.order.history import save_order_status_history
 from user.models import Regions, Districts
 from django.db import transaction, IntegrityError
@@ -42,7 +43,7 @@ def operator_app_order_details(request, id):
     product_list_service = ProductListService()
     order_crud_services = OrderCrudService()
     selected_products_list = order_crud_services.get_order_product_product_json(id)
-    all_products_json = product_list_service.get_product_json_by_site()
+    all_products_json = product_list_service.get_product_json_by_site(seller=request.user.seller)
     if request.method == "POST":
         try:
             with transaction.atomic():
@@ -70,7 +71,7 @@ def operator_app_order_details(request, id):
                 messages.success(request, "Buyurtma qabul qilindi")
                 return redirect('operator_app_my_order')
         except IntegrityError as e:
-            developer_logger.error(str(f"createOrderFromOtherSitesError {str(e)}"), exc_info=True)
+            handle_exception(e)
             messages.error(request, f"Ma'lumotlar saqlashda hatolik {e}")
             return redirect('operator_app_my_order')
     return render(request, 'operator_app/order/details.html', {

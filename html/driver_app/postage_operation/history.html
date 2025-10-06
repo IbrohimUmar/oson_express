@@ -1,0 +1,316 @@
+{% extends 'driver_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app" >
+        <div class="content-header">
+            <h4 class="content-title">Amaliyotlar</h4>
+            <div>
+                <a href="{% url 'driver_app_postage_operation_return' %}" class="btn btn-sm btn-brand"><i class="material-icons md-add"></i> Pochta qaytarish</a>
+            </div>
+        </div>
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'driver_app_menu' %}">Menyu</a></li>
+                            <li class="breadcrumb-item d-inline active">Amaliyotlar</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+
+            {% for i in page_obj %}
+            <div class="card " style="border: 1px solid #adacac !important;" id="infinite-lists">
+                <div class="card-body" style="padding: 1.0rem 1.0rem 0.4rem 1.0rem  !important;">
+                    <div class="row   order-info-wrap">
+                        <div>
+
+                            <div class="text">
+
+                                {% if i.action == '3' %}
+                                <h5 style="display:inline;" class="badge badge-soft-success">Turi : {{i.get_action_display}}</h5>
+                                {% elif i.action == '4' %}
+                                <h5 style="display:inline;" class="badge badge-soft-warning">Turi : {{i.get_action_display}}</h5>
+                                {% endif %}
+
+
+                                <h5  class=" bage-sm text-sm f-right">#{{i.id}}</h5>
+                                <hr>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mt-2">
+                                    <h4>Yuboruvchi</h4>
+                                    <div class="card-body" style="border:1px solid #ffff0091; border-radius:10px;">
+
+                                    {% if i.action == '3' %}
+                                        <div class="text-center">
+                                        <i class="fa-solid fa-warehouse fa-lg"></i>
+                                         <h6> {{i.from_logistic_branch.name}}</h6>
+                                        </div>
+                                        <hr class="m-2">
+                                    {% elif i.action == '4' %}
+                                        <div class="text-center">
+                                        <i class="fa-solid fa-car fa-lg"></i>
+                                         <h6> Haydovchi</h6>
+                                        </div>
+                                        <hr class="m-2">
+                                {% endif %}
+
+
+                                         <h6><b class="text-primary">Holati :</b>
+                                            {% if i.from_user_status == '1' %}
+                                                <span class="badge" style="border:1px solid white">{{i.get_from_user_status_display}}</span>
+                                            {% elif i.from_user_status == '2' %}
+                                                <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                            {% elif i.from_user_status == '3' %}
+                                                <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                            {% endif %}
+                                        </h6>
+                                        <h6><b class="text-primary">Holati o'zgargan sana :</b>
+                                            {% if i.from_user_status_changed_at %}
+                                            {{i.from_user_status_changed_at}}
+                                            {% else %}
+                                            -----
+                                            {% endif %}
+                                        </h6>
+
+                                        <h6><b class="text-primary">Ma'sul :</b>
+                                            {% if i.from_user %}
+                                            {{i.from_user.full_name}}
+                                            {% else %}
+                                            -----
+                                            {% endif %}
+                                        </h6>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <h4>Qabul qiluvchi</h4>
+                                    <div class="card-body" style="border:1px solid green; border-radius:10px;">
+
+                                    {% if i.action == '3' %}
+                                        <div class="text-center">
+                                        <i class="fa-solid fa-car fa-lg"></i>
+                                         <h6> Haydovchi</h6>
+                                        </div>
+                                        <hr class="m-2">
+                                    {% elif i.action == '4' %}
+<!--                                        <h6><i class="fa-solid fa-warehouse"></i> Filialga</h6>-->
+                                        <div class="text-center">
+                                        <i class="fa-solid fa-warehouse fa-lg"></i>
+                                         <h6>{{i.to_logistic_branch.name}}</h6>
+                                        </div>
+                                        <hr class="m-2">
+
+
+
+                                    {% endif %}
+                                        <h6><b class="text-primary">Holati :</b>
+                                            {% if i.to_user_status == '1' %}
+                                                <span class="badge" style="border:1px solid white">{{i.get_to_user_status_display}}</span>
+                                            {% elif i.to_user_status == '2' %}
+                                                <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                            {% elif i.to_user_status == '3' %}
+                                                <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                            {% endif %}
+                                        </h6>
+                                        <h6><b class="text-primary">Holati o'zgargan sana :</b>
+                                            {% if i.to_user_status_changed_at %}
+                                            {{i.to_user_status_changed_at}}
+                                            {% else %}
+                                            -----
+                                            {% endif %}
+                                        </h6>
+                                        <h6><b class="text-primary">Ma'sul :</b>
+                                            {% if i.to_user %}
+                                            {{i.to_user.full_name}}
+                                            {% else %}
+                                            -----
+                                            {% endif %}
+                                        </h6>
+
+
+                                        {% if i.action == '4' and i.to_user_status == '3' and i.from_user_status == '2' %}
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="postage" value="{{i.id}}">
+                                            <input type="hidden" name="action_type" id="action_type">
+                                            <button class="btn btn-sm btn-danger" name="type" type="button" value="cancel"   onclick="return Swal.fire({
+                                                                          title: 'Bekor qilmoqchimisiz?',
+                                                                          icon:'question',
+                                                                          showDenyButton: true,
+                                                                          showCancelButton: false,
+                                                                          confirmButtonText: 'Xa',
+                                                                          denyButtonText: `Qaytish`,
+                                                                        }).then((result) => {
+                                                                          /* Read more about isConfirmed, isDenied below */
+                                                                          if (result.isConfirmed) {
+                                                                               document.getElementById('action_type').value = 'cancel'
+                                                                              form.submit();
+                                                                          }
+                                                                        })"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                                        </form>
+                                        {% endif %}
+
+
+                                        {% if i.action == '3' and i.to_user_status == '1' and i.from_user_status == '2' %}
+                                          <a class="btn btn-sm btn-warning" href="{% url 'driver_app_postage_operation_input' i.id %}"><i class="material-icons md-barcode"></i> Qabul qilish</a>
+
+                                        {% endif %}
+
+<!--                                        <form action="" method="post" class="mt-5">-->
+<!--                                            {% csrf_token %}-->
+<!--                                            <input type="hidden" name="postage" value="{{i.id}}">-->
+<!--                                            <input type="hidden" name="action_type" id="action_type">-->
+
+
+<!--                                            <button class="btn btn-sm btn-brand" name="type" type="button" value="confirm" onclick="return Swal.fire({-->
+<!--                                                                          title: 'Tasdiqlamoqchimisiz?',-->
+<!--                                                                          icon:'question',-->
+<!--                                                                          showDenyButton: true,-->
+<!--                                                                          showCancelButton: false,-->
+<!--                                                                          confirmButtonText: 'Xa',-->
+<!--                                                                          denyButtonText: `Qaytish`,-->
+<!--                                                                        }).then((result) => {-->
+<!--                                                                          /* Read more about isConfirmed, isDenied below */-->
+<!--                                                                          if (result.isConfirmed) {-->
+<!--                                                                               document.getElementById('action_type').value = 'confirm'-->
+<!--                                                                              form.submit();-->
+<!--                                                                          }-->
+<!--                                                                        })"><i class="material-icons md-check"></i> Tasdiqlash</button>-->
+<!--                                            <button class="btn btn-sm btn-danger" name="type" type="button" value="cancel" disabled   onclick="return Swal.fire({-->
+<!--                                                                          title: 'Bekor qilmoqchimisiz?',-->
+<!--                                                                          icon:'question',-->
+<!--                                                                          showDenyButton: true,-->
+<!--                                                                          showCancelButton: false,-->
+<!--                                                                          confirmButtonText: 'Xa',-->
+<!--                                                                          denyButtonText: `Qaytish`,-->
+<!--                                                                        }).then((result) => {-->
+<!--                                                                          /* Read more about isConfirmed, isDenied below */-->
+<!--                                                                          if (result.isConfirmed) {-->
+<!--                                                                               document.getElementById('action_type').value = 'cancel'-->
+<!--                                                                              form.submit();-->
+<!--                                                                          }-->
+<!--                                                                        })"><i class="material-icons md-cancel"></i> Bekor qilish</button>-->
+<!--                                        </form>-->
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                        <hr class="m-1">
+                        <div class="col-md-12 text-center mt-2">
+                            <a href="{% url 'driver_app_postage_operation_details' i.id %}" class="btn btn-sm btn-brand" style="background-color:#3b9fb7;">
+                                <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-widgets"></i> Amaliyot haqida batafsil</h6>
+                            </a>
+                        </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+            {% endfor %}
+            </div>
+
+
+
+                                <div class="row mt-20 mb-20">
+{% if count > 0 %}
+                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                    <small >Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</small>
+                </div>
+                <div class="mt-10 col-md-12 pagination justify-content-center">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1" class="btn btn-brand text-white"><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}"
+                                                               class="btn btn-brand text-white"><</a>
+                                                        {% endif %}
+                                                    <span class="h4 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}"
+                                                               class="btn btn-brand text-white"> ></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                                                               class="btn btn-brand text-white">>></a>
+                                                        {% endif %}
+                                                    </span>
+                    <br>
+                    <h1>{{ page_obj.count }}</h1>
+                </div>
+                        {% else %}
+                        <h5 class="text-center">To'lov topilmadi!</h5>
+                        {% endif %}
+            </div>
+
+        </div>
+
+
+
+    </section>
+    <br>
+    <br>
+{% endblock %}
+{% block header %}
+    <script src="{% static '' %}js/vue.js"></script>
+    <script src="{% static '' %}js/axios.min.js"></script>
+   <style>
+   .material-icons{
+  vertical-align: middle;
+   }
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
+<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>-->
+
+{% endblock %}
+{% block footer %}
+<script>
+
+            new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+
+            data() {
+                return {
+                }
+            },
+            methods: {
+
+            },
+            });
+
+</script>
+{% endblock %}

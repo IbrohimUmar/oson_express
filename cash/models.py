@@ -3,11 +3,16 @@ from user.models import User, CashCategory
 
 
 class Cash(models.Model):
+    choice_person_type = (
+        ("1", "Admin to'lovlari"),
+        ("2", "Seller ichki to'lovlari"),
+    )
     choice_type = (
         ("1", "Kassaga Kirim"),
         ("2", "Kassadan Chiqim"),
         ("3", "Kassadan kassaga"),
     )
+    person_type = models.CharField(choices=choice_person_type, max_length=2, default='1', null=False, blank=False)
     type = models.CharField(choices=choice_type, max_length=40, null=False, blank=False)
     from_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="from_user")
     to_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="to_user")

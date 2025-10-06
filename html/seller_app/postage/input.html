@@ -1,0 +1,526 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block title %}
+Skanner orqali chiqim qilish
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Skanner orqali chiqim qilish </h4>
+        <div>
+
+            <a href="{% url 'seller_app_postage_history' %}" class="btn btn-sm btn-brand"><i class="material-icons md-left-arrow"></i> Qaytish</a>
+        </div>
+    </div>
+
+
+
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_postage_history' %}">Pochta amaliyotlar tarixi</a></li>
+                            <li class="breadcrumb-item d-inline active">Pochata yuborish</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="card mb-2">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <h6>Buyurtma barcode raqamini kiriting</h6>
+                    <input v-on:keyup.enter="create_send_product" type="text" v-model="barcode" class="form-control"
+                             :maxlength="13" placeholder="Barcodni kirting" ref="barcodeScanner" @blur="refocusBarcodeScanner"
+                    @input="updateBarcodeValue" @keydown="allowOnlyNumbers">
+                </div>
+                <div class="col-md-2">
+                    <h6 >Qo'shish</h6>
+                    <button  class="btn btn-brand btn-sm" type="button" :disabled="!(barcode.length===13 && agent.length !== 0)" @click="create_send_product()"><i class="material-icons md-add"></i>Qo'shish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card" @click="card_type='1'" :style="{backgroundColor : card_type === '1' ? '#358565a3' : '#222736' }" style="border:0.5px solid #ffffff7d;cursor:pointer;">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-boxes-stacked" style="font-size:50px;"></i>
+<!--                                    <i class="material-icons md-add" style="font-size:50px;"></i>-->
+<!--                                    <i class="fa fa-plus" style="font-size:45px;"></i>-->
+                                   <h5>Belgilanmaganlar</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="card" @click="card_type='2'" :style="{backgroundColor : card_type === '2' ? '#358565a3' : '#222736' }" style="border:0.5px solid #ffffff7d;cursor:pointer;">
+                                <div class="card-body text-center">
+                                    <i class="material-icons md-check" style="font-size:50px;"></i>
+<!--                                    <i class="fa fa-check" style="font-size:45px;"></i>-->
+                                   <h5>Skannerlanganlar </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="text-center">Buyurtmalar</h4>
+            <div class="text-center  mt-5">
+
+                <h4 class="text-white badge text-center d-inline" style="border:1px solid white;">Qadoqlanmoqda : [[statistic_order.being_packed_order_count]] ta</h4>
+
+                <h4 class="text-white badge text-center d-inline" style="border:1px solid white;"><i class="fas fa-cancel"></i> Yuborishga tayyor(Skannerlanmagan) : [[statistic_order.unchecked_ready_order_count]] ta</h4>
+                <h4 class="text-white badge text-center d-inline" style="border:1px solid white;"><i class="fas fa-check"></i> Yuborishga tayyor(Skannerlangan) : [[statistic_order.checked_ready_order_count]] ta</h4>
+
+            </div>
+        </div>
+
+        <div class="card-body" v-if="loading===true">
+
+            <div id="loading">
+                <div class="text-center mt-20 mb-20 m-auto loader"></div>
+                <h6 class="text-center">Bajarilmoqda...</h6>
+            </div>
+
+
+        </div>
+
+
+
+
+        <div class="card-body"  style="overflow-x:auto;" v-if="loading===false">
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Barcod</th>
+                    <th>Holati</th>
+                    <th>Mijoz</th>
+                    <th>Mahsulot</th>
+                    <th>data</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(order, index) in order_list" :style="order.transaction_lock
+                    ? 'background-color: rgb(40 167 69 / 20%); color: white;'
+                    : ''">
+                    <td>
+                        <button type="button" v-if="order.transaction_lock === true"
+                                 @click="un_check_order_from_button(order.barcode)" class="btn btn-sm btn-danger d-inline"><i class="material-icons md-cancel"></i> Qaytarish</button>
+
+                        <button type="button" v-if="order.transaction_lock === false" class="btn btn-sm btn-brand d-inline"
+                        @click="check_order_from_button(order.barcode)"><i class="material-icons md-check"></i> Skannerlash</button>
+                    </td>
+                    <td>
+                        <h6>
+                        [[order.barcode]]
+                    </h6>
+                    </td>
+
+                    <td>
+                        <span class="badge badge-soft-success" v-if="order.transaction_lock === true">Skannerlandi</span>
+                        <span class="badge badge-soft-danger" v-if="order.transaction_lock === false">Skannerlanmagan</span>
+                    </td>
+                    <td>[[order.customer_name]] <br>
+                        +[[order.customer_phone]]
+
+                    </td>
+                    <td>
+                        <span class="badge badge-soft-success mb-1" v-for="p in order.product_list">
+                            [[p.product_name]], [[p.amount]] ta, [[p.price]] uzs
+                        </span>
+                    </td>
+
+                    <td>[[order.total_price]] uzs</td>
+
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination-area mt-20 mb-20">
+                <nav aria-label="Page navigation example">
+                    <div class="mb-3 text-center">
+                        <div v-if="has_next">
+
+                            <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                               @click="goToNextPage()">
+                                <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                        </div>
+
+                    </div>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" v-if="has_previous">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToFirstPage()">
+                                < </a>
+                        </li>
+                        <li class="page-item" v-if="has_previous && (page-2) !== (page-1) && (page-2) > 0">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page-2)">[[page-2]]</a>
+                        </li>
+                        <li class="page-item" v-if="has_previous">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToPreviousPage()">[[page-1]]</a>
+                        </li>
+                        <li class="page-item active">
+                            <span class="badge btn-brand page-link" href="#"> [[page]]</span>
+                        </li>
+                        <li class="page-item" v-if="has_next===true">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToNextPage()"
+                            >[[page+1]]</a></li>
+
+                        <li class="page-item" v-if="has_next ===true && (page+2) < total_pages">
+                            <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page+2)"
+                            >[[page+2]]</a></li>
+                        <li class="page-item" v-if="has_next">
+                            <button type="button" class="badge page-link" style="background-color:#4d5561;"
+                                    @click="goToLastPage()"> >
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coiny&display=swap">
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+
+    <style>
+            .dtsp-name h6 {
+            color: black !important;
+        }
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+    #dataTable tr:nth-child(odd){background:#3c4252}
+{##dataTable tr:nth-child(even){background:blue}#}
+    </style>
+{% endblock %}
+
+{% block footer %}
+<script src="{% static '' %}js/vue.js"></script>
+<script src="{% static 'js/axios.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<script>
+
+axios.defaults.xsrfCookieName = "csrftoken"
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+JsBarcode(".barcode").init();
+
+new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+
+                card_type: '1',
+
+                printDiv : null,
+
+
+                //order_list :[],
+                order_list :[],
+                order_count :0,
+                total_order_count :0,
+                total_unprinted_order_count :0,
+                total_printed_order_count :0,
+
+                order_products :[],
+                product_list :[],
+                selected_product :0,
+
+                selected_region :0,
+                print_type :0,
+
+                order_length :25,
+
+                loading: false, // Yükleme durumu
+
+                error: null, // Hata mesajı
+
+                page: 1, // Şu anki sayfa numarası
+                has_next: true, // Sonraki sayfa var mı?
+                has_previous:false,
+                total_pages : 1, // jami sahifa soni
+
+
+
+            barcode:'',
+            type:1,
+            agent : '2',
+            order_list : [],
+
+            statistic_order : {},
+
+
+
+            total_count:'0',
+            order_count:'0',
+            Toast:Swal.mixin({
+                              toast: true,
+                              position: 'top-end',
+                              showConfirmButton: false,
+                              timer: 2500,
+                              timerProgressBar: true,
+                              didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                              }
+                            }),
+            not_accepted_temps : [],
+    },
+    created() {
+                    this.loadOrders();
+
+//    this.get_send_product_amount()
+            },
+  mounted() {
+    this.$refs.barcodeScanner.focus() // barkod scanner'a odaklan
+  },
+    methods: {
+    allowOnlyNumbers(event) {
+      // Sadece sayısal karakterlerin girilmesini sağlayan bir yöntem yazın
+      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete']
+      if (!allowedKeys.includes(event.key) && isNaN(parseInt(event.key))) {
+        event.preventDefault()
+      }
+    },
+    updateBarcodeValue(event) {
+      this.barcode = event.target.value // barkod değerini güncelle
+    },
+    refocusBarcodeScanner() {
+      this.$refs.barcodeScanner.focus() // barkod scanner'a tekrar odaklan
+    },
+
+    get_send_product_amount:async function(){
+        vm= this
+        await axios.get('{% url 'seller_app_postage_input_api' %}').then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+
+
+                           //vm.order_count = response.data['order_count']
+                        }
+                        return []
+                    })
+        return []
+    },
+
+        generateBarcode: async function(barcode) {
+                    const barcodeElement = document.getElementById('barcode' + barcode);
+
+                },
+
+                     loadOrders:async function() {
+                      this.loading = true;
+                      this.error = null;
+                      await axios.get(`{% url 'seller_app_postage_input_api' %}?page=${this.page}&card_type=${this.card_type}&region=${this.selected_region}&product=${this.selected_product}&order_length=${this.order_length}`,{
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }})
+                        .then((response) => {
+                          const data = response.data;
+                          if (data.status == 200){
+                            //console.log('12312')
+                            console.log(data.data)
+                               this.statistic_order = data.statistic_order;
+                              this.has_next = data.has_next;
+                              this.has_previous = data.has_previous;
+                              this.total_pages = data.num_pages;
+                              this.order_list = data.data
+                              this.order_count = data.order_count
+                              this.total_order_count = data.total_order_count
+                              this.order_products = data.order_products
+
+
+                              //this.orders = data.data.slice().sort(() => Math.random() - 0.5);
+                              this.loading = false;
+
+                              this.total_unprinted_order_count = data.total_unprinted_order_count;
+                              this.total_printed_order_count = data.total_printed_order_count;
+
+
+
+                        setTimeout(() => {
+                                          this.order_list.forEach((item, index) => {
+                                            this.generateBarcode(item.barcode);
+                                          });
+                                        }, 500); // 2 saniye gecikme
+
+
+                            }else if(data.status == 404){
+
+                              this.error = data.message;
+                              this.loading = false;
+                              this.is_disable = true;
+                            }
+
+                        })
+                        .catch((error) => {
+                          this.error = error.message;
+                          this.loading = false;
+                          this.is_disable = true;
+
+                        });
+                    },
+
+
+                    goToNextPage() {
+                        if (this.has_next) {
+                            this.page++;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToFirstPage() {
+                        if (this.has_previous) {
+                            this.page=1;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToThisPage(number) {
+                            this.page=number;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        },
+
+                        goToLastPage() {
+                        if (this.has_next) {
+                            this.page= Number(this.total_pages);
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+                        goToPreviousPage() {
+                        if (this.has_previous) {
+                            this.page--;
+                            this.loadOrders();
+                            window.scrollTo(0, 0);
+                        }
+                        },
+
+
+                        un_check_order_from_button:async function(barcode){
+                        Swal.fire({
+                              title: "Siz rostdanham qaytarmoqchimisiz?",
+                              showCancelButton: true,
+                              confirmButtonText: "Qaytarish",
+                              cancelButtonText:"Chiqish"
+                            }).then((result) => {
+                              /* Read more about isConfirmed, isDenied below */
+                              if (result.isConfirmed) {
+                                this.barcode = barcode
+                                this.create_send_product(type='cancel')
+                              }
+                            });
+                        },
+
+                        check_order_from_button:async function(barcode){
+                        Swal.fire({
+                              title: "Siz rostdanham skannerlandiga o'tkazmoqchimisiz?",
+                              showCancelButton: true,
+                              confirmButtonText: "Skannerlash",
+                              cancelButtonText:"Chiqish"
+                            }).then((result) => {
+                              /* Read more about isConfirmed, isDenied below */
+                              if (result.isConfirmed) {
+                                this.barcode = barcode
+                                this.create_send_product()
+                              }
+                            });
+                        },
+    create_send_product:async function(type='check'){
+        if (this.barcode.length < 13){
+             this.Toast.fire({ icon: 'error',title: "Barcodni to'liq kiriting"});
+        return 200
+        }
+
+    vm=this
+        console.log(vm.barcode)
+
+     await axios.post('{% url 'seller_app_postage_input_api' %}', {
+     'barcode':vm.barcode,
+     'type':type,
+     }).then(
+                    function (response){
+                        if (response.status==200){
+                            if (Number(response.data["status"]) == 200){
+                            Swal.fire({
+                              icon: "success",
+                              title: "Belgilandi",
+                              showConfirmButton: false,
+                              timer: 2500
+                            });
+                            vm.barcode = ""
+                            vm.page=1;
+                            vm.loadOrders();
+                            return 200
+                            }else if(Number(response.data["status"]) == 404){
+                            vm.barcode=""
+                            Swal.fire({
+                              icon: "error",
+                              title: "Hatolik",
+                              text: response.data['message'],
+                              confirmButtonText: 'Tushundim',
+                            });
+                                //vm.Toast.fire({ icon: 'warning',title: response.data['message']});
+                            }
+                        }else{
+                        vm.barcode=""
+                        vm.Toast.fire({ icon: 'error',title: "sizda xatolik mavjud"});
+                        }
+                        return []
+                    })
+    },
+},computed: {
+    },
+    watch: {
+    card_type:function (){
+        this.loadOrders();
+    }
+    },
+    })
+
+
+
+
+
+</script>
+
+
+{% endblock %}

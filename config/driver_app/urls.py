@@ -22,6 +22,8 @@ urlpatterns = [
     path('report/', include('config.driver_app.report.urls')),
     path('order/', include('config.driver_app.order.urls')),
     path('warehouse-operation/', include('config.driver_app.warehouse_operation.urls')),
+    path('postage/', include('config.driver_app.postage.urls')),
+    path('postage-operation/', include('config.driver_app.postage_operation.urls')),
     # path('payment/', include('config.driver_app.payment.urls'))
     path('payment/', include('config.driver_app.payment.urls'))
 

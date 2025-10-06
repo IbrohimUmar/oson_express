@@ -11,6 +11,11 @@ class RegionsAdmin(admin.ModelAdmin):
     list_display = ['id','name']
 
 
+@admin.register(ExportedFile)
+class ExportedFileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'file', 'is_view_user']
+
+
 @admin.register(Districts)
 class DistrictsAdmin(admin.ModelAdmin):
     list_display = ['id','region', 'name', 'driver_fee', 'is_active', 'driver_is_bonus', 'driver_one_day_bonus', 'driver_two_day_bonus']

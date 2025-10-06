@@ -1,0 +1,300 @@
+{% extends 'marketer_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <div>
+            <h3>Oqimlar ro'yxati</h3>
+
+        </div>
+    </div>
+
+
+    <div class="card">
+        <form method="get">
+            <div class="card-body" style="padding:8px;">
+
+                <div class="row">
+                    <div class="col-lg-8 col-md-8 me-auto">
+                        <div class="results">
+                            <div class="row">
+                                <div class="col-8" style="padding-right:0px ;">
+                                    <input type="text" placeholder="Qidiruv oqim, mahsulot nomi bo'yicha.."
+                                           style="border: 1px solid #adacac !important;"
+                                           {% if request.GET.search %}value="{{request.GET.search}}" {% endif %}
+                                           class="form-control" name="search">
+                                    {% if request.GET.status %}
+                                    <input type="hidden" name="status" value="{{request.GET.status}}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-4" style="padding:0px !important;">
+                                    <button class="btn btn-brand " type="submit"><i
+                                            class="material-icons md-search"></i></button>
+                                    {% if request.GET.search %}
+                                    <a class="btn btn-danger "
+                                       href="{% url 'marketer_app_stream_list' %}"><i
+                                            class="material-icons md-search_off"></i></a>
+                                    {% else %}
+                                    <button class="btn btn-danger " type="button" disabled><i
+                                            class="material-icons md-search_off"></i></button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="loading" style="display:none">
+        <div class="text-center mt-20 mb-20 m-auto loader"></div>
+        <h4 class="text-center">Bajarilmoqda...</h4>
+    </div>
+    <div id="take_order_card">
+        <div class="row gx-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5">
+            {% for p in queryset %}
+            <form method="post" class="col" onsubmit="submitForm()">
+                {% csrf_token%}
+                <div>
+                    <div class="card card-product-grid">
+                        <div class="info-wrap">
+                            <h4>{{p.name}}</h4>
+                            <hr style="margin:4px">
+
+
+                            <h6 class="mt-1"><i style="vertical-align:bottom;" class="material-icons md-widgets"></i>
+                                Mahsulot : {{p.product.name}} </h6>
+                            <h6 class="mt-1"><i style="vertical-align:bottom;"
+                                                class="material-icons md-local_shipping"></i> Yo'l kira :
+                                {% if p.product.toll is False %}
+                                {{TOLL_AMOUNT|format_money}} uzs
+                                <h6 class="text-muted" style="font-size:7px;">Yo‘lkira mahsulot narxiga qo‘shilmagan
+                                    holda alohida hisoblanadi.</h6>
+                                {% else %}
+                                <span class="badge badge-soft-success">Bepul</span>
+                                {% endif %}
+                            </h6>
+                            <h6 class="mt-1"><i style="vertical-align:bottom;" class="material-icons md-payments"></i>
+                                Narxi : {{p.product.sale_price|format_money}} uzs </h6>
+                            <h6 class="mt-1"><i style="vertical-align:bottom;" class="material-icons md-redeem"></i>
+                                Bonus : {{p.product.seller_fee|format_money}} uzs </h6>
+
+
+
+
+
+                             <hr class="m-1">
+                            <h6>Oqim linki</h6>
+                            <input type="text" class="d-inline form-control mb-0 text-center"
+                                   style="height:32px; width:100%;font-size: 12px;padding: 5px;" disabled
+                                   value="{{url}}{{p.url}}">
+                            <span @click="click_copy('{{url}}{{p.url}}')" style="width:100%;"
+                                  class="badge font-sm rounded btn-brand"><i
+                                    class="material-icons md-copy_all" style="font-size: 17px;vertical-align: sub;"></i>
+                                Nusxalash
+                            </span>
+
+
+                            <hr class="m-1">
+                            <h6 class="text-center">
+                            <a href="{% url 'marketer_app_product_details' p.product.id %}" style="text-align: center" class=" m-auto btn btn-sm btn-light"><i
+                                    class="material-icons md-visibility"></i>Batafsil</a>
+                                </h6>
+                        </div>
+                    </div>
+                    <!-- card-product  end// -->
+                </div>
+            </form>
+            {% endfor %}
+        </div>
+
+
+        <div class="pagination-area mt-20 mb-70">
+
+            <nav aria-label="Page navigation example">
+                <div class="mb-3 text-center">
+                    {% if order.has_next %}
+
+                    <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                       href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        <span class="m-auto">Keyingi sahifaga o'tish >> </span> </a>
+                    {% endif %}
+
+                </div>
+
+                <ul class="pagination justify-content-center">
+                    {% if order.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            << </a>
+                    </li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ order.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ order.previous_page_number }}</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ order.number }}</a></li>
+
+                    {% if order.has_next %}
+                    <li class="page-item"><a class="page-link"
+                                             href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ order.next_page_number }}</a></li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ order.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> >> </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+    <div v-if="modal_has_view" :style="{ display: modal_has_view ? 'block' : 'none' }" style="display:none!important;"
+         class="modal d-block">
+        <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+            <div class="modal-header">
+                <h4>Oqim yaratish</h4>
+                <span class="close" @click="modal_has_view = false">&times;</span>
+            </div>
+            <div class="modal-body card">
+                <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="mt-2">Oqim nomi</label>
+                                <input type="hidden" name="product_id" :value="product_id">
+                                <input type="text" class="form-control" required name="name" placeholder="Oqim nomini kiriting">
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="button" @click="modal_has_view=false" class="btn btn-danger btn-sm mt-3 "><i
+                                        class="material-icons md-cancel"></i> Bekor qilish
+                                </button>
+                                <button type="submit" id="submit_button" class="btn btn-brand btn-sm mt-3 "><i class="material-icons md-add"></i>
+                                    Yuborish
+                                </button>
+                            </div>
+                        </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+</section>
+{% endblock %}
+
+{% block header %}
+<style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+
+       @media (max-width: 767px) {
+            /* Mobil */
+            .product-card-col {
+                margin-right: 10px;
+                margin-left: 10px;
+            }
+
+            .product-image {
+                width: auto;
+                max-width: 100%;
+                min-height: 365px;
+                max-height: 365px;
+            }
+
+        }
+
+        /* desctop */
+        @media (min-width: 768px) {
+            /* Masaüstü özellikleri burada tanımlayabilirsiniz */
+            .product-card-col {
+                margin-right: 0px;
+                margin-left: 0px;
+            }
+
+            .product-image {
+                width: auto;
+                max-width: 100%;
+                min-height: 255px;
+                max-height: 255px;
+            }
+
+        }
+</style>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="{% static '' %}js/vue.js"></script>
+<link rel="stylesheet" href="{% static '' %}css/modal.css">
+
+{% endblock %}
+{% block footer %}
+<script>
+
+    var vue = new Vue({
+    el: "#app",
+    delimiters: ["[[", "]]"],
+    data: {
+        modal_has_view: false,
+        product_id:''
+     },methods: {
+            modal_show:async function(product_id){
+                    this.product_id=product_id
+                    this.modal_has_view=true
+            },
+
+                   click_copy:function(value) {
+                        console.log(value)
+                        navigator.clipboard.writeText(value)
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Nusxalandi',
+                            showConfirmButton: false,
+                            timer: 600
+                        })
+                    },
+    }
+});
+
+
+
+function submitForm() {
+             document.getElementById('take_order_card').style.display = 'none';
+             document.getElementById('loading').style.display = 'block';
+
+ }
+    function takeScreenshot(card_class_name) {
+        console.log(card_class_name)
+
+        const cardElement = document.querySelector('#' + card_class_name);
+        html2canvas(cardElement).then(canvas => {
+            const screenshotUrl = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.download = 'screenshot.png';
+            downloadLink.href = screenshotUrl;
+            downloadLink.click();
+        });
+    }
+
+</script>
+{% endblock %}

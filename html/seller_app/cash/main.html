@@ -1,0 +1,863 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block title %}
+Kassa
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h2 class="content-title">Kassa</h2>
+        <div>
+            			{% if perms.admin.seller_app_cash_out %}
+            <span class=" btn btn-danger btn-sm" @click="showCashOutModal" type="submit"><i class="material-icons md-remove"></i> Chiqim</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card" style="border:1px solid white;">
+        <div class="card-body">
+            <h5>Balans : [[money_format(report.total_balance)]] UZS</h5>
+            <button   @click="filterByCashier(r.user_id)" :style="{backgroundColor: r.user_id===filtered.user ? 'rgb(59 183 126)' : 'rgb(50, 57, 78)'}" class="badge d-inline btn-dark mt-1 mr-1 ml-1" style="border:1px solid white;" v-for="r in report.cash_list"> [[r.user__first_name]] [[r.user__last_name]] : [[money_format(r.balance)]] uzs</button>
+
+            <!--<h6 class="badge badge-dark mt-1 mr-1 ml-1" style="border:1px solid white;" v-for="r in report.cash_list">[[r.user__first_name]] [[r.user__last_name]] : [[money_format(r.balance)]] uzs</h6>-->
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <div class="row">
+                        <div class="col-md-6 row">
+                                <input type="text" placeholder="Izoh bo'yicha qidiruv.." v-model="search" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" @click="searchKeywords" :disabled="search.length===0" class="btn btn-brand"> <i class="material-icons md-search"></i></button>
+                            <button type="button" @click="showFilterModel" class="btn btn-brand"> <i class="material-icons md-filter_list"></i></button>
+                            <button type="button" @click="clearSearchAndFilter" v-if="search.length>0 || filtered.type ||filtered.category ||filtered.user ||filtered.from_date.length>0 ||filtered.to_date.length>0" class="btn btn-danger "> <i class="material-icons md-cancel"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="card-body">
+            <h6 class="text-muted">Tranzaksiyalar soni : [[total_item]] ta </h6>
+            <h6 class="text-muted">Tranzaksiyalar summasi : [[money_format(cash_total_amount)]] uzs </h6>
+
+
+
+
+               {% if perms.cash.change_cash %}
+            <span style="display:none;">[[ifChanged=true]]</span>
+                            {% endif %}
+
+
+            <div style="overflow-x:auto !important;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr style="border-bottom:1px solid white">
+                            <th>#
+                        </th>
+
+                        <th>Sana</th>
+                        <th>Turi</th>
+                        <th>Summa</th>
+                        <th>Kimdan</th>
+                        <th>Kimga</th>
+                        <th>Kategoriya</th>
+                        <th>Izoh</th>
+                        <th>Mas'ul</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(c, index) in cashList" :key="index">
+                        <td>
+
+<!--                            <a v-if="c.type === '2'"-->
+<!--                               :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/admin/cash/cash/' + c.id +'/change/'"-->
+<!--                               target="_blank" class="badge btn-sm badge-soft-success"><i-->
+<!--                                    class="material-icons md-edit"></i></a>-->
+<!--                            <button type="button" v-if="c.type === '2'"-->
+<!--                                    @click="out_modal_edit=true"-->
+<!--                                class="btn btn-sm badge-soft-success"><i-->
+<!--                                    class="material-icons md-edit"></i></button>-->
+                            {% if perms.admin.seller_app_cash_out_edit %}
+                            <button type="button" v-if="c.type === '2'"
+                                    @click="showCashOutEditModal(c.id)"
+                                class="btn btn-sm badge-soft-success"><i
+                                    class="material-icons md-edit"></i></button>
+                            {% endif %}
+
+                        </td>
+
+                        <td><h6>[[c.created_at__date]]</h6>
+                            <small>[[ c.created_at__time ]]</small>
+                            </td>
+                        <td>
+                            <span class="badge badge-soft-success" v-if="c.type === '1'">Kirim</span>
+                            <span class="badge badge-soft-danger" v-if="c.type === '2'">Chiqim</span>
+                            <span class="badge badge-soft-warning" v-if="c.type === '3'">O'tkazma</span>
+                        </td>
+                        <td style="white-space: nowrap"><h6 style="overflow-x:auto !important;" class="text-white">[[money_format(c.amount)]] UZS</h6></td>
+                        <td>
+
+
+                            [[c.from_user__first_name]] +[[c.from_user__username]]</td>
+                        <td>
+                            <span v-if='c.to_user__first_name'>[[c.to_user__first_name]] +[[c.to_user__username]]</span>
+
+                            </td>
+                        <td><span class="badge badge-soft-success">[[c.category__name]]</span></td>
+                        <td><i>[[c.desc]]</i></td>
+                        <td><i>[[c.responsible__first_name]] +[[c.responsible__username]]</i></td>
+<!--                        <td>-->
+
+<!--                            <a href=""-->
+<!--                               class="btn  btn-danger rounded font-sm btn-sm"><i-->
+<!--                                    class="material-icons md-delete"></i></a>-->
+<!--                        </td>-->
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+             <div class="pagination-area mt-20 mb-20">
+            <nav aria-label="Page navigation example">
+                <div class="mb-3 text-center">
+                    <div v-if="has_next">
+
+                        <a class="btn btn-brand btn-sm m-auto" style="width:70%;"
+                           @click="goToNextPage()">
+                            <span class="m-auto">Keyingi sahifaga o'tish ></span> </a>
+                    </div>
+
+                </div>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" v-if="has_previous">
+                        <a class="badge page-link" style="background-color:#4d5561;" @click="goToFirstPage()"> < </a>
+                    </li>
+                    <li class="page-item" v-if="has_previous && (page-2) !== (page-1) && (page-2) > 0">
+                        <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page-2)">[[page-2]]</a>
+                    </li>
+                    <li class="page-item" v-if="has_previous">
+                        <a class="badge page-link" style="background-color:#4d5561;" @click="goToPreviousPage()">[[page-1]]</a>
+                    </li>
+                    <li class="page-item active">
+                        <span class="badge btn-brand page-link" href="#"> [[page]]</span>
+                    </li>
+                    <li class="page-item" v-if="has_next===true">
+                        <a class="badge page-link" style="background-color:#4d5561;" @click="goToNextPage()"
+                        >[[page+1]]</a></li>
+
+                    <li class="page-item" v-if="has_next ===true && (page+2) < total_pages">
+                        <a class="badge page-link" style="background-color:#4d5561;" @click="goToThisPage(page+2)"
+                        >[[page+2]]</a></li>
+                    <li class="page-item" v-if="has_next">
+                        <button type="button" class="badge page-link" style="background-color:#4d5561;"
+                                @click="goToLastPage()"> >
+                        </button>
+                    </li>
+
+                </ul>
+            </nav>
+                <div>
+                                    <h6 class="text-center m-auto text-muted mt-2" style="font-size:10px;">Jami sahifalar soni : [[total_pages]] ta</h6>
+
+                </div>
+
+        </div>
+
+        </div>
+        <!-- card-body end// -->
+    </div>
+
+
+
+
+
+    <div v-if="out_modal" :style="{ display: out_modal ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+      <!-- Modal content -->
+      <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+
+        <div class="modal-header">
+                  <h4>Chiqim qilish</h4>
+
+          <span class="close" @click="out_modal = false">&times;</span>
+        </div>
+         <div class="modal-body">
+            <div class="row">
+
+                <div class="col-md-12">
+
+              <label class="mt-2">Kimdan</label>
+
+
+                    <multiselect v-model="cash_out.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.from_user_data" key="id" @input="cashOutFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+<!--              <select name="cash" class="form-select" v-model="cash_out.from_user">-->
+
+<!--                <multiselect v-model="cash_out.from_user" :options="cash_out_data.from_user_data"-->
+<!--                             :custom-label="fromUserLabel" placeholder="Tanlash" label="first_name"-->
+<!--                             track-by="name"-->
+<!--                             :close-on-select="false"></multiselect>-->
+
+<!--                  <option :value="d.id" v-for="(d, index) in cash_out_data.from_user_data" :key="index">[[d.first_name]] +[[d.username]]</option>-->
+
+
+<!--              </select>-->
+                </div>
+                <div class="col-md-12" v-if="cash_out_data.to_user_list.length > 0">
+              <label class="mt-2">Kimga</label>
+    <!--          <select name="cash" class="form-select"  v-model="cash_out.to_user">-->
+
+
+    <!--              <option :value="d.id" v-for="(d, index) in cash_out_data.to_user_list" :key="index">[[d.first_name]] +[[d.username]]</option>-->
+    <!--          </select>-->
+
+
+
+                    <multiselect v-model="cash_out.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.to_user_list" key="id" @input="cashOutToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
+
+
+
+                    <multiselect v-model="cash_out.category_select_2"  :options="cash_out_data.category" key="id" @input="cashOutCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+    <!--          <select name="cash" class="form-select"  v-model="cash_out.category">-->
+    <!--              <option value="0" selected>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</option>-->
+    <!--=           <option :value="d.id" v-for="(d, index) in cash_out_data.category" :key="index">[[d.name]]</option>-->
+
+    <!--          </select>-->
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Summa</label>
+                    <h6>
+                        <input type="tel" v-model="cash_out.amount" @input="out_format_money"  placeholder="Summa" name="amount"  class="form-control">
+                    </h6>
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Izoh</label>
+                    <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_out.desc" cols="30" rows="10"></textarea>
+                </div>
+                <div class="col-md-12 text-center">
+              <button type="button" @click="out_modal = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+
+              <button type="button" @click="setCashOutData" :disabled="cash_out.category.length===0 || cash_out.from_user.length===0 || cash_out.amount.length===0 || cash_out.category===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> Qo'shish</button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    <!--    <div class="modal-footer">-->
+    <!--      <h3>Modal Footer</h3>-->
+    <!--    </div>-->
+      </div>
+    </div>
+
+
+    <div v-if="out_modal_edit" :style="{ display: out_modal_edit ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+      <!-- Modal content -->
+      <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+
+        <div class="modal-header">
+                  <h4>Chiqimni o'zgartirish</h4>
+          <span class="close" @click="out_modal_edit = false">&times;</span>
+        </div>
+         <div class="modal-body">
+            <div class="row">
+
+                <div class="col-md-12">
+
+              <label class="mt-2">Kimdan</label>
+                    <multiselect v-model="cash_out_edit.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.from_user_data" key="id" @input="cashOutEditFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+                </div>
+
+                <div class="col-md-12"   v-if="cash_out_data.to_user_list && cash_out_data.to_user_list.length > 0">
+              <label class="mt-2">Kimga</label>
+                    <multiselect v-model="cash_out_edit.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.to_user_list" key="id" @input="cashOutToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
+                    <multiselect v-model="cash_out_edit.category_select_2"  :options="cash_out_data.category" key="id" @input="cashOutEditCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Summa</label>
+                    <h6>
+                        <input type="tel" v-model="cash_out_edit.amount" @input="out_format_money"  placeholder="Summa" name="amount"  class="form-control">
+                    </h6>
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Izoh</label>
+                    <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_out_edit.desc" cols="30" rows="10"></textarea>
+                </div>
+                <div class="col-md-12 text-center">
+<!--                  <button type="button" @click="out_modal_edit = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>-->
+<!--                  <button type="button" @click="setCashOutEditData" :disabled="cash_out_edit.category.length===0 || cash_out_edit.from_user.length===0 || cash_out_edit.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-edit"></i> O'zgartirish</button>-->
+                <button type="button"
+                          @click="setCashOutEditData"
+                          :disabled="
+                            !cash_out_edit.category ||
+                            !cash_out_edit.from_user ||
+                            !cash_out_edit.amount||
+                            cash_out_edit.amount <= 0
+                          "
+                          class="btn btn-brand btn-sm mt-3 mb-3"
+                        >
+                          <i class="material-icons md-edit"></i> O'zgartirish
+                        </button>
+                </div>
+
+
+            </div>
+
+        </div>
+      </div>
+    </div>
+
+        <div v-if="filter_modal" :style="{ display: filter_modal ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+
+        <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+  <!-- Modal content -->
+                <div class="modal-header">
+              <h4>Filterlash</h4>
+
+      <span class="close" @click="filter_modal = false">&times;</span>
+    </div>
+     <div class="modal-body card">
+        <div class="row">
+            <div class="col-md-12">
+          <label class="mt-2">Turi bo'yicha</label>
+          <select name="cash" class="form-select" v-model="filter.type">
+              <option value="1">Kirim</option>
+              <option value="2">Chiqim</option>
+              <option value="3">O'tkazma</option>
+          </select>
+            </div>
+            <div class="col-md-12">
+          <label class="mt-2">Kategoriya bo'yicha</label>
+                <multiselect v-model="filter.category_select2"  :options="data_for_filter.category" key="id" @input="filterCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                    <span slot="noResult">Topilmadi!</span>
+                </multiselect>
+            </div>
+            <div class="col-md-12">
+              <label class="mt-2">Foydalanuvchi bo'yicha</label>
+                <multiselect v-model="filter.user_select2"  :custom-label="multiSelectLibraryOptionName" :options="data_for_filter.user_list" key="id" @input="filterUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                    <span slot="noResult">Topilmadi!</span>
+                </multiselect>
+            </div>
+            <div class="col-md-12">
+              <label class="mt-2">Sana bo'yicha</label>
+                <div class="row">
+                    <div class="col-6"><small class="text-muted" style="font-size:9px;">Dan</small><input type="date" width="95% !important" class="form-control d-inline" name="from_date" v-model="filter.from_date"></div>
+                    <div  class="col-6"><small class="text-muted" style="font-size:9px;">Gacha</small><input type="date" width="95% !important" class="form-control d-inline" name="from_date" v-model="filter.to_date"></div>
+                </div>
+           </div>
+            <div class="col-md-12 text-center">
+                <button type="button" @click="cancelFilterData" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                <button type="button" @click="filterData" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> Filterlash</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</section>
+{% endblock %}
+{% block header %}
+<style>
+        #dataTable tr:nth-child(odd){background:#3c4252}
+</style>
+<link rel="stylesheet" href="{% static '' %}css/modal.css">
+<link rel="stylesheet" href="{% static '' %}css/multiselect.css">
+<link rel="stylesheet" href="{% static '' %}css/multiselect.min.css">
+{% endblock %}
+{% block footer %}
+<script src="{% static '' %}js/vue.js"></script>
+<script src="{% static '' %}js/vue-multiselect.min.js"></script>
+<script src="{% static '' %}js/axios.min.js"></script>
+<script>
+    axios.defaults.xsrfCookieName = "csrftoken"
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+    const v = new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        components: { Multiselect: window.VueMultiselect.default },
+        data: {
+            in_modal: false,
+            out_modal: false,
+            out_modal_edit: false,
+            edit_modal: false,
+            transfer_modal: false,
+            filter_modal: false,
+            ifChanged: false,
+            data_for_filter: [],
+            cash_total_amount: 0,
+            cashList: [],
+            total_item: 0,
+            pagination: 0,
+            start_data: '',
+            end_data: '',
+            search: '',
+            amount: '',
+            loading: false, // Yükleme durumu
+            error: null, // Hata mesajı
+            page: 1, // Şu anki sayfa numarası
+            has_next: true, // Sonraki sayfa var mı?
+            has_previous: false,
+            total_pages: 1, // jami sahifa soni
+            total_pages: 0, // jami sahifa soni
+
+
+
+            cash_out_data: {
+                from_user_data: [],
+                to_user_list: [],
+                category: []
+            },
+            filter: {
+                search: '',
+                type: '',
+                category: '',
+                user_select2: '',
+                user: '',
+                from_date: '',
+                to_date: '',
+            },
+            filtered: {
+                search: '',
+                type: '',
+                category: '',
+                category_select2: '',
+
+                user: '',
+                from_date: '',
+                to_date: '',
+            },
+            cash_out: {
+                //from_user:'{{request.user.id}}',
+                from_user: '',
+                from_user_select_2: '{{request.user.id}}',
+                to_user: '',
+                to_user_select_2: '',
+                category: 0,
+                category_select_2: 0,
+                amount: '',
+                desc: '',
+            },
+            cash_out_edit: {
+                category: {}
+            },
+            report: {
+                total_balance: 0,
+                cash_list: [],
+                category: '',
+                from_user: '',
+                amount: '',
+            }
+
+        },
+        created() {
+            this.getCashList()
+            this.getReportData()
+        },
+        methods: {
+            multiSelectLibraryOptionName({ first_name, username }) {
+                if (first_name && username) {
+                    return `${first_name} +${username}`
+                }
+            },
+            cashOutFromUserMultiselectHandle(value) {
+                if (this.cash_out.from_user_select_2) {
+                    var selected_id = this.cash_out.from_user_select_2.id
+                    this.cash_out.from_user = selected_id
+                } else {
+                    this.cash_out.from_user = ""
+                }
+            },
+            cashOutEditFromUserMultiselectHandle(value) {
+                if (this.cash_out_edit.from_user_select_2) {
+                    var selected_id = this.cash_out_edit.from_user_select_2.id
+                    this.cash_out_edit.from_user = selected_id
+                } else {
+                    this.cash_out_edit.from_user = ""
+                }
+            },
+            cashOutToUserMultiselectHandle(value) {
+                if (this.cash_out.to_user_select_2) {
+                    var selected_id = this.cash_out.to_user_select_2.id
+                    this.cash_out.to_user = selected_id
+                } else {
+                    this.cash_out.to_user = ""
+                }
+            },
+            cashOutCategoryMultiselectHandle(value) {
+                if (this.cash_out.category_select_2) {
+                    var selected_id = this.cash_out.category_select_2.id
+                    this.cash_out.category = selected_id
+                } else {
+                    this.cash_out.category = ""
+                }
+            },
+            cashOutEditCategoryMultiselectHandle(value) {
+                if (this.cash_out_edit.category_select_2) {
+                    var selected_id = this.cash_out_edit.category_select_2.id
+                    this.cash_out_edit.category = selected_id
+                } else {
+                    this.cash_out_edit.category = ""
+                }
+            },
+
+            filterCategoryMultiselectHandle(value) {
+                if (this.filter.category_select2) {
+                    var selected_id = this.filter.category_select2.id
+                    this.filter.category = selected_id
+                } else {
+                    this.filter.category = ""
+                }
+            },
+            filterUserMultiselectHandle(value) {
+                if (this.filter.user_select2) {
+                    var selected_id = this.filter.user_select2.id
+                    this.filter.user = selected_id
+                } else {
+                    this.filter.user = ""
+                }
+            },
+
+
+            fromUserLabel(option) {
+                return `${option.first_name} +${option.username}`
+
+            },
+
+
+            getReportData: async function () {
+                await axios.get(`{% url "seller_app_cash_report_json_data" %}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => {
+                    const data = response.data;
+                    this.report.total_balance = data.total_balance
+                    this.report.cash_list = data.cash_list
+
+                })
+                    .catch((error) => {
+                        this.error = error.message;
+                        this.loading = false;
+                    });
+            },
+
+            clearSearchAndFilter: async function () {
+                this.search = ''
+                this.filtered = {
+                    search: '',
+                    type: '',
+                    category: '',
+                    user: '',
+                    from_date: '',
+                    to_date: '',
+                }
+                this.filter = this.filtered
+                this.page = 1
+
+
+                await this.getCashList()
+            },
+
+            searchKeywords: async function () {
+                await this.getCashList()
+            },
+
+            showFilterModel: async function () {
+                await this.getFilterData()
+                this.filter_modal = true
+            },
+
+            filterByCashier: async function (cashier_id) {
+                if (this.filtered.user === cashier_id) {
+
+                    this.filtered.user = ''
+                } else {
+                    this.filtered.user = cashier_id
+                }
+                this.page = 1
+                await this.getCashList()
+            },
+
+            getFilterData: async function () {
+                await axios.get(`{% url "seller_app_cash_filter_json_data" %}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => {
+                    const data = response.data;
+                    this.data_for_filter = data.data
+
+                })
+                    .catch((error) => {
+                        this.error = error.message;
+                        this.loading = false;
+                    });
+            },
+
+            filterData: async function () {
+                this.filtered = this.filter
+                this.page = 1
+                await this.getCashList()
+                this.filter_modal = false
+
+            },
+
+            cancelFilterData: async function () {
+                this.filter_modal = false
+
+                this.filtered = {
+                    search: '',
+                    type: '',
+                    category: '',
+                    user: '',
+                    from_date: '',
+                    to_date: '',
+                }
+                this.filter = this.filtered
+                this.page = 1
+                await this.getCashList()
+            },
+            getCashList: async function () {
+                this.loading = true;
+                this.error = null;
+                await axios.get(`{% url "seller_app_cash_json_data" %}?page=${this.page}&search=${this.search}&type=${this.filtered.type}&category=${this.filtered.category}&user=${this.filtered.user}&from_date=${this.filtered.from_date}&to_date=${this.filtered.to_date}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => {
+                    const data = response.data;
+                    this.has_next = data.has_next;
+                    this.has_previous = data.has_previous;
+                    this.total_pages = data.num_pages;
+                    this.cashList = data.data
+                    this.loading = false;
+                    this.total_item = data.total_item;
+                    this.cash_total_amount = data.cash_total_amount;
+                })
+                    .catch((error) => {
+                        this.error = error.message;
+                        this.loading = false;
+                    });
+            },
+            goToNextPage() {
+                if (this.has_next) {
+                    this.page++;
+                    this.getCashList();
+                    window.scrollTo(0, 0);
+                }
+            },
+            goToFirstPage() {
+                if (this.has_previous) {
+                    this.page = 1;
+                    this.getCashList();
+                    window.scrollTo(0, 0);
+                }
+            },
+            goToThisPage(number) {
+                this.page = number;
+                this.getCashList();
+                window.scrollTo(0, 0);
+            },
+            goToLastPage() {
+                if (this.has_next) {
+                    this.page = Number(this.total_pages);
+                    this.getCashList();
+                    window.scrollTo(0, 0);
+                }
+            },
+            goToPreviousPage() {
+                if (this.has_previous) {
+                    this.page--;
+                    this.getCashList();
+                    window.scrollTo(0, 0);
+                }
+            },
+            showCashTransferModal: async function () {
+                await this.getCashTransferData()
+                this.transfer_modal = true
+            },
+
+            showCashOutModal: async function () {
+                await this.getCashOutData()
+                this.out_modal = true
+            },
+
+            showCashOutEditModal: function (cash_id) {
+                this.getCashOutData()
+                this.getCashOutEditData(cash_id)
+                this.out_modal_edit = true
+            },
+
+
+            getCashOutData: async function () {
+                this.cash_out_data = await axios.get('{% url "seller_app_cash_out_data_json" %}').then(
+                    function (response) {
+                        if (response.status == 200) {
+                            return response.data['data']
+
+                        }
+                        return []
+                    })
+                return this.cashList
+            },
+
+            getCashOutEditData: async function (cash_id) {
+                var vm = this
+                await axios.post('{% url "seller_app_cash_out_edit_data_json" %}', { type: 'get_data', cash_id: cash_id }).then(
+                    function (response) {
+                        if (response.status == 200) {
+                            vm.cash_out_edit = response.data['data']
+                            return response.data['data']
+
+                        }
+                        return this.cashList
+                    })
+                return this.cashList
+            },
+            setCashOutData: async function () {
+                vm = this
+                response = await axios.post('{% url "seller_app_cash_out_data_json" %}', { "data": this.cash_out }).then(
+                    function (response) {
+                        if (response.status == 200) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: "Saqlandi",
+                                showConfirmButton: false,
+                                timer: 1600
+                            })
+                            vm.out_modal = false
+                            vm.cash_out = {
+                                from_user: '',
+                                to_user: '',
+                                category: 0,
+                                amount: '',
+                                desc: '',
+                                date: new Date().toISOString().slice(0, 16),
+                            }
+                            vm.getCashList()
+                            vm.getReportData()
+
+                            return response.data
+
+                        } else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: "Xatolik",
+
+                                showConfirmButton: false,
+                                timer: 600
+                            })
+                        }
+                        return []
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+                return this.cashList
+            },
+
+            setCashOutEditData: async function () {
+                vm = this
+                response = await axios.post('{% url "seller_app_cash_out_edit_data_json" %}', { type: 'edit', data: this.cash_out_edit }).then(
+                    function (response) {
+                        if (response.status == 200) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: "Saqlandi",
+                                showConfirmButton: false,
+                                timer: 1600
+                            })
+                            vm.out_modal_edit = false
+                            vm.cash_out_data = {
+                                from_user_data: [],
+                                to_user_list: [],
+                                category: []
+                            }
+                            vm.getCashList()
+                            vm.getReportData()
+
+                            return response.data
+
+                        } else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: "Xatolik",
+
+                                showConfirmButton: false,
+                                timer: 600
+                            })
+                        }
+                        return []
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+                return this.cashList
+            },
+
+
+            showCashInModal: async function () {
+                await this.getCashInData()
+                this.in_modal = true
+            },
+
+            money_format: function (amount) {
+
+
+                if (amount === null || amount === undefined) {
+                    return ""; // veya başka bir değer döndürebilirsiniz
+                }
+                const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            },
+
+
+            out_format_money() {
+                this.cash_out.amount = this.cash_out.amount.replace(/\D/g, '').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            },
+
+        },
+        computed: {
+        },
+        watch: {
+        },
+    });
+
+
+</script>
+{% endblock %}

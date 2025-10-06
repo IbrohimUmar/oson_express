@@ -144,10 +144,16 @@
                                 <div v-for="(p,index) in selected_products_json" :key="index">
                                     <!--      Donali mahsulot                  -->
 
-                                    <div class="text card-body mb-10"
+                                    <div class="text card-body row mb-10"
                                          style="background-color:#32394e;     border: 1px solid; border-radius: 10px;">
-                                        <h6><i class="fa-solid fa-box-open"></i> <span style="color:rgb(72 226 155);;">Mahsulot :</span>
+
+                                        <div class="col-md-3">
+                                            <img :src="p.image" style="border-radius:7px;" alt="mahsulot surati">
+                                        </div>
+                                        <div class="col-md-9">
+                                                       <h6><i class="fa-solid fa-box-open"></i> <span style="color:rgb(72 226 155);;">Mahsulot :</span>
                                             [[p.name]]</h6>
+
                                         <h6 class="mb-1">
                                             <div v-if="p.is_collection">
 
@@ -405,6 +411,9 @@
                                                 style="font-size:15px ;vertical-align: middle;"
                                                 class="material-icons md-delete"></i> O'chirish
                                         </button>
+                                        </div>
+
+
                                     </div>
                                 </div>
 

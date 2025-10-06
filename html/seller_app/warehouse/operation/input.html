@@ -1,0 +1,486 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+            {% csrf_token %}
+
+
+                                                    <input type="hidden" name="products" :value="myDataJson" />
+
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h3 class="content-title">
+                            Mahsulot kirim qilish</h3>
+                        <div>
+                            <a href="{% url 'seller_app_warehouse_list' %}" class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+                            <button id="submit_button" class="btn btn-md rounded font-sm hover-up" :disabled="disabledButton"><i
+                                    class="material-icons md-add_circle mr-2" type="submit"></i> Saqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-lg-12">
+
+
+                <div class="card" style="margin-bottom:8px;">
+                    <div class="card-body" style="padding:16px; ">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_home' %}">Boshqaruv paneli</a></li>
+                                    <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_warehouse_list' %}">Ombor</a></li>
+                                    <li class="breadcrumb-item d-inline active">Mahsulot kirim qilish</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                       <label class="form-label">Tovarlar kimdan olinganini tanlang</label>
+                                        <select name="supplier" required class="form-select">
+                                            {% for s in supplier %}
+                                            <option value="{{s.id}}">{{s.first_name}} {{s.last_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Kirim holati</label>
+                                        <select name="status" required class="form-select">
+                                            <option value="1">Tasdiqlanmagan</option>
+                                            <option value="2">Tasdiqlangan</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="mb-4">
+                                            <label class="form-label">Izoh </label>
+                                            <textarea placeholder="Izoh" class="form-control"
+                                                      name="desc"
+                                                      rows="1"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="text-center"><i class="material-icons md-check"></i> Belgilangan mahsulotlar</h4>
+
+                                    <div class="col-md-12 text-center">
+                                        <hr>
+
+                                        <h5 class="d-inline mr-5 ml-5">
+                                            <span class="badge" style="border:1px solid white;">Jami mahsulot soni : [[getTotalProductAmount]] Ta </span>
+                                        </h5>
+
+                                        <h5 class="d-inline mr-5 ml-5">
+                                            <span class="badge" style="border:1px solid white;">Jami kirim narxi : [[money_format(getTotalProductPrice)]] uzs </span>
+                                        </h5>
+
+                                    </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mt-5" style="overflow-x:auto !important;">
+                                <table class="table">
+                                    <thead>
+                                        <tr style="border-bottom:1px solid white;">
+                                            <td>Nomi</td>
+                                            <td>Rangi</td>
+                                            <td>Razmeri</td>
+                                            <td>Soni</td>
+                                            <td>Dona narxi</td>
+                                            <td>Jami narxi</td>
+                                            <td>#</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                                                                <tr v-for="f in getSelectedProductList" :key="f.id" >
+                                            <td >
+                                                <h6>[[f.product__name]]</h6>
+                                            </td>
+                                            <td>
+                                                <div v-if="f.color__name">
+                                                    <span class="badge" style="border:1px solid white;">[[f.color__name]]</span>
+                                                </div>
+                                                <div v-else>
+                                                    --------
+                                                </div>
+
+                                            </td>
+                                            <td>
+                                                <div v-if="f.measure_item__name">
+                                                    <span class="badge" style="border:1px solid white;">[[f.measure_item__name]]</span>
+                                                </div>
+                                                <div v-else>
+                                                    --------
+                                                </div>
+                                                </td>
+                                            <td>
+                                                <h6>
+                                                <input type="number" name="amount" style="min-width:100px;" v-model="f.amount" class="form-control" placeholder="soni">
+                                                    </h6>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="price" style="min-width:120px;"  v-model="f.price" class="form-control" placeholder="dona narxi">
+                                            </td>
+                                            <td>
+                                                <h6>[[money_format(f.amount * f.price)]] uzs</h6>
+                                            </td>
+                                            <td>
+                                                <button type="button" @click="f.is_check = 0" class="btn btn-sm btn-danger"><i class="material-icons md-minus"></i> Bekor qilish</button>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="text-center"><i class="material-icons md-add"></i> Mahsulot belgilash</h4>
+
+                            <hr>
+
+                            <div class="row mt-5">
+                                <div class="col-md-3">
+                                    <label>Mahsulot nomi bo'yicha</label>
+                                    <input type="text" style="min-width:200px;" v-model="search_product_name" name="" placeholder="Nomi bo'yicha qidiruv" class="form-control">
+
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Mahsulot rangi bo'yicha</label>
+                                    <input type="text" style="min-width:160px;" v-model="search_product_color" name=""  placeholder="Rangi bo'yicha qidiruv" class="form-control">
+
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Mahsulot o'lchovi bo'yicha</label>
+                                    <input type="text" style="min-width:160px;" v-model="search_product_size" name="" placeholder="Razmeri bo'yicha qidiruv" class="form-control">
+
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Tozalash</label> <br>
+                                                                                <button class="btn btn-danger btn-sm" type="button" @click="clear_search()" :disabled="!(search_product_name.length > 0 || search_product_color.length > 0 || search_product_size.length > 0)"><i class="material-icons md-cancel"></i> Qidiruvni tozalash</button>
+
+                                </div>
+
+
+                            </div>
+<!--                                    <tr style="border-top:1px solid white; border-bottom:1px solid white;" >-->
+<!--                                        <th>-->
+<!--                                            <input type="text" style="min-width:200px;" v-model="search_product_name" name="" placeholder="Nomi bo'yicha qidiruv" class="form-control">-->
+<!--                                        </th>-->
+<!--                                        <th>-->
+<!--                                            <input type="text" style="min-width:160px;" v-model="search_product_color" name=""  placeholder="Rangi bo'yicha qidiruv" class="form-control">-->
+<!--                                        </th>-->
+<!--                                        <th>-->
+<!--                                            <input type="text" style="min-width:160px;" v-model="search_product_size" name="" placeholder="Razmeri bo'yicha qidiruv" class="form-control">-->
+<!--                                        </th>-->
+<!--&lt;!&ndash;                                        <th></th>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <th></th>&ndash;&gt;-->
+<!--                                        <th colspan="3">-->
+<!--                                            <button class="btn btn-danger btn-sm" type="button" @click="clear_search()" :disabled="!(search_product_name.length > 0 || search_product_color.length > 0 || search_product_size.length > 0)"><i class="material-icons md-cancel"></i> Qidiruvni tozalash</button>-->
+<!--                                        </th>-->
+
+<!--                                    </tr>-->
+
+
+                        </div>
+                        <div class="card-body">
+                                                        <div style="overflow-x:auto !important; overflow-y:scroll; height:1000px;" >
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nomi</th>
+                                            <th>Rangi</th>
+                                            <th>Razmeri</th>
+                                            <th>Soni</th>
+                                            <th>Dona narxi</th>
+                                            <th>Belgilash</th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+
+
+                                        <tr v-for="f in filteredList" :key="f.id">
+                                            <td >
+                                                <h6>[[f.product__name]]</h6>
+                                            </td>
+                                            <td>
+                                                <div v-if="f.color__name">
+                                                    <span class="badge" style="border:1px solid white;">[[f.color__name]]</span>
+                                                </div>
+                                                <div v-else>
+                                                    --------
+                                                </div>
+
+                                            </td>
+                                            <td>
+                                                <div v-if="f.measure_item__name">
+                                                    <span class="badge" style="border:1px solid white;">[[f.measure_item__name]]</span>
+                                                </div>
+                                                <div v-else>
+                                                    --------
+                                                </div>
+                                                </td>
+                                            <td>
+                                                <h6 style="font-size:10px; line-height:1;">Soni</h6>
+                                                <input type="number" style="min-width:100px;" name="amount" v-model="f.amount" class="form-control" placeholder="soni">
+                                            </td>
+                                            <td>
+                                                <h6 style="font-size:10px; line-height:1;">1 dona narxi</h6>
+                                                <input type="number" style="min-width:120px;" name="price" v-model="f.price" class="form-control" placeholder="dona narxi">
+                                            </td>
+                                            <td>
+                                                <button type="button" v-if="f.is_check===0" @click="f.is_check = 1" class="btn btn-sm btn-brand" :disabled="f.amount === 0 || f.price === 0"><i class="material-icons md-add"></i> Belgilash</button>
+                                                <button type="button" v-if="f.is_check===1" @click="f.is_check = 0" class="btn btn-sm btn-danger" :disabled="f.amount === 0 || f.price === 0"><i class="material-icons md-minus"></i> Bekor qilish</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+
+                                </table>
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+
+
+
+                </div>
+            </div>
+
+        </form>
+    </section>
+{% endblock %}
+{% block header %}
+    <script src="{% static '' %}js/vue.js"></script>
+<style>
+td{white-space: nowrap
+}
+        .table tr:nth-child(odd){background:#3c4252}
+
+ li{
+     color: black;
+ }
+.select2-container--open .select2-dropdown--below{
+    color: black !important;
+}
+.custom_select .select2-container--default .select2-selection--single .select2-selection__rendered{
+    color:#3BB77E !important;
+ }
+.select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results{
+    color:#3BB77E !important;
+}
+</style>
+{% endblock %}
+{% block footer %}
+    <script type="text/javascript">
+        new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data: {
+                productFilter: {{product_list|safe}},
+                SelectedProductList: [],
+                InputProducts: '',
+
+                search_product_name : '',
+                search_product_color : '',
+                search_product_size : '',
+
+                amount: 0,
+                price: 0,
+                total_amount: 0,
+                total_price: 0,
+                pay_type:0,
+            },
+            mounted() {
+                let self = this;
+                $('.select2').select2().on("change", function () {
+                    self.onSelectChange(this.value);
+                });
+            },
+
+            methods: {
+
+            clear_search : function(amount){
+                this.search_product_name= ''
+                    this.search_product_color= ''
+                    this.search_product_size= ''
+            },
+            money_format : function(amount){
+                  const formattedNumber = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                return formattedNumber;
+            },
+                onSelectChange(val) {
+                    this.InputProducts= val;
+                },
+
+
+                selected_product_add_list(f){
+                 console.log(f)
+                 var value = this.productFilter.filter(values => values.id === Number(v.InputProducts))
+
+
+                },
+
+                productAddList: function () {
+                    var v = this
+                    if (v.InputProducts == null || v.amount == null || v.amount <= 0 || v.InputProducts == '' || v.price == null || v.price <= 0) {
+                        var swal = Swal.fire({
+                            icon: 'info',
+                            title: "Ma'lumotlarni to'liq kiriting",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                        return swal
+                    }
+                    var value = this.productFilter.filter(values => values.id === Number(v.InputProducts))
+
+                    if (v.amount > value[0].amount){
+                            var swal = Swal.fire({
+                            icon: 'info',
+                            title: "Omborda buncha mahsulot mavjud emas",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                        return swal
+                    }
+
+                    this.SelectedProductList.push({
+                        'id': Number(v.InputProducts),
+                        'name': value[0].name,
+                        'amount': v.amount,
+                        'price': v.price,
+                    })
+                    v.amount = null
+                    v.price = null
+                    v.InputProducts = ''
+                },
+                deleteListItems: function (index) {
+                    Swal.fire({
+                        title: 'Siz rostanham o\'chirmoqchimisiz?',
+                        showCancelButton: true,
+                        cancelButtonText: 'chiqish',
+                        confirmButtonText: 'O\'chirish',
+                        confirmButtonColor: 'warning',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.SelectedProductList.splice(index, 1)
+                        }
+                    })
+
+                },
+            },
+            computed: {
+            myDataJson: function () {
+                      return JSON.stringify(this.productFilter.filter(item => item.is_check === 1));
+                    },
+
+                getTotalProductPrice: function () {
+                    const totalPrice = this.productFilter.filter(item => item.is_check === 1).reduce((total, current) => {
+                                          return  total + parseFloat(current.amount * current.price);
+                                        }, 0);
+                       return totalPrice
+                },
+                getTotalProductAmount: function () {
+                    const totalPrice = this.productFilter.filter(item => item.is_check === 1).reduce((total, current) => {
+                                          return  Number(total) +Number(current.amount);
+                                        }, 0);
+                       return Number(totalPrice)
+                },
+
+                getSelectedProductList: function () {
+                    let result = this.productFilter.filter(item => item.is_check === 1);
+                    return result
+                },
+
+
+                filteredList: function () {
+
+                    let result = this.productFilter.filter(o1 => o1.is_check === 0);
+
+
+                    return result.filter((item) => {
+                        return (this.search_product_name.length === 0 || item.product__name.toLowerCase().includes(this.search_product_name.toLowerCase()) ) &&
+                            (this.search_product_color.length === 0 || ( item.color__name && item.color__name.toLowerCase().includes(this.search_product_color.toLowerCase())) ) &&
+                            (this.search_product_size.length === 0 || (item.measure_item__name && item.measure_item__name.toLowerCase().includes(this.search_product_size.toLowerCase())) )
+
+                    })
+
+
+                },
+                disabledButton: function () {
+
+                    let result = this.productFilter.filter(o1 => o1.is_check === 1)
+                    if(result.length > 0) {
+                    console.log(result.some(item => item.amount <= 0 || item.price <= 0))
+                     return result.some(item => item.amount <= 0 || item.price <= 0)
+
+                    }else {
+                    return true
+                    }
+
+                    //return (this.productFilter.filter(o1 => o1.is_check === 1).length > 1)
+
+                    // product tanlangan bo'lishi kerak
+                    // tanlanganlarini soni va narxi 0 dan tepa bo'lishi kerak
+
+
+
+                }
+            },
+ watch: {
+                InputProducts : function () {
+                    var value = this.productFilter.filter(values => values.id === Number(this.InputProducts))
+                    if (value){
+                    this.price = value[0].input_price
+                    }
+
+                },
+
+                SelectedProductList: function () {
+                    this.total_amount = 0
+                    this.total_price = 0
+                    for (i in this.SelectedProductList) {
+                        this.total_amount += Number(this.SelectedProductList[i].amount)
+                        this.total_price += Number(this.SelectedProductList[i].amount) * Number(this.SelectedProductList[i].price)
+                    }
+                }
+            },
+        });
+    </script>
+{% endblock %}

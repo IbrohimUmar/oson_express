@@ -6,14 +6,10 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from config.driver.send_products_v2 import get_object_name_or_none
-from config.warehouse.services.warehouse_operation_item_details_manager import WarehouseOperationItemDetailsManager
-from config.warehouse.services.warehouse_operation_item_manager import WarehouseOperationItemManager
 from order.models import Order, OrderProduct
-from order.services.order_warehouse_operation import OrderWarehouseOperationsService, InsufficientStockError
+from order.services.order_warehouse_operation import InsufficientStockError
 from user.models import User
-from warehouse.models import WarehouseOperationAndOrderRelations, WarehouseOperation, WareHouse, \
-    WarehouseOperationItemDetails
-import datetime
+from warehouse.models import WarehouseOperationAndOrderRelations, WarehouseOperation
 from order.services.order_warehouse_operation import OrderWarehouseOperationsService
 
 

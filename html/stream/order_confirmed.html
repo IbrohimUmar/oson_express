@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{{SITE_NAME}} internet magazin</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content="{{SITE_NAME}} internet magazin"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta property="og:title" content="{{SITE_NAME}}"/>
+    <meta property="og:type" content="text/css"/>
+    <meta property="og:url" content="{{SITE_NAME}}"/>
+    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+</head>
+<body style="background-color: #222736" class="dark">
+
+<section class="content-main">
+    <div class="row mt-60">
+                    <div class="col-sm-12">
+                        <div class="w-50 mx-auto text-center">
+                                                    <i class="material-icons md-check" style="font-size: 60px; border: 2px solid white; border-radius: 50%; padding: 30px;"></i>
+                            <h3 class="mt-40 mb-15">Arizangiz qabul qilindi!</h3>
+                            <p>Batafsil ma'lumot uchun operator yaqin vaqt ichida siz bilan aloqaga chiqadi.
+Iltimos, telefoningiz yoqilgan holda bo'lsin!</p>
+                            <div>
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Mahsulot</th>
+                                        <th>Summa</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>{{order.marketer_stream.product.name}}</td>
+                                        <td>{{order.total_product_price}} uzs</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a href="{% url 'stream_order_create' order.marketer_stream.url %}" class="btn btn-primary mt-4"><i class="material-icons md-keyboard_return"></i> Oqimga qaytish</a>
+                        </div>
+                    </div>
+                </div>
+</section>
+</body>
+</html>

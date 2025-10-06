@@ -1,0 +1,199 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Operatorni : {{o.first_name}} {{o.last_name }} hisobotlari</h4>
+            </div>
+            <div>
+                <a href="{% url 'seller_app_operator_list' %}" class="btn btn-brand btn-sm">
+
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <a href="{% url 'seller_app_operator_edit' o.id %}" class="btn btn-brand btn-sm">
+
+                    <i class="material-icons md-edit"></i> Ma'lumotlarini O'zgartirish
+                </a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row  mt-20 mb-20">
+                    <div class="col-md-12">
+                        <h3 class="text-center">Operator hisoboti</h3>
+                    </div>
+                    
+                    
+
+                        <div class="col-md-6 m-auto mt-10 mb-2">
+                        <article {% if o.operator_data.order_amount_today < o.operator_data.operator_daily_limit %}class="box" style="background-color:#ff141454;"{% else %}class="box bg-light"{% endif %}>
+                            <h6>
+                                Kunlik plan {{o.operator_data.operator_daily_limit}} ta operator kiritdi : {{ o.operator_data.order_amount_today }} ta</h6>
+                            <small class="text-muted d-block ">Kunlik minimum {{o.operator_data.operator_daily_limit}} ta buyurtma kiritishi kerak</small>
+                        </article>
+                    </div>
+                    
+                    
+                    <div class="col-md-6 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Balansi : {{ o.operator_data.balance }} so'm</h6>
+                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>
+                        </article>
+                    </div>
+                    <div class="col-md-6 m-auto mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Hold balansi : {{ o.operator_data.hold }} so'm</h6>
+                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>
+                        </article>
+                    </div>
+
+
+                    <div class="col-md-12 mt-10">
+                        <h5 class="text-center">Operatorning jami kiritgan buyurtmalar bo'yicha</h5>
+                    </div>
+                    <div class="col-md-12 text-center">
+
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">O'chirilgan buyurtmalari : {{ o.operator_data.order_status.delete }} ta
+                        </h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.wait }} ta
+                        </h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsuloti yuborilgan : {{ o.operator_data.order_status.send_products }} ta
+                        </h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.being_delivered }} ta
+                        </h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delivered }} ta</h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi : {{ o.operator_data.order_status.canceled }} ta
+                        </h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.call_back }} ta
+                        </h6>
+                        <br>
+                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta
+                        </h6>
+                    </div>
+
+
+                </div>
+
+                <hr>
+                <br>
+                <div class="row">
+                    <h5 class="text-center">Operatorning sana bo'yicha qancha buyurtma kirtayotgani</h5>
+                    <div class="col-md-10 m-auto">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-5">
+
+                        <label>Oy tanlang :</label>
+<!--                        <input type="month" class="form-control" name="to" value="{{to}}">-->
+                        <input type="month" class="form-control" required name="to" value="{{dates}}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="">Filterlash</label><br>
+                        <button class="btn btn-brand"><i class="icon material-icons md-search"></i></button>
+                    </div>
+                </div>
+                <br>
+            </form>
+
+                 <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Sana</th>
+                        <th>Kiritgan buyurtmalari soni</th>
+                        <th>Shu kuni pul oldi</th>
+                        <th>Batafsil</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in data%}
+                    <tr>
+                        <td>{{d.date|date}}
+                            
+                            </td>
+                        <td>{{d.input_order}} ta kiritdi</td>
+                        <td>{{d.payment}} so'm oldi </td>
+                        <td>
+                            {% if d.input_order > 0%}
+                            <a href="{% url 'seller_app_operator_details_order' o.id d.date.year d.date.month d.date.day %}" class="btn btn-brand btn-sm"><i class="material-icons md-list"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                        <tr>
+                        <td>Jami</td>
+                        <td>{{total_order}} ta kiritdi</td>
+                        <td>{{total_payment}} so'm oldi </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+</section>
+<!--<script type='text/javascript'>-->
+<!--    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});-->
+
+<!--</script>-->
+
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block title %}
+    Pochta haqida batafsil ma'lumot
+{% endblock %}
+
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Amaliyotlar tarixi </h4>
+        <div>
+
+            <button id="choose-driver"  type="button" class="btn btn-sm btn-brand">
+                                                                    <i class="fa-solid fa-plus"></i>
+                                                                    Pochta qaytarish</button>
+
+            <a href="{% url 'postage_main' %}" class="btn btn-sm btn-brand">
+                <i class="material-icons md-left-arrow"></i> Qaytish
+            </a>
+        </div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'postage_main' %}">Pochta</a></li>
+                            <li class="breadcrumb-item d-inline active">Amaliyotlar tarixi</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="card mb-4">
+        <div class="card-body">
+                        <form method="get">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>Turi bo'yicha</h6>
+                                    <select name="action" class="form-control">
+                                        <option value="0">-----</option>
+                                        <option value="1" {% if request.GET.action == '1' %}selected{% endif %}>Seller omborga pochta topshirdi</option>
+                                        <option value="2" {% if request.GET.action == '2' %}selected{% endif %}>Seller ombordan pochtani qaytarib olish</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6>Yuboruvchi holati</h6>
+                                    <select name="from_user_status" class="form-control">
+                                        <option value="0">-----</option>
+                                        <option value="1" {% if request.GET.from_user_status == '1' %}selected{% endif %}>Tasdiqlanmagan</option>
+                                        <option value="2" {% if request.GET.from_user_status == '2' %}selected{% endif %}>Tasdiqlandi</option>
+                                        <option value="3" {% if request.GET.from_user_status == '3' %}selected{% endif %}>Bekor qilindi</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6>Qabul qiluvchi holati</h6>
+                                    <select name="to_user_status" class="form-control">
+                                        <option value="0">-----</option>
+                                        <option value="1" {% if request.GET.to_user_status == '1' %}selected{% endif %}>Tasdiqlanmagan</option>
+                                        <option value="2" {% if request.GET.to_user_status == '2' %}selected{% endif %}>Tasdiqlandi</option>
+                                        <option value="3" {% if request.GET.to_user_status == '3' %}selected{% endif %}>Bekor qilindi</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <h6>Qo'llash</h6>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+
+                                    {% if request.GET %}
+                                      <a href="{% url 'postage_branch_seller_history' logistic_branch.id %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </form>
+                        <h6 class="text-muted">Soni : {{count}} ta</h6>
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Turi</th>
+                        <th>Yuboruvchi</th>
+                        <th>Qabul qiluvchi</th>
+                        <th>Pochta soni</th>
+                        <th>Skannerlandi</th>
+                        <th>Sana </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                            {% if o.action == '1' and o.to_logistic_branch and o.to_user_status == '1' and o.from_user_status == '2' %}
+                            <a href="{% url 'postage_branch_seller_input' o.to_logistic_branch.id o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-info"></i>Qabul qilish</a>
+                            {% endif %}
+
+
+                            {% if o.to_logistic_branch %}
+                            <a href="{% url 'postage_branch_seller_details' o.to_logistic_branch.id o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-info"></i>Batafsil</a>
+                            {% else %}
+
+                            <a href="{% url 'postage_branch_seller_details' o.from_logistic_branch.id o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-info"></i>Batafsil</a>
+                            {% endif  %}
+
+
+                            {% if o.action == '2' and o.from_user_status == '2' and o.to_user_status == '3' %}
+                             <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postage_id" value="{{o.id}}">
+                                <input type="hidden" name="action" value="cancel" >
+                                <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"
+                                onclick="return Swal.fire({
+                                  title: 'Siz rostdanham bekor qilmoqchimisiz?',
+                                   showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                    confirmButtonColor: '#F30000',
+                            }).then(function(result) {
+                              if (result.value) {
+                                form.submit();
+                              }
+                            })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
+                            </form>
+                            {% endif %}
+
+
+
+
+                            {% if o.action == '1' and o.from_user_status == '1' %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postage_id" value="{{o.id}}">
+                                <input type="hidden" name="action" value="none" id="action">
+                                <button class="btn btn-sm btn-brand d-inline" type="button" name="type" value="confirm"
+                                onclick="return Swal.fire({
+                                  title: 'Siz rostdanham tasdiqlamoqchimisiz?',
+                                   showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Tasdiqlash',
+                                    confirmButtonColor: '#3BB77E',
+                            }).then(function(result) {
+                              if (result.value) {
+                                  document.getElementById('action').value = 'confirm'
+                                form.submit();
+                              }
+                            })"><i class="material-icons md-check"></i> Tasdiqlash</button>
+                                <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"
+                                onclick="return Swal.fire({
+                                  title: 'Siz rostdanham bekor qilmoqchimisiz?',
+                                   showCancelButton: true,
+                                  cancelButtonText: 'Qaytish',
+                                  cancelButtonColor: '#4f5d77',
+                                  confirmButtonText: 'Bekor qilish',
+                                    confirmButtonColor: '#F30000',
+                            }).then(function(result) {
+                              if (result.value) {
+                              document.getElementById('action').value = 'cancel'
+                                form.submit();
+                              }
+                            })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if o.action == '1' %}badge-soft-success{% elif o.action == '2' %}badge-soft-warning{% endif %}" >
+                                {{o.get_action_display}}
+                            </span>
+                        </td>
+                        <td>
+                            {% if o.action == '1' %}
+                            {{ o.from_user.full_name }}dan
+                            {% elif o.action == '2' %}
+                            {{o.from_logistic_branch.name}}dan
+                            {% endif %}
+
+                            <br>
+                            {% if o.from_user_status == '1' %}
+                            <span class="badge" style="border:1px solid white;">{{o.get_from_user_status_display}}</span>
+                            {% elif o.from_user_status == '2' %}
+                            <span class="badge badge-soft-success">{{o.get_from_user_status_display}}</span>
+                            {% elif o.from_user_status == '3' %}
+                            <span class="badge badge-soft-danger">{{o.get_from_user_status_display}}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if o.action == '2' %}
+                            {{ o.to_user.full_name }}ga
+                            {% elif o.action == '1' %}
+                            {{o.to_logistic_branch.name}}ga
+                            {% endif %}
+                            <br>
+                            {% if o.to_user_status == '1' %}
+                            <span class="badge" style="border:1px solid white;">{{o.get_to_user_status_display}}</span>
+                            {% elif o.to_user_status == '2' %}
+                            <span class="badge badge-soft-success">{{o.get_to_user_status_display}}</span>
+                            {% elif o.to_user_status == '3' %}
+                            <span class="badge badge-soft-danger">{{o.get_to_user_status_display}}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ o.postage_details_count }} ta</td>
+                        <td>
+                            {% if o.action == '1' %}
+                            {{ o.postage_details_scanned_to_user_count }} ta
+                            {% elif o.action == '3' %}
+                            {{ o.postage_details_scanned_from_user_count }} ta
+                            {% endif %}
+                        </td>
+                        <td>{{ o.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+
+
+</section>
+{% endblock %}
+
+{% block header %}
+        <link href="{% static '' %}css/select2.css" rel="stylesheet" type="text/css">
+        <style>
+
+
+            .select2-container--default{
+                border:1px solid white;
+                background-color:white !important;
+            }
+
+        </style>
+    {% load compress %}
+    {% compress css %}
+        <link href="{% static 'css/table_custom.css' %}" rel="stylesheet" type="text/css">
+    {% endcompress %}
+{% endblock %}
+{% block footer %}
+<script>
+document.getElementById("choose-driver").addEventListener("click", function() {
+    Swal.fire({
+        title: 'Seller tanlang',
+        html: `
+            <select id="driver-select" style="width:100%">
+                <option value="">--------------</option>
+                {% for d in sellers %}
+                <option value="{{d.id}}">{{d.full_name}} | +{{d.username}}</option>
+                {% endfor %}
+            </select>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        cancelButtonText:'Chiqish',
+        confirmButtonText: 'Pochta qaytarish',
+        didOpen: () => {
+            $('#driver-select').select2({
+                dropdownParent: $('.swal2-popup') // önemli!
+            });
+        },
+        preConfirm: () => {
+            const driverId = document.getElementById("driver-select").value;
+            if (!driverId) {
+                Swal.showValidationMessage("Iltimos bir haydovchi tanlang!");
+                return false;
+            }
+            return driverId;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let driverId = result.value;
+            window.location.href = "/seller/return/" + driverId;
+            window.location.href = "/postage/branch/seller/return/{{logistic_branch.id}}/" + driverId;
+        }
+    });
+});
+</script>
+{% endblock %}

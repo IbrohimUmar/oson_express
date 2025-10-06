@@ -1,0 +1,93 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h3 class="content-title card-title">Yangi marketolog qo'shish</h3>
+            </div>
+            <div>
+                <a href="{% url 'seller_app_marketer_list' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Marketolog qo'shish uchun ma'lumotlarni to'ldiring</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Marketolog ismi</label>
+                        <input type="text" name="first_name" placeholder="Marketolog ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
+                               class="form-control">
+
+                        <label>Marketolog familiyasi</label>
+                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Marketolog familiyasi"
+                               class="form-control">
+                        <label>Parol</label>
+                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+                               class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Marketolog karta raqami</label>
+<!--                        <input type="number" class="form-control" {% if r %}value="{{r.payment_card}}" {% endif %} name="payment_card" placeholder="Marketolog karta raqami">-->
+
+                        <input type="text"
+                               class="form-control"
+                               name="payment_card"
+                               {% if r %}value="{{r.payment_card}}" {% endif %}
+                               placeholder="1111222233334444"
+                       inputmode="numeric"
+                       pattern="\d{16}"
+                       maxlength="16"
+                       minlength="16"
+                       required
+                       title="Iltimos, 16 ta raqam kiriting." />
+
+
+                        <label>Marketolog telefon raqami</label>
+                         {% if r %}
+                        <input type="text" name="phone" value="{{r.phone}}"  max="16" min="16"
+                               class=" form-control" placeholder="Marketolog telefon raqami">
+                        {% else %}
+
+
+
+                        
+                        <input type="text" name="phone" id="phone_inputmask" 
+                               class="js-phone-input form-control" placeholder="Marketolog telefon raqami">
+                        {% endif %}
+                        <label class="text-sm">Marketolog aktivmi</label>
+                        <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active == "on" %} checked{% endif %}{% endif %}>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<script type='text/javascript'>
+    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});
+
+</script>
+
+{% endblock %}
+{% block header %}
+<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+{% endblock %}
+{% block footer %}
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Sotib olinishi kerak mahsulotlar boshqaruvi</h4>
+        <div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div>
+             <div class="card mb-4">
+                 <div class="card-header text-center">
+                     <a href="?type=0"
+                        {% if request.GET.type == '0' %}class="btn btn-primary"{% else %}class="btn " style="border:1px solid;"{% endif %} >Hammasi bo'yicha</a>
+                     <a href="?type=2"
+                        {% if request.GET.type == '2' %}class="btn btn-primary btn-sm" {% else %}class="btn" style="border:1px solid;"{% endif %} >Bozordan sotib olish kerak</a>
+                     <hr>
+                 </div>
+                 {% if request.GET.type == '0' %}
+
+            <div style="overflow-x:auto !important;">
+                        <table class="table"  id="dataTable">
+                            <thead>
+                            <tr>
+                                <th>Mahsulot</th>
+                                <th>Rangi</th>
+                                <th>Razmeri</th>
+                                <th>Donaliga</th>
+                                <th>To'plam ichida</th>
+                                <th>Jami kutilmoqda soni</th>
+
+                                <th>Asosiy Omborda bor</th>
+                                <th>Sotib olinishi kerak</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in most_purchase_list %}
+                            <tr>
+                                <td><h6>{{i.product__name}}</h6></td>
+                                <td>
+                                    {% if i.product_variable__color__name %}
+                                    {{i.product_variable__color__name}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if i.product_variable__measure_item__name %}
+                                    {{i.product_variable__measure_item__name}}
+                                    {% endif %}
+                                </td>
+                                <td>{{i.unit_count}} ta</td>
+                                <td>{{i.collection_count}} ta</td>
+                                <td>{{i.total_count}} ta</td>
+
+
+                                <td>{{i.warehouse_attachment_amount}} ta</td>
+                                <td>{{i.need_to_buy}} ta</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                 {% elif request.GET.type == '2' %}
+                 <div class="card-body">
+                     <h4 class="text-center mt-2 mb-2">Bozordan sotib olinishi kerak</h4>
+            <div style="overflow-x:auto !important;">
+                    <table class="table"  id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>Mahsulot</th>
+                            <th>Rangi</th>
+                            <th>Razmeri</th>
+                            <th>Sotib olish kerak</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in most_purchase_list %}
+                        <tr>
+                            <td><h6>{{i.product__name}}</h6></td>
+                            <td>
+                                {% if i.product_variable__color__name %}
+                                {{i.product_variable__color__name}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if i.product_variable__measure_item__name %}
+                                {{i.product_variable__measure_item__name}}
+                                {% endif %}
+                            </td>
+                            <td>{{i.need_to_buy}} ta</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+            </div>
+                 {% endif %}
+
+            <!-- card-body end// -->
+        </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block header %}
+        <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+            <script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+
+    <script src="{% static '' %}js/datatables/excel/dataTables.buttons.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/jszip.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/buttons.html5.min.js"></script>
+    <script>
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+            }
+        });
+    </script>
+
+{% endblock %}

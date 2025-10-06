@@ -7,6 +7,7 @@ INCLUDE STYLES AND COMPONENTS
 @import url(vendors/material-icon-round.css);
 @import url(vendors/perfect-scrollbar.css);
 @import url(vendors/select2.min.css);
+@import url(vendors/custom.css);
 @import url(additional_app.css);
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&family=Quicksand:wght@400;500;600;700&display=swap");
 /*RESET*/
@@ -51,6 +52,10 @@ ol, ul {
 blockquote, q {
   quotes: none;
 }
+
+
+
+
 
 blockquote:before, blockquote:after,
 q:before, q:after {

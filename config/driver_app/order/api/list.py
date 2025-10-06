@@ -20,9 +20,11 @@ def driver_app_order_api_list(request):
         warehouse_operation = get_object_or_404(WarehouseOperation, id=warehouse_operation_id)
         orders = orders.filter(id__in=warehouse_operation.relation_orders_id)
 
-    status = int(request.GET.get('status', 3))
+    print(request.GET)
+    status = int(request.GET.get('status', 1))
     if status:
-        orders = orders.filter(status=status)
+        orders = orders.filter(driver_status=status)
+
     search_terms = request.GET.get("search", None)
     if search_terms:
         orders = orders.filter(
@@ -31,7 +33,6 @@ def driver_app_order_api_list(request):
     district = request.GET.get("district", '0')
     if district != '0':
         orders = orders.filter(customer_district_id=district)
-
 
 
     def get_not_none_value(value):
@@ -85,8 +86,9 @@ def driver_app_order_api_list(request):
                 'customer_phone2': r.customer_phone2,
                 'customer_street': r.customer_street,
                 'customer_district': r.customer_district.name,
-                'operator': get_not_none_operator_username(r.operator), 'status': r.status,
-                'status_name': r.get_status_display(),
+                'operator': get_not_none_operator_username(r.operator),
+                'status': r.driver_status,
+                'status_name': r.get_driver_status_display(),
                 'order_date': r.order_date.strftime(("%Y-%m-%d")),
                 'delivered_date': r.delivered_date.strftime(("%Y-%m-%d")),
                 'driver_fee': r.driver_fee, 'driver_is_bonus': {True: 1, False: 0}.get(r.driver_is_bonus),
@@ -99,13 +101,13 @@ def driver_app_order_api_list(request):
                 'is_delivered_date_over': {True: 1, False: 0}.get(r.is_delivered_date_over),
                 'operator_note': get_not_none_value(r.operator_note),
                 'cancelled_status': '1',
-                "payment_status": r.payment_status,
-                "payment_status_name": r.get_payment_status_display(),
+                "driver_status": r.driver_status,
                 "defective_product_order": get_not_none_value(r.defective_product_order_id),
                 "defective_order_details": defective_order_details(r, r.defective_product_order_id) if r.defective_product_order is not None else '',
                 # "defective_order_details": {"defective_sold_order":r.id, 'driver_fee':10000},
                 # "defective_order_details": '',
             })
+        print(order_list)
     return JsonResponse({
         'status':200,
         'data': order_list,

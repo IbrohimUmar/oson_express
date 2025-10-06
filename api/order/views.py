@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.views import APIView
 from django.db import transaction, IntegrityError
-from order.models import SellerStream, Order, OrderProduct
+from order.models import MarketerStream, Order, OrderProduct
 from config.settings.base import TOLL_AMOUNT, API_ALLOWED_URLS
 from config.barcode import barcode_generate
 from services.order.history import save_order_status_history
@@ -18,7 +18,7 @@ def check_stream_url(value):
     url_to_list = value.replace("/", " ").split()
     if len(url_to_list) == 4:
         sites = API_ALLOWED_URLS.get(url_to_list[1].lower(), None)
-        stream = SellerStream.objects.filter(url=url_to_list[3]).exists()
+        stream = MarketerStream.objects.filter(url=url_to_list[3]).exists()
         if not sites or not stream:
             raise serializers.ValidationError("Oqim url noto'g'ri")
     else:
@@ -90,7 +90,7 @@ def create_order(v, request):
             return f"+{value}"
         return value
 
-    stream = SellerStream.objects.filter(url=return_stream_url(v["stream"])["stream_url"]).first()
+    stream = MarketerStream.objects.filter(url=return_stream_url(v["stream"])["stream_url"]).first()
     today = datetime.datetime.today()
     old_order = Order.objects.filter(
         customer_phone=v['phone'],

@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'compressor',
+    'debug_toolbar',
 ]
 CUSTOM_APPS = [
     'cash',
@@ -48,12 +49,23 @@ CUSTOM_APPS = [
     'store.apps.StoreConfig',
     'api.apps.ApiConfig',
     'report',
-    'warehouse'
+    'warehouse',
+    'postage',
 
 ]
-SITE_NAME = 'Ozar'
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+] # for django-debug-toolbar
+
+SITE_NAME = 'Oson.express'
 API_ALLOWED_URLS = {"127.0.0.1:8000": True, "ozar.uz": True, "Ozar.uz": True}
 OPERATOR_BONUS_FOR_ADDITIONAL_SOLD = 500
+
+DEVELOPER_TG_CHAT_ID = 6937180
+PROJECT_NAME_FOR_EXCEPTION_BOT = "Oson.Express"
+EXCEPTION_BOT_TOKEN = "5987201267:AAHUho2camKMj25dgdrGBC6-V3FPRl8Iby4"
 
 def global_variables(request):
     return {
@@ -80,6 +92,7 @@ INSTALLED_APPS += CUSTOM_APPS + THIRD_PART_APPS
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -88,6 +101,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -235,13 +250,36 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+
+# Bu ayar Django Compressor’ın aktif olup olmayacağını belirler.
+# True ise Compressor CSS ve JS dosyalarını sıkıştırır, optimize eder.
+# False ise Compressor hiçbir şey yapmaz, normal statik dosyalar çalışır.
+# Production ortamında genellikle True olur.
+# Geliştirme ortamında sıkıştırma süresi uzatmasın diye çoğu zaman False yapılır.
+COMPRESS_ENABLED = False
+
+
+# Geliştirme ortamında (COMPRESS_OFFLINE=False) değişiklikler anında yansır.
+# Production ortamında (COMPRESS_OFFLINE=True) dosyalar önceden sıkıştırılır,
+# değişiklik olursa tekrar "python manage.py compress" çalıştırılır.
+# COMPRESS_ENABLED=True => Django Compressor aktif, False => devre dışı.
+COMPRESS_OFFLINE = False
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/static/'
+# STATIC_ROOT = '/static/'
 STATICFILES_DIRS = [
-        BASE_DIR / 'static'
-    ]
+    os.path.join(BASE_DIR, 'static'),
+]
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace("\\", '/')
 # MEDIA_URL = '/media/'

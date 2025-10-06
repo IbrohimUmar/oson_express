@@ -251,9 +251,10 @@ def export_excel_from_warehouse_residue(warehouse_name, leave_product_input_pric
             "Mahsulot":o.product.name,
             "Rangi": o.product_variable.color.name if o.product_variable.color else '-',
             "Razmeri": o.product_variable.measure_item.name if o.product_variable.measure_item else '-',
-            "Ombordagi_soni": o.amount,
-            "Kirim_narxlari": [f"{i['leave_amount']} ta {i['input_price']} dan," for i in o.get_input_price_list.values("leave_amount", "input_price")],
-            "Jami_kirim_narxda": o.total_input_price_uzs,
+            "Ombordagi_soni": o.quantity,
+            # "Kirim_narxlari": [f"{i['leave_amount']} ta {i['input_price']} dan," for i in o.get_input_price_list.values("leave_amount", "input_price")],
+            "Kirim_narxi": o.input_price,
+            "Jami_kirim_narxda": o.total_input_price,
         })
         if len(data) == 500: # eğer liste 500 elemana ulaştıysa
             df = pd.DataFrame(data) # listeyi bir DataFrame'e dönüştürün

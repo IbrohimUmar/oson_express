@@ -3,6 +3,9 @@ from .models import *
 # Register your models here.
 # admin.site.index_template = "home/index.html"
 
+# admin.py faylingizga yozing
+from django.contrib import admin
+from .models import ProductApprovalNote
 
 from django.forms import ModelForm
 from django.forms.widgets import TextInput
@@ -18,6 +21,18 @@ class ColorsForm(ModelForm):
         
         
         
+
+
+@admin.register(ProductApprovalNote)
+class ProductApprovalNoteAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user_display', 'note', 'created_at')
+    list_filter = ('created_at', 'user', 'product')
+    search_fields = ('note', 'product__name', 'user__username')
+
+    def user_display(self, obj):
+        return obj.user.username if obj.user else 'Anonim'
+    user_display.short_description = 'Foydalanuvchi'
+
 
 
     
@@ -136,7 +151,7 @@ class ProductCollectionItemInline(admin.StackedInline):
 
 from order.models import Order, OrderProduct
 from django.db.models import Q, ExpressionWrapper
-from warehouse.models import WarehouseOperationItemDetails, WareHouseStock
+# from warehouse.models import WarehouseOperationItemDetails, WareHouseStock
 
 
 @admin.register(Product)
@@ -152,20 +167,6 @@ class ProductAdmin(admin.ModelAdmin):
             OrderProduct.objects.filter(status=4, order__status=4, product_id=self.id).aggregate(t=Coalesce(Sum('ordered_amount'), 0))['t']
         return driver_hand_product_price
 
-    def yangi_xitoy_omboridagi_soni(self):
-        stock = WareHouseStock.objects.filter(warehouse_id__in=[3, 4], product_id=self.id).aggregate(t=Coalesce(Sum('amount'), 0))['t']
-        return stock
-
-    def yangi_elituvchi_omboridagi_soni(self):
-        stock = WareHouseStock.objects.filter(warehouse_id__in=[1, 2], product_id=self.id).aggregate(t=Coalesce(Sum('amount'), 0))['t']
-        return stock
-    def eski_omborga_haydovchidan_qaytarib_olindi(self):
-        result = OrderProduct.objects.filter(product_id=self.id, status=5).aggregate(t=Coalesce(Sum("ordered_amount"), 0))['t']
-        return result
-
-    def eski_omborga_haydovchidan_nosoz_qaytarib_olindi(self):
-        result = OrderProduct.objects.filter(product_id=self.id, status=7).aggregate(t=Coalesce(Sum("amount"), 0))['t']
-        return result
 
 
     list_display = ['id', 'name']

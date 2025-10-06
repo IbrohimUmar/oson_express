@@ -14,6 +14,7 @@
     <meta property="og:url" content="{{SITE_NAME}}"/>
     <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
     <link href="{% static '' %}css/additional_app.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
 
     <script src="{% static 'js/sweetalert2@10.js' %}"></script>
     <script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
@@ -150,16 +151,12 @@ backdrop-filter: blur(10px);">
 
          <li class="header_navbar_collapse_nav_item">
             <div class="header_navbar_collapse_nav_item_pad">
-                <a class="badge {% if u == 'driver_app_order_main' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_order_main' %}"> <span
-                        class="material-icons md-list_alt " style="font-size: 28px" aria-hidden="true"></span> <br>
-                    Buyurtmalar
+                <a class="badge {% if u == 'driver_app_postage_input_history' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_postage_input_history' %}"> <span
+                        class="material-icons md-widgets " style="font-size: 28px" aria-hidden="true"></span> <br>
+                    Pochtalar
                     </a>
-
-
             </div>
         </li>
-
-
             <li class="header_navbar_collapse_nav_item">
             <div class="header_navbar_collapse_nav_item_pad">
                 <a class="badge {% if u == 'driver_app_menu' %}text-primary{% else %}text-de-active{% endif %}" style="font-size:9px !important;" href="{% url 'driver_app_menu' %}"> <span
@@ -172,11 +169,7 @@ backdrop-filter: blur(10px);">
 </div>
 
 
-<button
-        type="button"
-        class="btn btn-brand"
-        id="btn-back-to-top"
->
+<button type="button" class="btn btn-brand" id="btn-back-to-top">
     <i class="material-icons md-arrow_upward"></i>
 </button>
 </main>

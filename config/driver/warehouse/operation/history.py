@@ -11,7 +11,7 @@ from config.export_excel import export_excel_from_driver_send_product_order_deta
 from order.models import Order
 from user.models import User
 
-from warehouse.models import WarehouseOperation, WarehouseOperationItem, WarehouseOperationAndOrderRelations
+from warehouse.models import WarehouseOperation, WarehouseOperationAndOrderRelations
 
 
 @login_required(login_url='/login')
@@ -63,11 +63,11 @@ def driver_warehouse_operation_history_details_by_order(request, driver_id, ware
 def driver_warehouse_operation_history_details_by_product(request, driver_id, warehouse_operation_id):
     driver = get_object_or_404(User, id=driver_id, type=2)
     warehouse_operations = get_object_or_404(WarehouseOperation, id=warehouse_operation_id)
-    warehouse_operation_item = WarehouseOperationItem.objects.filter(warehouse_operation_id=warehouse_operation_id).values("product__name","product_variable_id", "product_variable__color__name", 'product_variable__measure_item__name').annotate(
-        total_amount=Coalesce(Sum("amount"), 0)
-    )
+    # warehouse_operation_item = WarehouseOperationItem.objects.filter(warehouse_operation_id=warehouse_operation_id).values("product__name","product_variable_id", "product_variable__color__name", 'product_variable__measure_item__name').annotate(
+    #     total_amount=Coalesce(Sum("amount"), 0)
+    # )
     return render(request, 'driver/warehouse/operation/details/by_product.html',
-                  {"d": driver, 'warehouse_operation_item': warehouse_operation_item})
+                  {"d": driver})
 
 
 

@@ -8,7 +8,7 @@ from user.models import CashierUser, User
 from django.db.models import Sum, ExpressionWrapper, F
 from django.db.models.functions import Coalesce
 
-from warehouse.models import WarehouseOperationItemDetails
+# from warehouse.models import WarehouseOperationItemDetails
 
 
 @login_required(login_url='/login')
@@ -122,43 +122,47 @@ class WarehouseReportService:
 
     @property
     def total_product_input_price_all_warehouse(self):
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_stock__warehouse_id__in=[1, 2, 3, 4],
-            leave_amount__gt=0,
-            warehouse_operation__to_warehouse_status="2"
-        ).aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
-                       0))['t'] or 0
+        # return WarehouseOperationItemDetails.objects.filter(
+        #     warehouse_stock__warehouse_id__in=[1, 2, 3, 4],
+        #     leave_amount__gt=0,
+        #     warehouse_operation__to_warehouse_status="2"
+        # ).aggregate(
+        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
+        #                0))['t'] or 0
+        return 0
 
     @property
     def total_product_input_price_all_transit(self):
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_operation__action__in=[1, 3],
-            leave_amount__gt=0,
-            warehouse_operation__from_warehouse_status__in=["1", "2"],
-            warehouse_operation__to_warehouse_status__in=["1", "3"]
-        ).aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
-                       0))['t'] or 0
+        # return WarehouseOperationItemDetails.objects.filter(
+        #     warehouse_operation__action__in=[1, 3],
+        #     leave_amount__gt=0,
+        #     warehouse_operation__from_warehouse_status__in=["1", "2"],
+        #     warehouse_operation__to_warehouse_status__in=["1", "3"]
+        # ).aggregate(
+        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
+        #                0))['t'] or 0
+        return 0
 
     def total_product_input_price_warehouse_by(self, warehouse_id):
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_stock__warehouse_id=warehouse_id,
-            leave_amount__gt=0,
-            warehouse_operation__to_warehouse_status="2"
-        ).aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
-                       0))['t'] or 0
+        # return WarehouseOperationItemDetails.objects.filter(
+        #     warehouse_stock__warehouse_id=warehouse_id,
+        #     leave_amount__gt=0,
+        #     warehouse_operation__to_warehouse_status="2"
+        # ).aggregate(
+        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
+        #                0))['t'] or 0
+        return 0
 
     def total_product_input_price_all_warehouse_date_by(self, date):
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_stock__warehouse_id__in=[1, 2, 3, 4],
-            leave_amount__gt=0,
-            warehouse_operation__to_warehouse_status="2",
-            created_at__lte=date,
-        ).aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
-                       0))['t'] or 0
+        # return WarehouseOperationItemDetails.objects.filter(
+        #     warehouse_stock__warehouse_id__in=[1, 2, 3, 4],
+        #     leave_amount__gt=0,
+        #     warehouse_operation__to_warehouse_status="2",
+        #     created_at__lte=date,
+        # ).aggregate(
+        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
+        #                0))['t'] or 0
+        return 0
 
 
 class DriverReportService:
@@ -220,21 +224,14 @@ class SupplierReportService:
     def get_all_supplier_total_input_product_price(self):
         # return WarehouseOperationItemDetails.objects.filter(
         #     warehouse_operation__action="2",
-        #     from_warehouse_operation__from_warehouse_responsible__type=5,
-        #     from_warehouse_operation__from_warehouse_responsible__is_active=True,
-        #     from_warehouse_operation__from_warehouse_status="2",
-        #     from_warehouse_operation__to_warehouse_status="2",
+        #     warehouse_operation__from_warehouse_responsible__type=5,
+        #     warehouse_operation__from_warehouse_responsible__is_active=True,
+        #     warehouse_operation__from_warehouse_status="2",
+        #     warehouse_operation__to_warehouse_status="2",
         # ).aggregate(
-        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))['t'] or 0
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_operation__action="2",
-            warehouse_operation__from_warehouse_responsible__type=5,
-            warehouse_operation__from_warehouse_responsible__is_active=True,
-            warehouse_operation__from_warehouse_status="2",
-            warehouse_operation__to_warehouse_status="2",
-        ).aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))[
-            't'] or 0
+        #     t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))[
+        #     't'] or 0
+        return 0
 
     @property
     def get_total_debt_amount(self):

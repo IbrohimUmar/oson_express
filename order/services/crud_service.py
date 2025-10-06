@@ -36,6 +36,7 @@ class OrderCrudService:
                 "order_product_id": item.id,
                 "global_id": product.id,
                 "name": product.name,
+                "image": product.image.url,
 
                 "total_price": item.total_price,
                 "price": item.unit_price,

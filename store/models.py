@@ -8,12 +8,6 @@ from django.utils.safestring import mark_safe
 from tinymce.models import HTMLField
 
 
-
-
-
-
-
-
 class Measure(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False, verbose_name="Nomi")
     short_name = models.CharField(max_length=100, null=False, blank=False, verbose_name="Nomi")
@@ -74,6 +68,25 @@ class Product(models.Model):
         ("1", "2+1 shaklidagi chegirma"),
         ("2", "2 chisidan mahsulotdan 30 000 mingdan chegirma")
     )
+    APPROVAL_CHOICES = [
+        ('1', 'Tasdiqlash kutilmoqda'),
+        ('2', 'Tasdiqlandi'),
+        ('3', 'Bekor qilindi'),
+    ]
+    SIZE_CHOICES = [
+        ('1', "Standart o'lchovda"),
+        ('2', "Gabariti katta mahsulot"),
+    ]
+
+    approval_status = models.CharField(
+        max_length=20,
+        choices=APPROVAL_CHOICES,
+        default='1'
+    )
+    approval_status_updated_at = models.DateTimeField(null=True, blank=True)
+    approval_status_updated_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,
+                                          related_name='approval_status_updated_by_user')
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="seller_product",null=True, blank=True)
     name = models.CharField(max_length=350, null=True, blank=True, verbose_name="Mahsulot nomi")
     short = models.TextField(null=True, blank=True, verbose_name="Mahsulot haqida qisqacha")
     desc = HTMLField(verbose_name='Konkurs haqida to\'liq')
@@ -82,11 +95,16 @@ class Product(models.Model):
     toll = models.BooleanField(default=False, null=False,verbose_name="Yo'l kira pullimi")
     youtube_link = models.CharField(max_length=450, null=True, blank=True, verbose_name='Youtube video link')
     sale_price = models.IntegerField(null=False, blank=False, verbose_name='Sotuv narxi', default=0)
-    image = models.ImageField(upload_to='images/ProductsImages/', null=False, verbose_name='Mahsulot ning asosiy surati')
+    image = models.ImageField(upload_to='products', null=True, blank=True, verbose_name="Katta rasim (1201 x 1801)")
+    small_image = models.ImageField(upload_to='products_small', null=True, blank=True, verbose_name="Kichik rasm (180 x 240)")
 
     is_active = models.BooleanField(default=True, null=False, verbose_name="mahsulot sotuvdami")
     is_collection = models.BooleanField(default=False, null=False, verbose_name="bu mahsulot to'plammi")
     category = models.ManyToManyField(Category, verbose_name='Kategoriyasi', related_name='category')
+
+    size_type = models.CharField(choices=SIZE_CHOICES, max_length=10, default='1', null=False, blank=False)
+    size_based_delivery_extra = models.IntegerField(null=True, blank=True, verbose_name="Gabariti katta mahsulotning yetkazish tafovuti")
+
 
     bonus_type = models.CharField(choices=bonus_type_choices, max_length=100, default=0, null=False, blank=False)
     bonus = models.IntegerField(null=True, blank=True, verbose_name="Nechtadan so'ng berilishi kerakligi")
@@ -99,30 +117,23 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
     @property
-    def jami_buyurtmalar_holati_buyicha(self):
-        import order
-        being_delivered = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, order__status=3).values_list("amount",
-                                                                                                      flat=True)))
-        delivered = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, order__status=4).values_list("amount",
-                                                                                                      flat=True)))
-        cancelled_product_in_hand = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, order__status=5,
-                                                     order__cancelled_status=1).values_list("amount", flat=True)))
-        cancelled_product_give_an_other_order = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, order__status=5,
-                                                     order__cancelled_status=2).values_list("amount", flat=True)))
-        cancelled_product_take_back = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, status=5, order__status=5,
-                                                     order__cancelled_status=3).values_list("amount", flat=True)))
-        total_call_back = sum(list(
-            order.models.OrderProduct.objects.filter(product_id=self.id, order__status=6).values_list("amount",
-                                                                                                      flat=True)))
-        safe_text = f'Yetkazilmoqda : {being_delivered}, Yetkazib berildi : {delivered}, Bekor qilingan(mahsulot qoulida) : {cancelled_product_in_hand}, Bekor qilingan(mahsulot qaytarib olingan) : {cancelled_product_take_back} ' \
-                    f', Qayta qo\'ng\'iroq : {total_call_back} '
-        return mark_safe(safe_text)
+    def total_delivery_price(self):
+        if self.size_type == '1':
+            return self.seller.special_fee_amount
+        elif self.size_type == '2':
+            return self.seller.special_fee_amount + self.size_based_delivery_extra
+
+    @property
+    def get_sale_discount_type_title(self):
+        if self.bonus_type == '1':
+            return f"{self.bonus} ta olsa {self.bonus_amount} ta sovg'a"
+        elif self.bonus_type == '2':
+            return f"{self.bonus} chisidankeyin harbiri uchun {self.bonus_amount} so'mdan chegirma"
+        return ''
+
+
 
     @property
     def defective_data(self):
@@ -209,6 +220,15 @@ class ProductCollectionItem(models.Model):
 
 
 
+
+class ProductApprovalNote(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='approval_notes')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approval_notes_written')
+    note = models.TextField(verbose_name="Izoh / Sabab")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.user.username if self.user else 'Anonim'} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
 
 

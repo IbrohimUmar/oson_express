@@ -9,7 +9,7 @@ import datetime
 from calendar import monthrange
 from django.db import models
 from order.models import Order, OrderProduct
-from warehouse.models import WarehouseOperationItemDetails
+# from warehouse.models import WarehouseOperationItemDetails
 from config.report.big_balance import WarehouseReportService, SupplierReportService, DriverReportService
 
 

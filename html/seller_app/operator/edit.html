@@ -1,0 +1,88 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Operatorni ma'lumotlarini o'zgartirish</h4>
+            </div>
+            <div>
+                <a href="{% url 'seller_app_operator_list' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Operatorning  ma'lumotlari</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Operator ismi</label>
+                        <input type="text" name="first_name" max="50" maxlength="50" placeholder="Operator ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
+                               class="form-control">
+
+                        <label>Operator familiyasi</label>
+                        <input type="text" name="last_name" maxlength="50" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi"
+                               class="form-control">
+                        <label>Parol</label>
+                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+                               class="form-control">
+
+                        <label>Karta raqami</label>
+                        <input type="text"
+                               class="form-control"
+                               name="payment_card"
+                               {% if r %}value="{{r.payment_card}}" {% endif %}
+                               placeholder="1111222233334444"
+                       inputmode="numeric"
+                       pattern="\d{16}"
+                       maxlength="16"
+                       minlength="16"
+                       required
+                       title="Iltimos, 16 ta raqam kiriting." />
+
+
+
+                    </div>
+                    <div class="col-md-6">
+                        <label>Operator Id</label>
+                        <input type="number" class="form-control" {% if r %}value="{{r.operator_id}}" {% endif %} name="operator_id" required placeholder="Operator Id">
+
+                        <label>Operator telefon raqami</label>
+                        <input type="text" name="username" {% if r %}value="{{r.username}}" {% endif %}
+                               class="form-control" placeholder="Operator telefon raqami">
+
+                        <label class="text-sm">Operator aktivmi </label>
+                        {% if main %}
+                        <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active %} checked{% endif %}{% endif %}>
+                        {% else %}
+                       <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active %} checked{% endif %}{% endif %}>
+                        {% endif %}
+                        <br>
+                        <label>Operatorning daromadi</label>
+                        <input type="text" name="special_fee_amount" required {% if r %}value="{{r.special_fee_amount}}" {% endif %} placeholder="Operator kiritgan buyurtmalari sotilsa beriladigan daromad"
+                               class="form-control">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+{% block footer %}
+{% endblock %}

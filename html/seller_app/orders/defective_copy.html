@@ -1,0 +1,257 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Buyurtmaning nosoz mahsuloti o'rniga yangi mahsulot yuborish uchun nusxa olish</h4>
+            </div>
+            <div>
+                <a href="{{request.META.HTTP_REFERER}}" class="btn btn-primary">Qaytish</a>
+                <button type="submit" id="submit_button" :disabled="CheckReturnedProduct.length === 0"
+                        class="btn btn-primary">Saqlash
+                </button>
+
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-3 mb-lg-0 ">
+                        <span class="text-sm">Buyurtma kelgan sayt</span>
+                        <input type="text" readonly value="{{o.get_site_display}}" class="form-control">
+                        {% if o.site_order_id %}
+                        <input type="hidden" value="{{ o.site }}"
+                               class="form-control">
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-3 col-md-3 mb-lg-0 ">
+                        <span class="text-sm">Masul operator</span>
+                        <input type="text" disabled value="{{ o.operator.first_name }} {{ o.operator.last_name }}"
+                               readonly class="form-control">
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+
+                    </div>
+                </div>
+            </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-6 m-auto">
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                            <div class="text">
+                                <h6 class="mb-1">Mijoz</h6>
+
+                                <p class="mb-1">
+                                    Mijoz haqida ma'lumot
+                                </p>
+                            </div>
+                        </article>
+                        <hr>
+
+                        <label>Mijoz ismi</label>
+                        <input type="text" readonly value="{{o.customer_name}}" placeholder="ismi va familiyasi"
+                               required
+                               class="form-control input-disabled">
+
+                        <label>Mijoz telefon raqami</label>
+                        <input type="text" readonly id="phone_inputmask" value="{{o.customer_phone}}"
+                               class="input-disabled js-phone-input form-control"
+                               placeholder="Telefon raqami" required>
+
+                        <label>Mijoz telefon raqami2</label>
+                        <input type="text" readonly id="phone_inputmask2" value="{{o.customer_phone2}}"
+                               class="input-disabled js-phone-input form-control"
+                               placeholder="Qo'shimcha telefon raqami">
+
+                        <label class="text-sm">Mijozga yetkazish sanasi</label>
+                        <input type="date" required name="delivered_date" class="form-control"
+                               value="{{o.delivered_date|date:" Y-m-d"}}">
+
+
+                        <label class="text-sm">Viloyati</label>
+                        <input type="text" required class="form-control input-disabled"
+                               value="{{o.customer_region.name}}">
+
+                        <label class="text-sm">Tuman</label>
+                        <input type="text" required class="form-control input-disabled"
+                               value="{{o.customer_district.name}}">
+
+                        <hr>
+                        <label>Ko'cha uy, mo'ljal, qo'shimcha ma'lumot</label>
+                        <textarea rows="1" required class="form-control"
+                                  placeholder="Ko'cha uy, mo'ljal, qo'shimcha ma'lumot"
+                                  name="street"> {{o.customer_street}}</textarea>
+
+
+                        <label class="text-sm">Haydovchi daromadi</label>
+                        <input type="text" required class="form-control" name="driver_fee" value="10000">
+                        <hr>
+
+                    </div>
+                    <!-- col products-->
+                    <div class="col-md-6">
+                        <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-place"></i>
+                                    </span>
+                            <div class="text">
+                                <h5 class="mb-1">Almashtirilishi kerak bo'lgan nosoz mahsulot tanlang</h5>
+                                <small>Belgilagan mahsulotingizni o'rniga yangi mahulot yuboriladi va nosoz mahsulotni qaytariladi</small>
+                            </div>
+                        </article>
+                        <hr>
+                        <div>
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Tanlash</th>
+                                    <th>Mahsulot</th>
+                                    <th>Rangi</th>
+                                    <th>Razmeri</th>
+                                    <th>Soni</th>
+                                    <th>Qaytariladigan soni</th>
+                                    <th>Summasi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for p in order_products %}
+                                <tr>
+                                    <td><input type="checkbox" v-model="CheckReturnedProduct" class="from-check"
+                                               value="{{p.id}}" name="defective_products"></td>
+
+                                    <td>
+
+
+                                        {{p.product__name}}</td>
+                                     <td>{% if p.product_variable__color__name  %}
+                                       <span style="border:1px solid white;" class="badge"> {{p.product_variable__color__name}}</span>
+
+                                        {% else %}
+                                        -----
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if p.product_variable__measure_item__name  %}
+                                       <span style="border:1px solid white;" class="badge">{{p.product_variable__measure_item__name}}</span>
+                                        {% else %}
+                                        -----
+                                        {% endif %}</td>
+
+
+
+                                    <td>{{p.total_amount}} ta</td>
+
+
+                                    <td>
+                                        <div v-if="checkReturnProductList({{p.id}})">
+
+                                        <input type="number" required placeholder="soni" value="{{p.total_amount}}" id="price"
+                                               v-if="{{p.total_amount}} > 1"
+                                               style="height: 30px !important; width: 60%; padding: 2px !important;"
+                                               class="form-control" name="defective_products_amount">
+                                        <input type="hidden" name="defective_products_amount" value="1"
+                                               v-if="{{p.total_amount}} == 1">
+<!--                                            agar amount == 1  else amount > 1 and amount < 1-->
+                                        <input type="hidden" name="new_order_product_amount" value="{{p.total_amount}}"
+                                               v-if="{{p.total_amount}} == 1">
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                       0 so'm
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<!--<script type='text/javascript'>-->
+<!--    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});-->
+<!--    $("#phone_inputmask2").inputmask({"mask": "+\\9\\98999999999"});-->
+<!--</script>-->
+
+{% endblock %}
+{% block header %}
+<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+<!--<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>-->
+<script src="{% static '' %}js/vue.js"></script>
+
+<style>
+    li {
+        color: black;
+    }
+
+    .input-disabled{
+        background-color: #69696934 !important;
+    }
+
+    .select2-container--open .select2-dropdown--below {
+        color: black !important;
+    }
+
+    .custom_select .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #3BB77E !important;
+    }
+
+    .select2-results__option .select2-results__option--highlighted .select2-results__options .select2-results {
+        color: #3BB77E !important;
+    }
+
+    .select2-dropdown .select2-search--dropdown .select2-search__field {
+        border: 1px solid black;
+    }
+
+    input[type='number'] {
+    -moz-appearance:textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+</style>
+{% endblock %}
+{% block footer %}
+
+<script type="text/javascript">
+
+    new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+        CheckReturnedProduct : [],
+    },
+    methods: {
+        checkReturnProductList:function(product_id){
+            filtered = this.CheckReturnedProduct.filter(o => Number(o)===Number(product_id)).length
+            if (filtered > 0){
+                return true
+            }
+            return false
+        },
+    },
+    })
+    ;
+
+</script>
+{% endblock %}
+
+
+

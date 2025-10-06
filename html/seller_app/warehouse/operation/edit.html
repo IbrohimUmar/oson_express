@@ -1,0 +1,225 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+    <section class="content-main" id="app">
+        <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+            {% csrf_token %}
+
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h3 class="content-title">
+                            Amaliyotni o'zgartirish</h3>
+                        <div>
+                            <a href="{% url 'seller_app_warehouse_list' %}" class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+                            <button id="submit_button" class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-add_circle mr-2" type="submit"></i> Saqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                        <div class="card mb-4" style="border:1px solid green;">
+        <div class="card-header">
+            <h5 class="d-inline">#{{i.id}}</h5>
+            <h5 class="d-inline f-right">Amaliyot Turi :
+                <span class="badge badge-soft-success">
+                    {{i.get_action_display}}</span></h5>
+            <br>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot boshladi : {{i.creating_user.first_name}} {{i.creating_user.last_name}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyotni o'zgartirdi : {{i.responsible.first_name}} {{i.responsible.last_name}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot boshlangan sana: {{i.created_at}}</span>
+            <span class="mt-1 badge mr-5" style="border:1px solid white;">Amaliyot o'zgartirilgan sana: {{i.updated_at}}</span>
+
+        </div>
+        <div class="card-body">
+
+
+            <div class="row">
+                <div class="col-md-6 m-auto">
+
+                    <h6>{{i.get_from_warehouse_type_name}}dan</h6>
+                    <div class="card-body" style="border:1px solid red; border-radius:10px;">
+
+                        {% if i.from_warehouse %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">Ombor</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.from_warehouse.name}}</h6>
+                        {% elif i.from_warehouse_responsible %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">{{i.from_warehouse_responsible.get_type_display}}</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.from_warehouse_responsible.first_name}} {{i.from_warehouse_responsible.last_name}}</h6>
+                        {% else %}
+                        <h6><b class="text-primary">Turi :</b> -----------</h6>
+                        <h6><b class="text-primary">Nomi :</b> -----------</h6>
+                        {% endif %}
+
+                        <h6><b class="text-primary">Ma'sul :</b>
+                            {% if i.from_warehouse_responsible  %}{{i.from_warehouse_responsible.first_name}} {{i.from_warehouse_responsible.last_name}}{% else %}-------{% endif %}</h6>
+
+                            <h6><b class="text-primary">Holati :</b>
+                                {% if i.from_warehouse_status == '1' %}
+                                    <span class="badge" style="border:1px solid white">{{i.get_from_warehouse_status_display}}</span>
+                                {% elif i.from_warehouse_status == '2' %}
+                                    <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                {% elif i.from_warehouse_status == '3' %}
+                                    <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                {% endif %}
+                            </h6>
+
+                        <h6><b class="text-primary">Holatini o'zgartirdi :</b> {% if i.from_warehouse_status_changed_user  %}{{i.from_warehouse_status_changed_user.first_name}} {{i.from_warehouse_status_changed_user.last_name}}{% else %}-------{% endif %}</h6>
+                        <h6><b class="text-primary">Holatini o'zgartirilgan sana :</b> {% if i.from_warehouse_confirm_date %}{{i.from_warehouse_confirm_date}} {% else %}-------{% endif %}</h6>
+
+                        <h6><b class="text-primary">Izoh :</b> {% if i.from_warehouse_desc %}{{i.from_warehouse_desc}}{% endif %}</h6>
+
+                    </div>
+                </div>
+
+                <div class="col-md-6 m-auto">
+
+                    <h6>{{i.get_to_warehouse_type_name}}ga</h6>
+                    <div class="card-body" style="border:1px solid green; border-radius:10px;">
+
+                        {% if i.to_warehouse %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">Ombor</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.to_warehouse.name}}</h6>
+                        {% elif i.to_warehouse_responsible %}
+                        <h6><b class="text-primary">Turi :</b> <span class="badge" style="border:1px solid white;">{{i.to_warehouse_responsible.get_type_display}}</span></h6>
+                        <h6><b class="text-primary">Nomi :</b> {{i.to_warehouse_responsible.first_name}} {{i.to_warehouse_responsible.last_name}}</h6>
+                        {% else %}
+                        <h6><b class="text-primary">Turi :</b> -----------</h6>
+                        <h6><b class="text-primary">Nomi :</b> -----------</h6>
+                        {% endif %}
+
+
+                        <h6><b class="text-primary">Ma'sul :</b>
+
+
+                            <select name="driver" class="form-select d-inline">
+                                {% for d in drivers %}
+                                <option value="{{d.id}}" {% if i.to_warehouse_responsible_id == d.id %}selected{% endif %}>{{d.first_name}} {{d.last_name}} | {{d.region.name}}</option>
+                                {% endfor %}
+                            </select>
+
+
+<!--                            {% if i.to_warehouse_responsible %}{{i.to_warehouse_responsible.first_name}} {{i.to_warehouse_responsible.last_name}}{% else %}-&#45;&#45;&#45;&#45;&#45;&#45;{% endif %}-->
+
+                        </h6>
+
+                            <h6><b class="text-primary">Holati :</b>
+                                {% if i.to_warehouse_status == '1' %}
+                                    <span class="badge" style="border:1px solid white">{{i.get_to_warehouse_status_display}}</span>
+                                {% elif i.to_warehouse_status == '2' %}
+                                    <span class="badge badge-soft-success">Tasdiqlandi</span>
+                                {% elif i.to_warehouse_status == '3' %}
+                                    <span class="badge badge-soft-danger">Bekor qilindi</span>
+                                {% endif %}
+                            </h6>
+
+                        <h6><b class="text-primary">Holatini o'zgartirdi :</b> {% if i.to_warehouse_status_changed_user %}{{i.to_warehouse_status_changed_user.first_name}} {{i.to_warehouse_status_changed_user.last_name}}{% else %}-------{% endif %}</h6>
+                        <h6><b class="text-primary">Holatini o'zgartirilgan sana :</b> {% if i.to_warehouse_confirm_date %}{{i.to_warehouse_confirm_date}} {% else %}-------{% endif %}</h6>
+
+                        <h6><b class="text-primary">Izoh :</b> {% if i.to_warehouse_desc %}{{i.to_warehouse_desc}}{% endif %}</h6>
+
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+<!--            <h4 class="mt-5 text-center">Tovarlar</h4>-->
+
+            <div class="text-center">
+
+            <a href="{% url 'seller_app_warehouse_operation_product_list' i.id %}" target="_blank" class="btn btn-sm btn-brand">Mahsulotlar ro'yxatini ko'rish</a>
+            <span class="badge" style="border:1px solid white;">Jami mahsulotlar soni : {{i.items_total_amount}} ta</span>
+            <span class="badge" style="border:1px solid white;">Jami mahsulotlar kirim narxi : {{i.items_total_input_price_uzs}} so'm</span>
+
+            </div>
+
+
+
+
+<!--                        <th colspan="4"><h6>Jami</h6></th>-->
+<!--                        <th><h6>{{i.items_total_amount}} ta </h6></th>-->
+<!--                        <th></th>-->
+<!--                        <th colspan="1"><h6>{{i.items_total_input_price_uzs}} so'm </h6></th>-->
+<!--                        <th></th>-->
+<!--                        <th colspan="1"><h6>{{i.items_total_selling_price_uzs}} so'm </h6></th>-->
+
+
+
+
+<!--            <div style="overflow-x:auto !important;">-->
+<!--                <table class="table" >-->
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>#</th>-->
+<!--                        <th>Mahsulot</th>-->
+<!--                        <th>Rangi</th>-->
+<!--                        <th>Razmeri</th>-->
+<!--                        <th>Soni</th>-->
+<!--                        <th>kirim narxlari</th>-->
+<!--                        <th>Jami Kirim narxi</th>-->
+<!--                        <th>Dona sotish narxi</th>-->
+<!--                        <th>Jami sotish narxi</th>-->
+
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+
+
+<!--                    {% for a in i.items %}-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            {{a.id}}-->
+
+<!--                        </td>-->
+<!--                        <td style="white-space: nowrap">{{a.product.name}}</td>-->
+<!--                        <td style="white-space: nowrap">{{a.product_variable.get_color_name}}</td>-->
+<!--                        <td style="white-space: nowrap">{{a.product_variable.get_measure_item_name}}</td>-->
+<!--                        <td style="            white-space: nowrap-->
+<!--">{{a.amount}} ta-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {% for b in a.item_details %}-->
+<!--                            <span class="badge " style="border:1px solid white">{{b.amount}} ta {{b.input_price_uzs}} so'mdan</span>-->
+<!--                            {% endfor %}-->
+<!--                        </td>-->
+<!--                        <td>{{a.total_input_price_uzs}} uzs</td>-->
+
+
+<!--                        <td>{{a.selling_price_uzs}} uzs</td>-->
+<!--                        <td>{{a.total_selling_price_uzs}} uzs</td>-->
+
+<!--                    </tr>-->
+<!--                    {% endfor %}-->
+
+
+<!--                    </tbody>-->
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th colspan="4"><h6>Jami</h6></th>-->
+<!--                        <th><h6>{{i.items_total_amount}} ta </h6></th>-->
+<!--                        <th></th>-->
+<!--                        <th colspan="1"><h6>{{i.items_total_input_price_uzs}} so'm </h6></th>-->
+<!--                        <th></th>-->
+<!--                        <th colspan="1"><h6>{{i.items_total_selling_price_uzs}} so'm </h6></th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+
+<!--                </table>-->
+
+<!--            </div>-->
+        </div>
+    </div>
+
+
+
+
+                </div>
+            </div>
+
+        </form>
+    </section>
+{% endblock %}

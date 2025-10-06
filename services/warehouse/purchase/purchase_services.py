@@ -3,7 +3,7 @@ from django.db.models import Sum, F, Q
 from django.db.models.functions import Coalesce
 
 from order.models import OrderProduct
-from warehouse.models import WarehouseOperationItemDetails, WareHouseStock
+from warehouse.models import WareHouseStock, WarehouseStockAttachmentOrder
 
 
 class PurchaseProductServices:
@@ -75,17 +75,17 @@ class PurchaseProductServices:
         # return main_order_product
         return []
 
-    def get_unit_product_and_collection(self, order_status=1, order_region=None):
+    def get_unit_product_and_collection(self, seller, order_status=1, order_region=None):
         if order_region:
             return list(
-                OrderProduct.objects.filter(product_type__in=[1, 2], order__status=order_status, order__customer_region_id=order_region).values(
+                OrderProduct.objects.filter(order__seller=seller, product_type__in=[1, 2], order__status=order_status, order__customer_region_id=order_region).values(
                     "product__name", "product_variable__color__name", "type",
                     "product_variable__measure_item__name").annotate(
                     total_count=Coalesce(Sum("total_quantity"), 0),
                 ).order_by('-total_count'))
 
         order_product = list(
-            OrderProduct.objects.filter(product_type__in=[1, 2], order__status=order_status).values(
+            OrderProduct.objects.filter(order__seller=seller, product_type__in=[1, 2], order__status=order_status).values(
                 "product__name", "product_variable__color__name", "type",
                 "product_variable__measure_item__name").annotate(
                 total_count=Coalesce(Sum("total_quantity"), 0),
@@ -131,10 +131,10 @@ class PurchaseProductServices:
         return order_product
 
 
-    def get_product_variable_list(self, order_status=1, order_region=None):
+    def get_product_variable_list(self, seller, order_status=1, order_region=None):
         if order_region:
             return list(
-                OrderProduct.objects.filter(product_type__in=[1, 3], order__status=order_status, product_variable__isnull=False, order__customer_region_id=order_region).values(
+                OrderProduct.objects.filter(order__seller=seller, product_type__in=[1, 3], order__status=order_status, product_variable__isnull=False, order__customer_region_id=order_region).values(
                     "product_variable_id", "product__name", "product_variable__color__name",
                     "product_variable__measure_item__name").annotate(
                     unit_count=Coalesce(Sum("total_quantity", filter=Q(product_type="1")), 0),
@@ -142,7 +142,7 @@ class PurchaseProductServices:
                     total_count=F("unit_count") + F("collection_count")
                 ).order_by('-total_count'))        
         order_product = list(
-            OrderProduct.objects.filter(product_type__in=[1, 3], order__status=order_status, product_variable__isnull=False).values(
+            OrderProduct.objects.filter(order__seller=seller, product_type__in=[1, 3], order__status=order_status, product_variable__isnull=False).values(
                 "product_variable_id", "product__name", "product_variable__color__name",
                 "product_variable__measure_item__name").annotate(
                     unit_count=Coalesce(Sum("total_quantity", filter=Q(product_type="1")), 0),
@@ -153,23 +153,19 @@ class PurchaseProductServices:
 
 
 
-    @property
-    def get_product_waited_product_variable_count(self):
-        order_product = self.get_product_variable_list()
 
+    def get_product_waited_product_variable_count(self, warehouse):
+        order_product = self.get_product_variable_list(warehouse.responsible)
         variables_list = [i['product_variable_id'] for i in order_product]
 
-        main_warehouse_results = {w['product_variable_id']: w['attachment_amount'] for w in WareHouseStock.objects.filter(warehouse_id=1, product_variable_id__in=variables_list,
+        main_warehouse_results = {w['product_variable_id']: w['attachment_amount'] for w in WarehouseStockAttachmentOrder.objects.filter(warehouse=warehouse, product_variable_id__in=variables_list,
                                                         attachment_amount__gt=0).values("product_variable_id", "attachment_amount")}
 
         for o in order_product:
-
             warehouse_attachment_amount =  main_warehouse_results.get(o['product_variable_id'], 0)
             total_order_product_amount = o['total_count']
             need_to_buy = total_order_product_amount
             take_china_warehouse_amount = 0
-
-
 
             if need_to_buy > warehouse_attachment_amount:
                 need_to_buy -= warehouse_attachment_amount

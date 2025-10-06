@@ -34,7 +34,7 @@ def operator_app_order_edit(request, id):
         operator_standard_fee = 4000
 
     product_list_service = ProductListService()
-    all_products_json = product_list_service.get_product_json_by_site()
+    all_products_json = product_list_service.get_product_json_by_site(seller=request.user.seller)
     client_history_services = ClientReportService()
     order_crud_services = OrderCrudService()
     selected_product_list = order_crud_services.get_order_product_product_json(order.id)

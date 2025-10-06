@@ -14,8 +14,9 @@ from services.order.history import save_order_status_history
 @permission_required('admin.operator_app_take_order', login_url="/home")
 @check_work_hours
 def operator_app_take_order(request):
-    order = Order.objects.filter(status=9, operator=None).order_by('id')
-    statistic = Order.objects.filter(status__in=[9, 6]).aggregate(
+    seller = request.user.seller
+    order = Order.objects.filter(status=9, seller=seller, operator=None).order_by('id')
+    statistic = Order.objects.filter(status__in=[9, 6], seller=seller).aggregate(
         new_order=models.Count("id", filter=models.Q(status=9, operator=None)),
         taked_new_order=models.Count("id", filter=models.Q(status=9, operator__isnull=False)),
         call_back=models.Count("id", filter=models.Q(status=6))
@@ -28,7 +29,7 @@ def operator_app_take_order(request):
     if request.method == "POST":
         try:
             with transaction.atomic():
-                order = Order.objects.filter(id=request.POST['id'], operator=None).update(operator=request.user, updated_at=datetime.datetime.now())
+                order = Order.objects.filter(id=request.POST['id'], operator=None, seller=seller).update(operator=request.user, updated_at=datetime.datetime.now())
                 if order:
                     order = Order.objects.get(id=request.POST['id'])
                     save_order_status_history(order, order.status, "Operator buyurtmani uziga belgiladi", request.user,

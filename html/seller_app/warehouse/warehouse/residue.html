@@ -1,0 +1,210 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block title %}
+    Asosiy ombordagi mahsulotlar
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h2 class="content-title">{{warehouse.get_type_display}}dagi qoldiq mahsulotlar ro'yxati</h2>
+
+            <div>
+                            <a href="{% url 'seller_app_warehouse_list' %}" class="btn btn-md rounded font-sm hover-up"><i
+                                    class="material-icons md-arrow_left mr-2"></i> Qaytish </a>
+            </div>
+        </div>
+
+
+
+                <div class="card" style="margin-bottom:8px;">
+                    <div class="card-body" style="padding:16px; ">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_home' %}">Boshqaruv paneli</a></li>
+                                    <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_warehouse_list' %}">Ombor</a></li>
+                                    <li class="breadcrumb-item d-inline active">Qoldiq mahsulotlar</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+
+                            <h5 class="card-title">Qidiruv</h5>
+                <div class="row align-items-center">
+                    <div class="col-md-8 col-12 me-auto mb-md-0 mb-3">
+
+                        <form method="get">
+                            <div class="row">
+                                <div class="col-8">
+                                    <input type="text" class="form-control" placeholder="Nomi bo'yicha qidiruv" name="search"
+                                           {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                                </div>
+                                <div class="col-md-4">
+                                                                    {% if request.GET.search %}
+
+                                      <a href="{% url 'seller_app_supplier_warehouse_products_list' %}" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                                                    {% endif %}
+
+
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+                         <a href="?excel=True{% for key, value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}" class="badge badge-soft-success btn-sm">Excel export</a>
+
+                        <h6 class="text-muted badge mt-1 mb-1" style="border:1px solid #adb5bd;">Mahsulotlar soni : {{total_amount}} ta</h6>
+                        <h6 class="text-muted badge mt-1 mb-1" style="border:1px solid #adb5bd;">Mahsulotlar kirim narxida jami summasi : {{total_input_price}} uzs</h6>
+
+
+
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" >
+                    <thead>
+                    <tr>
+                           <th>Surati</th>
+                           <th>Mahsulot</th>
+                            <th>Rangi</th>
+                            <th>Razmeri</th>
+
+                            <th>Ombordagi soni</th>
+
+                        {% if warehouse.id == 1 %}
+                            <th>Qadoqlash uchun belgilandian keyin qoldi</th>
+                        {% endif %}
+
+
+                            <th>Kirish narxilari</th>
+                            <th>Kirish narxilari jami</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                            <img style="width:60px;" src="{{o.product.small_image.url}}" alt="">
+                        </td>
+                        <td>
+                          <h6>
+                            {{ o.product.name }}
+                            </h6>
+                        </td>
+                        <td>
+
+                            {% if o.product_variable.color %}
+                            <span class="badge" style="border:1px solid white;">{{o.product_variable.get_color_name}}</span>
+                            {% else %}
+                            -----
+                            {% endif %}
+                        </td>
+                        <td>
+
+                            {% if o.product_variable.measure_item %}
+                            <span class="badge" style="border:1px solid white;">{{o.product_variable.get_measure_item_name}}</span>
+                            {% else %}
+                            -----
+                            {% endif %}
+                        </td>
+                        <td>
+                          <h6>
+                            {{o.quantity}} ta
+                          </h6>
+                        </td>
+
+
+                        {% if warehouse.id == 1 %}
+                           <td>
+                          <h6>
+                            {{o.attachment_amount}} ta
+                          </h6>
+                        </td>
+                        {% endif %}
+
+
+
+
+                        <td>
+                          <h6>
+                        {{o.input_price}} uzs
+                          </h6>
+                        </td>
+                        <td>
+                          <h6>
+                          {{ o.total_input_price }} uzs
+                          </h6>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+    </div>
+    </section>
+{% endblock %}
+{% block header %}
+    <style>
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+
+{% endblock %}

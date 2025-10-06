@@ -1,0 +1,170 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h3 class="content-title">Buyurtmalar amaliyotlari</h3>
+            <div>
+                <a href="{% url 'seller_app_warehouse_list' %}" class="btn btn-sm btn-brand">Qaytish</a>
+            </div>
+        </div>
+
+
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_warehouse_list' %}">Ombor</a></li>
+                            <li class="breadcrumb-item d-inline active">Buyurtmalar amaliyotlari</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card mb-4">
+            <header class="card-header">
+<!--                <h5 class="card-title">Qidiruv</h5>-->
+                <div class="align-items-center">
+                        <form method="get">
+                            <div class="row">
+                                <div class="col-3">
+                                    <h6>Qidiruv</h6>
+                                    <input type="number" class="form-control" placeholder="id, barcode bo'yicha qidiruv" name="filter" {% if request.GET.filter %}value="{{ request.GET.filter }}" {% endif %}>
+                                </div>
+                                <div class="col-md-2">
+                                    <h6>Holati</h6>
+                                    <select class="form-control" name="type">
+                                         <option value="None">---------</option>
+                                         <option value="out" {% if request.GET.type == 'out' %}selected{% endif %}>Ombordan chiqim</option>
+                                         <option value="return" {% if request.GET.type == 'return' %}selected{% endif %}>Omborga chiqim</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <h6>Qo'llash</h6>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                                    {% if request.GET.region or request.GET.status or request.GET.site or request.GET.filter %}
+                                        <a href="{% url 'seller_app_warehouse_order_warehouse_action_history' warehouse.id %}" class="btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </form>
+                </div>
+            </header>
+
+            <div class="card-body">
+                                <h5>Soni : {{ count }} ta</h5>
+
+                    <div style="overflow-x:auto;">
+                        <table class="table" id="dataTable">
+                            <thead>
+                            <tr>
+                                <th>Turi</th>
+                                <th>Ma'sul</th>
+                                <th>id</th>
+                                <th>Barcodi</th>
+                                <th>Viloyati</th>
+                                <th>Mahsulot</th>
+                                <th>Sana</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for o in page_obj %}
+                                <tr>
+                                    <td>
+                                        {% if o.type == 'out' %}
+                                            <span class="badge badge-soft-success">
+                                                {{o.get_type_display}}
+                                            </span>
+                                        {% elif o.type == 'return' %}
+                                        <span class="badge badge-soft-danger">
+                                            {{o.get_type_display}}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{o.responsible.full_name}}
+                                    </td>
+
+                                    <td>
+                                        #{{ o.order.id }}
+
+                                    </td>
+
+                                    <td>
+
+                                     {% if o.order.barcode %}{{o.order.barcode}}{% endif %}
+
+                                    </td>
+
+
+                                    <td>
+                                        {% if o.order.customer_region %}
+                                        {{ o.order.customer_region.name }}
+                                        {% else %}
+                                        ---------------
+                                        {% endif %}
+                                    </td>
+                                    <td>
+
+                                         {% for p in o.order.order_products %}
+                                    <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.total_quantity}}ta, {{p.total_price|format_money}} so'm</span> <br>
+                                {% endfor %}
+                                    <p>Jami : {{o.order.total_product_price|format_money}} uzs, {{o.order.total_product_quantity}} ta</p>
+
+                                    </td>
+                                    <td>
+                                        {{o.created_at}}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                           <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block title %}
+Agentlar ro'yxati
+{% endblock %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h3 class="content-title">Omborlar ro'yxati</h3>
+
+            <div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline active">Ombor</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            {% for w in warehouses %}
+                {% if w.perms %}
+
+                    <div class="col-md-6 mt-2">
+                        <div class="card mb-4">
+                            <div class="card-body row">
+        <!--                        <h3 class="mt-2 mb-2 text-center">Elituvchi ombori</h3>-->
+
+                                {% if w.perms.has_view %}
+
+                                        <div class="box text-center " style="border:1px solid #05a87945; border-radius:10px;">
+                                                <div class="text">
+                                                   <img src="{% static '' %}svg/warehouse1.svg" class="mt-2" height="170px" alt="">
+                <!--                                    <i class="material-icons md-check"></i>-->
+                                                    <h3 class="mt-2  text-center">{{w.get_type_display}}</h3>
+        <!--                                            <h4>-->
+
+
+        <!--                                            Soz mahsulotlar ombori</h4>-->
+
+                                                    <h6 class="mb-2"> <i class="material-icons md-perm_identity " style="vertical-align:bottom"></i> Ma'sul : {{w.responsible.full_name}}</h6>
+
+
+                                                    <div class="row">
+                                                        {% if w.perms.input_product or w.perms.transfer_product %}
+                                                        <div class="col-md-8 col-sm-12 col-lg-6 m-auto mt-1" >
+                                                            <div class="m-0 " style="border:0.5px solid #1a8d74; border-radius:10px; padding:10px;">
+<!--                                                            <h6><i class="material-icons md-add" style="vertical-align:bottom"></i> Kirim</h6>-->
+                                                                {% if w.perms.input_product %}
+                                                                    <a class=" d-inline" title="Kirim" href="{% url 'seller_app_warehouse_operation_input_product' w.id %}">
+                                                                        <img src="{% static '' %}svg/product_in.svg"  class="mt-2" height="70px" alt="Kirim">
+                                                                    </a>
+                                                                {% endif %}
+                                                                {% if w.perms.transit_product %}
+                                                                    <a class=" d-inline" title="Kirim" href="{% url 'seller_app_warehouse_operation_transit_product' w.id %}">
+                                                                        <img src="{% static '' %}svg/product_transfer.svg"  class="mt-2" height="70px" alt="Kirim">
+                                                                    </a>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <div class="mt-2">
+                                                        {% if w.perms.residue %}
+                                                        <a class="btn btn-outline-success btn-sm" href="{% url 'seller_app_warehouse_residue' w.id %}" style="border:1px solid #1a8d74;">
+                                                            <i class="icon material-icons md-widgets"></i>
+                                                           <h6>Qoldiq mahsulotlar</h6>
+                                                        </a>
+                                                        {% endif %}
+
+                                                        {% if w.perms.operation_history %}
+                                                        <a class="btn btn-outline-success btn-sm" href="{% url 'seller_app_warehouse_operation_history' w.id %}" style="border:1px solid #1a8d74;">
+                                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                                           <h6> Kirim, O'tkazma amaliyotlari</h6>
+                                                        </a>
+                                                        {% endif %}
+
+                                                        {% if w.perms.order_warehouse_action_history and w.type == '1' %}
+                                                        <a class="btn btn-outline-success btn-sm" href="{% url 'seller_app_warehouse_order_warehouse_action_history' w.id %}" style="border:1px solid #1a8d74;">
+                                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                                           <h6> Buyurtmalar amaliyotlari</h6>
+                                                        </a>
+                                                        {% endif %}
+
+
+                                                    </div>
+                                                </div>
+                                        </div>
+
+                                </div>
+                                {% endif %}
+                            </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+

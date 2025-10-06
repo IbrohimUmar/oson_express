@@ -1,12 +1,15 @@
 from django.urls import path, include
-from .profile import seller_app_profile
-from .menu import seller_app_menu
+from .home import seller_app_home
 
 urlpatterns = [
-    path('profile/', seller_app_profile, name="seller_app_profile"),
+    path('home/', seller_app_home, name="seller_app_home"),
+    path('marketer/', include('config.seller_app.marketer.urls')),
+    path('postage/', include('config.seller_app.postage.urls')),
+    path('operator/', include('config.seller_app.operator.urls')),
+    path('supplier/', include('config.seller_app.supplier.urls')),
+    path('warehouse/', include('config.seller_app.warehouse.urls')),
     path('product/', include('config.seller_app.product.urls')),
-    path('stream/', include('config.seller_app.stream.urls')),
-    path('statistic/', include('config.seller_app.statistic.urls')),
-    path('payment/', include('config.seller_app.payment.urls')),
-    path('menu/', seller_app_menu, name="seller_app_menu"),
+    path('cash/', include('config.seller_app.cash.urls')),
+    path('orders/', include('config.seller_app.orders.urls')),
+
 ]

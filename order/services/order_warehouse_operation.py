@@ -1,18 +1,17 @@
-from config.warehouse.services import warehouse_operation_manager
-from config.warehouse.services.warehouse_operation_item_manager import WarehouseOperationItemManager
-from config.warehouse.services.warehouse_operation_item_details_manager import WarehouseOperationItemDetailsManager
+from config.seller_app.warehouse.services import warehouse_operation_manager
+from config.seller_app.warehouse.services.warehouse_operation_item_manager import WarehouseOperationItemManager
+from config.seller_app.warehouse.services.warehouse_operation_item_details_manager import WarehouseOperationItemDetailsManager
 from order.models import Order
 from services.order.history import save_order_status_history
 
-from warehouse.models import WarehouseOperation, WareHouse, WarehouseOperationItem, WarehouseOperationItemDetails, WarehouseOperationAndOrderRelations
-from config.warehouse.services.warehouse_stock_manager import WarehouseStockManager
+from warehouse.models import WareHouse, WarehouseOperationAndOrderRelations
+from config.seller_app.warehouse.services.warehouse_stock_manager import WarehouseStockManager
 from warehouse.models import WareHouseStock
 from order.models import OrderProduct
 import datetime
-from django.db.models import F, ExpressionWrapper, Sum
-from django.db import models
+from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from config.warehouse.services.warehouse_operation_manager import WarehouseOperationManager
+from config.seller_app.warehouse.services.warehouse_operation_manager import WarehouseOperationManager
 
 
 class InsufficientStockError(Exception):
@@ -49,11 +48,11 @@ class OrderWarehouseOperationsService:
                                                       updated_at=datetime.datetime.today())
 
             
-        for o in OrderProduct.objects.filter(product_type__in=[1, 3], order_id__in=orders_id):
-            input_price_total = WarehouseOperationItemDetails.objects.filter(order_product=o).aggregate(
-                    t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))['t']
-            o.total_input_price = input_price_total
-            o.save()
+        # for o in OrderProduct.objects.filter(product_type__in=[1, 3], order_id__in=orders_id):
+        #     input_price_total = WarehouseOperationItemDetails.objects.filter(order_product=o).aggregate(
+        #             t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))['t']
+        #     o.total_input_price = input_price_total
+        #     o.save()
 
 
         for o in Order.objects.filter(id__in=orders_id):

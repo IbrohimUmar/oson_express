@@ -1,0 +1,352 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h4 class="content-title">Kelgan buyurtmalarga ombordan mahsulot biriktirish</h4>
+        <div>
+
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <h4 class="text-center">Buyurtma bo'yicha</h4>
+                 <div class="col-md-3 m-auto mt-10 mb-2">
+                        <article class="box bg-light" style="border:1px solid red;">
+                            <h5>
+                                Qabul qilingan : {{order_statistic.product_pending}} ta</h5>
+                            <small class="text-muted d-block ">Jami hali mahsulot belgilnamagan buyurtmalar soni </small>
+
+
+
+
+
+                            <form method="get">
+                            <div>
+                                <select name="region_attachment" id="" class="form-control">
+                                    <option value="0">Hamma viloyat bo'yicha</option>
+                                    {% for r in regions %}
+                                    <option value="{{r.id}}" {% if request.GET.region_attachment|add:'0' == r.id %}selected{% endif %}>{{r.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                                <button type="submit" class="btn btn-brand  btn-sm d-block" onclick="return confirm('Siz rostdanham avto biriktirmoqchimisiz\n Biriktirishdan oldin olinishi kerak mahsulotlarni kirim qilganligingizga amin bo\'ling');"><i class="material-icons md-check"></i> Mahsulot biriktirish</button>
+                            </form>
+<!--                      <a href="?create_new_attachment=1" onclick="return confirm('Siz rostdanham avto biriktirmoqchimisiz\n Biriktirishdan oldin olinishi kerak mahsulotlarni kirim qilganligingizga amin bo\'ling');" class="btn btn-sm btn-brand">-->
+<!--                        <i class="material-icons md-add"></i> Ombordan avto mahsulot belgilash-->
+<!--                    </a>-->
+
+
+
+
+
+
+
+                        </article>
+
+
+                    </div>
+                         <div class="col-md-3 m-auto mt-10 mb-2">
+                        <article class="box bg-light" style="border:1px solid #ff7f00;">
+                            <h5>
+                                Mahsuloti belgilangan: {{order_statistic.product_checked}} ta</h5>
+                            <small class="text-muted d-block ">Mahsuloti ombordan belgilangan buyurtmalar soni </small>
+                      <a href="?clear_check_product=1" onclick="return confirm('Siz rostdanham avto belgilangan mahsulotlarni mahsulot kutilmoqdaga qaytarmoqchimisiz');"
+                         class="btn btn-sm btn-danger">
+                        <i class="material-icons md-minus"></i> Qabul qilindiga o'tkazish
+                    </a>
+
+
+                            <a href="{% url 'seller_app_warehouse_product_attachment_print' %}" class="btn btn-sm btn-brand"><i class="material-icons md-print"></i> Chop etish</a>
+
+                        </article>
+                    </div>
+
+                         <div class="col-md-3 m-auto mt-10 mb-2">
+                        <article class="box bg-light" style="border:1px solid #75997f;">
+                            <h5>
+                                Qadoqlanmoqdadagi : {{order_statistic.product_being_packed}} ta</h5>
+                            <small class="text-muted d-block ">Jami barcodi chop etilib qadoqlaniyotgan buyurtmalar soni </small>
+                                <a href="?clear_being_packed=1" onclick="return confirm('Siz rostdanham avto belgilangan mahsulotlarni mahsulot kutilmoqdaga qaytarmoqchimisiz');"
+                                 class="btn btn-sm btn-danger">
+                                <i class="material-icons md-minus"></i> Qabul qilindiga o'tkazish
+                            </a>
+                            <a href="{% url 'seller_app_warehouse_product_attachment_packaging_order_print' %}" class="btn btn-sm btn-brand"><i class="material-icons md-print"></i> Chop etish</a>
+
+
+                    
+                        </article>
+
+                    </div>
+                         <div class="col-md-3  mt-10 mb-2">
+                             <article class="box bg-light" style="border:1px solid green;">
+                                 <h5>
+                                     Yuborishga tayyor : {{order_statistic.packed}} ta</h5>
+                                 <small class="text-muted d-block ">Jami Yuborishga tayyor buyurtmalar soni </small>
+                                 <a href="?clear_ready_to_send=1"
+                                    onclick="return confirm('Siz rostdanham qadoqlanmoqdaga qaytarmoqchimisiz');"
+                                    class="btn btn-sm btn-danger">
+                                     <i class="material-icons md-minus"></i> Qadoqlanmoqdaga o'tkazish
+                                 </a>
+                                 <a href="{% url 'seller_app_warehouse_product_attachment_scanned_for_packaging' %}"
+                                    class="btn btn-sm btn-brand">
+                                     <i class="material-icons md-barcode"></i>
+                                     Yuborishga tayyorga olish
+                                 </a>
+                             </article>
+                    </div>
+            </div>
+            <div>
+            <hr>
+             <div class="card mb-4">
+                 <div class="card-header text-center">
+                                                  <div>
+                    <form method="get">
+                        <div class="row">
+
+                            <div class="col-md-3">
+
+                                <h6>Viloyat bo'yicha filter</h6>
+
+                                <select name="region" class="form-select">
+                                    <option value="0">----------</option>
+
+                                    {% for r in regions %}
+                                    <option value="{{r.id}}" {% if request.GET.region|add:'0' == r.id %}selected{% endif %}>{{r.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <h6>Buyurtma holati bo'yicha</h6>
+
+                                <select name="status" class="form-select">
+                                    <option value="1" {% if request.GET.status is None or request.GET.status|add:'0' == 1 %}selected{% endif %}>Mahsulot kutilmoqda</option>
+                                    <option value="7" {% if request.GET.status|add:'0' == 7 %}selected{% endif %}>Mahsulot belgilandi</option>
+                                    <option value="8" {% if request.GET.status|add:'0' == 8 %}selected{% endif %}>Qodqolanmoqda</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <h6>Mahsulotlar turi bo'yicha</h6>
+                                <select name="type" class="form-select">
+                                    <option value="1" {% if request.GET.type|add:'0' == 1 or request.GET.type is None  %}selected{% endif %}>Donali mahsulot</option>
+                                    <option value="2" {% if request.GET.type|add:'0' == 2 %}selected{% endif %}>To'plam bo'yicha</option>
+                                </select>
+                            </div>
+
+                                <div class="col-md-2">
+                                    <h6>Qo'llash</h6>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                                    {% if request.GET.region or request.GET.status or request.GET.site or request.GET.filter %}
+                                        <a href="{% url 'seller_app_warehouse_product_attachment_history' %}" class="btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+                                    {% endif %}
+
+                                </div>
+
+
+                        </div>
+                    </form>
+                </div>
+
+                 </div>
+
+            <div class="card-body">
+                {% if request.GET.status == None or request.GET.status == '1' %}
+                <h4 class="text-center mt-2 mb-2">Mahsulot kutilmoqdalar</h4>
+                {% elif request.GET.status == '7' %}
+                <h4 class="text-center mt-2 mb-2">Mahsulot  belgilanganlar</h4>
+                {% elif request.GET.status == '8' %}
+                <h4 class="text-center mt-2 mb-2">Qadoqlanmoqdalar</h4>
+                {% endif %}
+
+           {% if request.GET.type == '1' or request.GET.type is None %}
+
+ <div  class="table-responsive-sm">
+                    <table class="table"  id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>Mahsulot</th>
+                            <th>Rangi</th>
+                            <th>Razmeri</th>
+                            <th>Donaliga tushdi soni</th>
+                            <th>To'plam ichida tushdi soni</th>
+                            <th>Jami belgilangan soni</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in status_by_product_list %}
+                        <tr>
+                            <td><h6>{{i.product__name}}</h6></td>
+                            <td>
+                                {% if i.product_variable__color__name %}
+                                {{i.product_variable__color__name}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if i.product_variable__measure_item__name %}
+                                {{i.product_variable__measure_item__name}}
+                                {% endif %}
+                            </td>
+                            <td>{{i.unit_count}} ta</td>
+                            <td>{{i.collection_count}} ta</td>
+                            <td>{{i.total_count}} ta</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% elif request.GET.type == '2' %}
+
+
+                   <div  class="table-responsive">
+                    <table class="table"  id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>Mahsulot</th>
+                            <th>Turi</th>
+                            <th>Rangi</th>
+                            <th>Razmeri</th>
+<!--                            <th>To'plam mahsulotlari</th>-->
+                            <th>Jami belgilangan soni</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+<!--                        {% for i in status_by_collection_product_list %}-->
+<!--                        <tr>-->
+<!--                            <td><h6>{{i.queryset.product__name}}</h6></td>-->
+<!--                            <td><h6 class="badge" style="border:1px solid;">To'plam</h6></td>-->
+<!--                            <td>-->
+<!--                                - -->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                - -->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                [-->
+<!--                                {% for item in i.variables %}-->
+<!--                                <span class="badge" style="border:1px solid;">{{item.product__name}} {% if item.product_variable__color__name %}, {{item.product_variable__color__name}}{% endif %} {% if item.product_variable__measure_item__name %}, {{item.product_variable__measure_item__name}}{% endif %}</span>-->
+<!--                                {% endfor %}-->
+<!--                                ]-->
+<!--                                    </td>-->
+<!--                            <td>{{i.total_amount}} ta</td>-->
+<!--                        </tr>-->
+<!--                        {% endfor %}-->
+                        {% for i in status_by_product_list %}
+                        <tr>
+                            <td><h6>{{i.product__name}}</h6></td>
+                            <td>
+                                {% if i.type == '1' %}
+                                <h6 class="badge" style="border:1px solid;">Donali</h6>
+                                {% else %}
+                                <h6 class="badge" style="border:1px solid;">To'plam</h6>
+                                {% endif %}
+                                </td>
+                            <td>
+                                {% if i.product_variable__color__name %}
+                                {{i.product_variable__color__name}}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if i.product_variable__measure_item__name %}
+                                {{i.product_variable__measure_item__name}}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>{{i.total_count}} ta</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+                {% endif %}
+
+
+            </div>
+            <!-- card-body end// -->
+        </div>
+            </div>
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block header %}
+        <link href="{% static '' %}js/datatables/buttons.dataTables.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .dtsp-name h6 {
+            color: black !important;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        td {
+            white-space: nowrap
+        }
+    </style>
+{% endblock %}
+{% block footer %}
+            <script src="{% static '' %}js/datatables/jquery.dataTables.min.js"></script>
+
+    <script src="{% static '' %}js/datatables/excel/dataTables.buttons.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/jszip.min.js"></script>
+    <script src="{% static '' %}js/datatables/excel/buttons.html5.min.js"></script>
+    <script>
+        var table = $('#dataTable').DataTable({
+
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            bPaginate: false,
+            info: false,
+            searching: true,
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+            }
+        });
+    </script>
+
+{% endblock %}

@@ -108,8 +108,8 @@ backdrop-filter: blur(10px);
 
                         {% if request.user.type != "3" %}
                     <li class="nav-item">
-                        <a  class="badge btn btn-brand" style="padding:6px;" onclick="axios.get('/change_color')" type="submit"
-                           id="change-color" href="{% url 'home' %}">
+                        <a  class="badge btn btn-brand" style="padding:6px;" type="submit"
+                           id="change-color" href="{% url 'seller_app_home' %}">
                             Qaytish
                         </a>
                     </li>

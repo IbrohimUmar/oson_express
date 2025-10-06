@@ -7,24 +7,19 @@ from store.models import Product, ProductVariable
 # Create your models here.
 from config.format_money import format_money
 
+from config.format_money import format_money
+from order.models import Order
+
+
 
 class WareHouse(models.Model):
     choice_type = (
-        ("1", "Asosiy soz ombor"),
-        ("2", "Asosiy nosoz ombor"),
-        ("3", "Asosiy qoldiq to'g'irlash ombori"),
-
-        ("4", "Haydovchi bo'shdagilar ombor"),
-        ("5", "Haydovchi yetkaziliyotganlar ombori"),
-        ("6", "Haydovchi nosoz ombori"),
-        ("7", "Haydovchi tranzit"),
+        ("1", "Asosiy ombor"),
+        ("2", "Nosoz ombor"),
+        ("3", "Qoldiq to'g'irlash ombori"),
     )
     type = models.CharField(choices=choice_type, max_length=50, default=1, null=True, blank=True)
-    name = models.CharField(max_length=30, null=False, blank=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="ware_house_owner")
-    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name="ware_house_responsible")
-    desc = models.TextField(null=True, blank=True)
+    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="ware_house_responsible")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -32,75 +27,44 @@ class WareHouse(models.Model):
         return self.get_type_display()
 
 
-class WareHousePerson(models.Model):
-    person = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="ware_house_person")
-    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE, null=False, blank=False)
+    def get_user_permission(self, user):
+        permission = WarehousePermission.objects.filter(user=user, warehouse_id=self.id).first()
+        return permission
+
+    def has_permission(self, user, perm_field):
+        permission = WarehousePermission.objects.filter(user=user, warehouse=self).first()
+        return getattr(permission, perm_field, False) if permission else False
 
 
-from config.format_money import format_money
+class WarehousePermission(models.Model):
+    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    has_view = models.BooleanField(default=True, verbose_name="has_view")
+    input_product = models.BooleanField(default=False, verbose_name="input_product")
+    transit_product = models.BooleanField(default=False, verbose_name="transfer_product")
+    operation_history = models.BooleanField(default=False, verbose_name="operation_history")
+    order_warehouse_action_history = models.BooleanField(default=False, verbose_name="history_orders")
+    operation_history_details = models.BooleanField(default=False, verbose_name="operation_history_details")
+    residue = models.BooleanField(default=False, verbose_name="residue")
 
 
-class WareHouseStock(models.Model):
-    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE, null=False, blank=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True,
-                                verbose_name="Asosiy mahsulot")
-    product_variable = models.ForeignKey(ProductVariable, on_delete=models.SET_NULL, null=True, blank=True,
-                                         verbose_name="Mahsulot hususiyatlari")
+    class Meta:
+        unique_together = ('warehouse', 'user')  # Her kullanıcı için aynı depoya birden fazla yetki eklenemez.
 
-    input_price = models.IntegerField(null=True, blank=True, verbose_name="kirim narxi")
-    selling_price = models.IntegerField(null=True, blank=True, verbose_name="sotish narxi")
-
-    amount = models.IntegerField(null=True, blank=True, verbose_name="Mahsulot soni")
-    attachment_amount = models.IntegerField(null=True, blank=True, verbose_name="Mahsulot soni")
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    @property
-    def get_warehouse_operation_item_details_queryset(self):
-        return WarehouseOperationItemDetails.objects.filter(
-            warehouse_stock_id=self.id,
-            leave_amount__gt=0,
-            warehouse_operation__to_warehouse_status="2"
-        )
-
-    @property
-    def total_input_price(self):
-        result = self.get_warehouse_operation_item_details_queryset.aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("leave_amount"), output_field=models.IntegerField())),
-                       0)
-        )['t']
-        return result
-
-    @property
-    def total_input_price_uzs(self):
-        return format_money(self.total_input_price)
-
-    @property
-    def get_input_price_list(self):
-        return self.get_warehouse_operation_item_details_queryset.values("leave_amount", "input_price")
+    def __str__(self):
+        return f"{self.user} - {self.warehouse}"
 
 
-# sokga qo'shilsa ayrilsa hammasidan qahca qo'shilib ayrilganini saqledi tarih saqlash uchun
-class WareHouseStockHistory(models.Model):
-    warehouse_stock = models.ForeignKey(WareHouseStock, on_delete=models.CASCADE, null=False, blank=False)
-    amount = models.IntegerField(null=True, blank=True, verbose_name="Mahsulot soni")
-    obj_id = models.IntegerField(null=True, blank=True, verbose_name="obyekt idsi")
-    model_name = models.CharField(max_length=200, null=True, blank=True, verbose_name="model name")
-    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    expired_date = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class WarehouseOperation(models.Model):
     action_type = (
         ("1", "Ombordan omborga tranzit"),
         ("2", "Omborga ta'minotchidan kirim"),
-        ("3", "Ombordan haydovchiga chiqim"),
-        ("4", "Omborga haydovchidan mahsulot qaytarish"),
-        ("5", "Haydovchi atkaziga baykod berish"),
 
+        ("3", "Buyurtma uchun chiqim"),
+        ("4", "Buyurtmadan omborga kirim"),
     )
     choice_status = (
         ("1", "Tasdiqlanmagan"),
@@ -108,35 +72,22 @@ class WarehouseOperation(models.Model):
         ("3", "Bekor qilindi"),
     )
     action = models.CharField(choices=action_type, max_length=50, default=1, null=True, blank=True)
-
-    from_warehouse = models.ForeignKey(WareHouse, on_delete=models.SET_NULL, null=True, blank=True,
-                                       related_name="from_warehouse_operation")
-    from_warehouse_responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                                   related_name="from_warehouse_operation_responsible",
-                                                   verbose_name="ombor holatini o'zgartigan masul")
-    from_warehouse_desc = models.CharField(max_length=500, null=True, blank=True)
-    from_warehouse_status = models.CharField(choices=choice_status, max_length=50, default=1, null=True, blank=True)
-    from_warehouse_status_changed_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                                           related_name="from_warehouse_status_changed_user",
+    status = models.CharField(choices=choice_status, max_length=50, default=1, null=True, blank=True)
+    status_changed_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                                           related_name="warehouse_operation_status_changed_user",
                                                            verbose_name="ombor holatini o'zgartigan masul")
-    from_warehouse_confirm_date = models.DateTimeField(null=True, blank=True)
-
+    status_changed_at = models.DateTimeField(null=True, blank=True)
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                                   related_name="warehouse_operation_seller",
+                                                   verbose_name="Seller")
+    supplier = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                                   related_name="warehouse_operation_supplier",
+                                                   verbose_name="Ta'minotchi")
+    from_warehouse = models.ForeignKey(WareHouse, on_delete=models.SET_NULL, null=True, blank=True,
+                                       related_name="from_warehouse")
     to_warehouse = models.ForeignKey(WareHouse, on_delete=models.SET_NULL, null=True, blank=True,
-                                     related_name="to_warehouse_operation")
-    to_warehouse_desc = models.CharField(max_length=500, null=True, blank=True)
-    to_warehouse_status = models.CharField(choices=choice_status, max_length=50, default=1, null=True, blank=True)
-    to_warehouse_status_changed_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                                         related_name="to_warehouse_status_changed_user",
-                                                         verbose_name="ombor holatini o'zgartigan masul")
-    to_warehouse_responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                                 related_name="to_warehouse_operation_responsible",
-                                                 verbose_name="ombor holatini o'zgartigan masul")
-    to_warehouse_confirm_date = models.DateTimeField(null=True, blank=True)
-
-    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name="warehouse_operation_reponsible")
-    creating_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
-                                      related_name="warehouse_operation_creating_user")
+                                     related_name="to_warehouse")
+    desc = models.TextField(null=True, blank=True,  verbose_name="Izoh")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -145,8 +96,8 @@ class WarehouseOperation(models.Model):
     def get_from_warehouse_type_name(self):
         if self.from_warehouse:
             return "Ombor"
-        elif self.from_warehouse_responsible:
-            return str(self.from_warehouse_responsible.get_type_display())
+        elif self.supplier:
+            return str(self.supplier.get_type_display())
         else:
             return "Nomalum"
 
@@ -159,18 +110,19 @@ class WarehouseOperation(models.Model):
     def get_to_warehouse_type_name(self):
         if self.to_warehouse:
             return "Ombor"
-        elif self.to_warehouse_responsible:
-            return str(self.to_warehouse_responsible.get_type_display())
+        elif self.seller:
+            return str(self.seller.get_type_display())
         else:
             return "Nomalum"
 
     @property
     def items(self):
-        return WarehouseOperationItem.objects.filter(warehouse_operation_id=self.id)
+        return WareHouseStock.objects.filter(warehouse_operation_id=self.id)
 
     @property
     def item_details(self):
-        return WarehouseOperationItemDetails.objects.filter(warehouse_operation_id=self.id)
+        pass
+        # return WarehouseOperationItemDetails.objects.filter(warehouse_operation_id=self.id)
 
     @property
     def items_count(self):
@@ -178,13 +130,12 @@ class WarehouseOperation(models.Model):
 
     @property
     def items_total_amount(self):
-        return self.items.aggregate(t=Coalesce(Sum("amount"), 0))['t']
+        return self.items.aggregate(t=Coalesce(Sum("quantity"), 0))['t']
 
     @property
     def items_total_input_price(self):
-        return self.item_details.aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))[
-            't']
+        return self.items.aggregate(
+            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("quantity"), output_field=models.IntegerField())), 0))['t']
 
     @property
     def items_total_input_price_uzs(self):
@@ -250,115 +201,81 @@ def get_or_zero(value):
     return 0
 
 
-class WarehouseOperationItem(models.Model):
-    warehouse_operation = models.ForeignKey(WarehouseOperation, on_delete=models.CASCADE, null=False, blank=False,
-                                            related_name="WarehouseOperationItem")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Mahsulot nomi")
-    product_variable = models.ForeignKey(ProductVariable, on_delete=models.SET_NULL, null=True, blank=True,
-                                         verbose_name="Mahsulot hususiyatlari")
-    warehouse_stock = models.ForeignKey(WareHouseStock, on_delete=models.SET_NULL, null=True, blank=True,
-                                        verbose_name="Sotuvchi ombori")
-    input_price = models.IntegerField(null=False, blank=False, default=0, verbose_name="kirim narxi")
-    selling_price = models.IntegerField(null=False, blank=False, default=0, verbose_name="sotish narxi")
-    amount = models.IntegerField(null=False, blank=False, default=0, verbose_name="Mahsulot soni")
+class OrderWarehouseAction(models.Model):
+    TYPE_CHOICES = [
+        ("out", "Ombordan chiqim"),
+        ("return", "Omborga Kirim"),
+    ]
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE)
+    responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+
+class WareHouseStock(models.Model):
+    choice_action_type = (
+        ("1", "Omborga taminotchidan kirim qilindi"),
+        ("2", "Ombordan omborga o'tkazma qilindi"),
+        ("3", "Ombordan buyurtmaga berildi"),
+        ("4", "Omborga buyurtmadan qaytarib olindi"),
+        ("5", "Buyurtmaga belgilanganidan ortib qoldi"),
+        ("6", "Ombordan omborga o'tkazma qilishda ortib qoldi"),
+        ("7", "Ombordan omborga o'tkazma bekor qilindi va omborga qayta qo'shildi"),
+        ("8", "Filealdan qaytarib olingan mahsulot omborga qo'shildi"),
+    )
+    choice_status = (
+        ("0", "not_stock"),
+        ("1", "in_stock"),
+        ("2", "order")
+    )
+    status = models.CharField(choices=choice_status, max_length=50, default=1 ,null=True, blank=True)
+    action_type = models.CharField(max_length=3, choices=choice_action_type, default=1, null=True, blank=True)
+
+    warehouse = models.ForeignKey(WareHouse, on_delete=models.SET_NULL, null=True, blank=True)
+    warehouse_operation = models.ForeignKey(WarehouseOperation, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False, verbose_name="Asosiy mahsulot")
+    product_variable = models.ForeignKey(ProductVariable, on_delete=models.CASCADE, null=False, blank=False, verbose_name="Asosiy mahsulot")
+    quantity = models.IntegerField(null=True, blank=True,  verbose_name="Mahsulot soni")
+    input_price = models.IntegerField(default=0, null=False, blank=False,  verbose_name="kirim narxi")
+
+    lot_number = models.IntegerField(null=True, blank=True,  verbose_name="Lot number")
+
+    generic_model_name = models.CharField(max_length=100, null=True, blank=True,  verbose_name="model nomi")
+    generic_model_id = models.PositiveIntegerField(null=True, blank=True,  verbose_name="model id si")
+
+    source_stock = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def item_details(self):
-        return WarehouseOperationItemDetails.objects.filter(warehouse_operation_item_id=self.id)
-
-    @property
-    def input_price_uzs(self):
-        return format_money(self.input_price)
 
     @property
     def total_input_price(self):
-        return self.item_details.aggregate(
-            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("amount"), output_field=models.IntegerField())), 0))[
-            't']
-
-    @property
-    def total_input_price_uzs(self):
-        return format_money(self.total_input_price)
-
-        # result = get_or_zero(self.input_price) * get_or_zero(self.amount)
-        # return format_money(result)
-
-    @property
-    def selling_price_uzs(self):
-        return format_money(self.selling_price)
-
-    @property
-    def total_selling_price_uzs(self):
-        result = get_or_zero(self.selling_price) * get_or_zero(self.amount)
-        return format_money(result)
+        return self.input_price * self.quantity
 
 
-from order.models import OrderProduct, Order
 
 
-# class WarehouseOperationItemTransfer(models.Model):
-#     from_warehouse_operation_item = models.ForeignKey(WarehouseOperationItem, on_delete=models.CASCADE, null=False, blank=False, related_name="from_warehouse_operation_item_history")
-#     to_warehouse_operation_item = models.ForeignKey(WarehouseOperationItem, on_delete=models.SET_NULL, null=True, blank=True, related_name="to_warehouse_operation_item_history")
-#     to_order_product = models.ForeignKey(OrderProduct, on_delete=models.SET_NULL, null=True, blank=True)
-#     amount = models.IntegerField(null=True, blank=True,  verbose_name="Mahsulot soni")
-#     leave_amount = models.IntegerField(null=True, blank=True,  verbose_name="Mahsulot soni")
-#     input_price = models.IntegerField(null=True, blank=True,  verbose_name="Mahsulot kirim narxi")
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#
+
+class WarehouseStockAttachmentOrder(models.Model):
+    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE, null=False, blank=False)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
+    product_variable = models.ForeignKey(ProductVariable, on_delete=models.SET_NULL, null=True, blank=True)
+    warehouse_quantity = models.IntegerField(null=True, blank=True,verbose_name="warehouse_quantity", default=0)
+    attachment_amount = models.IntegerField(null=True, blank=True,verbose_name="attachment_amount", default=0)
 
 
-class WarehouseOperationItemDetails(models.Model):
-    from_warehouse_operation = models.ForeignKey(WarehouseOperation, on_delete=models.SET_NULL, null=True, blank=True,
-                                                 related_name="WarehouseOperationItemDetailsFromOperations")
-    from_warehouse_operation_item = models.ForeignKey(WarehouseOperationItem, on_delete=models.SET_NULL, null=True,
-                                                      blank=True,
-                                                      related_name="WarehouseOperationItemDetailsFromOperationsItem")
-    from_warehouse_operation_item_details = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True,
-                                                              related_name="WarehouseOperationItemDetailsFromOperationsItemDetails")
-    from_warehouse_stock = models.ForeignKey(WareHouseStock, on_delete=models.SET_NULL, null=True, blank=True,
-                                             related_name="WarehouseOperationItemDetailsFromWarehouseStock")
-    from_warehouse_input_price = models.IntegerField(null=False, blank=False, default=0,
-                                                     verbose_name="dan ombor kirim narxi")
-    from_order_product = models.ForeignKey(OrderProduct, on_delete=models.SET_NULL, null=True, blank=True,
-                                           related_name="WarehouseOperationItemDetailsFromOrderProduct")
-
-    warehouse_operation = models.ForeignKey(WarehouseOperation, on_delete=models.CASCADE, null=False, blank=False,
-                                            related_name="WarehouseOperationItemDetailsOperations")
-    warehouse_operation_item = models.ForeignKey(WarehouseOperationItem, on_delete=models.CASCADE, null=False,
-                                                 blank=False,
-                                                 related_name="WarehouseOperationItemDetailsOperationsItem")
-    warehouse_stock = models.ForeignKey(WareHouseStock, on_delete=models.SET_NULL, null=True, blank=True,
-                                        verbose_name="Sotuvchi ombori",
-                                        related_name="WarehouseOperationItemDetailsWarehouseStock")
-
-    order_product = models.ForeignKey(OrderProduct, on_delete=models.SET_NULL, null=True, blank=True,
-                                      related_name="WarehouseOperationItemDetailsOrderProduct")
-
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Mahsulot nomi")
-    product_variable = models.ForeignKey(ProductVariable, on_delete=models.SET_NULL, null=True, blank=True,
-                                         verbose_name="Mahsulot hususiyatlari")
-
-    input_price = models.IntegerField(null=False, blank=False, default=0, verbose_name="kirim narxi")
-    amount = models.IntegerField(null=False, blank=False, default=0, verbose_name="Mahsulot soni")
-    leave_amount = models.IntegerField(null=False, blank=False, default=0, verbose_name="Qolgan mahsulot soni")
-
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def input_price_uzs(self):
-        return format_money(self.input_price)
 
 
 class WarehouseOperationAndOrderRelations(models.Model):
-    action_type = (
-        ("1", "Ombordan mahsulot yuborish"),
-        ("2", "Mahsulot qaytarish"),
-    )
-    action = models.CharField(choices=action_type, max_length=50, default=1, null=True, blank=True)
     warehouse_operation = models.ForeignKey(WarehouseOperation, on_delete=models.CASCADE, null=False, blank=False,
                                             related_name="WarehouseOperationAndOrderRelations")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+

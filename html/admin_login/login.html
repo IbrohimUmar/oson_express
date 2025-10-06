@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 
 {% load static %}
+{% load compress %}
+
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>{{SITE_NAME}} internet magazin</title>
+    <title>{{SITE_NAME}}</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-    <meta name="description" content="Eltuvchi boshqaruv paneli"/>
+    <meta name="description" content="{{SITE_NAME}} boshqaruv paneli"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta property="og:title" content="Eltuvchi bot"/>
+    <meta property="og:title" content="{{SITE_NAME}}"/>
     <meta property="og:type" content="text/css"/>
-    <meta property="og:url" content="eltuvchi"/>
-    <link href="{% static '' %}css/main.css?v=1.1" rel="stylesheet" type="text/css"/>
-    <script src="{% static '' %}js/vue.js"></script>
+    <meta property="og:url" content="{{SITE_NAME}}"/>
+    {% compress css %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+   {% endcompress %}
 
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static '' %}imgs/theme/fav.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static '' %}imgs/theme/fav.svg">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static '' %}imgs/theme/fav.svg">
+
 </head>
 <body style="background-color: #222736">
 <section class="content-main mt-80 mb-80" id="app" style="background-color: #222736">
@@ -61,6 +65,10 @@
     </div>
 </section>
 <!--        <script type='text/javascript'>$("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});</script>-->
+
+    {% compress js %}
+            <script src="{% static '' %}js/vue.js"></script>
+   {% endcompress %}
 <script>
     var vue = new Vue({
         el: "#app",

@@ -1,0 +1,123 @@
+
+            :root {
+              --metronic_blue: #1e90ff;
+              --metronic_white: #ffffff;
+
+              --metronic_danger: #F64E60;
+              --metronic_warning: #fabc43;
+              --metronic_info: #8950FC;
+              --metronic_dark: #181C32;
+              --metronic_secondary: #E4E6EF;
+              --metronic_primary: #60abf9;
+              --metronic_success: #1BC5BD;
+            }
+
+
+            .badge-lg {
+                min-width: 2rem;
+                font-size: 1rem;
+            }
+
+            .badge-dark {
+                color: black;
+                background-color: #f9f9f9;
+            }
+            .badge-danger {
+                color: white;
+                background-color: var(--metronic_danger);
+            }
+            .badge-warning {
+                color: white;
+                background-color: var(--metronic_warning);
+            }
+            .badge-info {
+                color: white;
+                background-color: var(--metronic_info);
+            }
+
+            .badge-success {
+                color: white;
+                background-color: var(--metronic_success);
+            }
+
+            .badge-secondary {
+                color: black;
+                background-color: var(--metronic_secondary);
+            }
+
+            .badge-primary {
+                color: white;
+                background-color: var(--metronic_primary)
+            }
+
+            .btn-metronic-primary{
+                color: #FFFFFF;
+                background-color: #3699FF;
+                border-color: #3699FF;
+            }
+            .btn-metronic-primary:hover{
+                color: #FFFFFF;
+                background-color: #60abf9;
+                border-color: #3699FF;
+            }
+            .btn-metronic-secondary{
+                color: #3F4254 !important;
+                background-color: #E4E6EF;
+                border-color: #E4E6EF;
+            }
+            .btn-metronic-success{
+                    color: #ffffff;
+                    background-color: #1BC5BD;
+                    border-color: #1BC5BD;
+            }
+            .btn-metronic-success:hover{
+                    color: #ffffff;
+                    background-color: #11d1c8;
+                    border-color: #1BC5BD;
+            }
+            .btn-metronic-success.disabled{
+                color: #ffffff;
+                background-color: #1BC5BD;
+                border-color: #1BC5BD;
+            }
+
+            .btn-metronic-danger{
+                    color: #ffffff;
+                    background-color: #F64E60;
+                    border-color: #F64E60;
+            }
+            .btn-metronic-danger:hover{
+                    color: #ffffff;
+                    background-color: #f5717e;
+                    border-color: #F64E60;
+            }
+            .btn-metronic-warning{
+                color: #ffffff;
+                background-color: #FFA800;
+                border-color: #FFA800;
+            }
+            .btn-metronic-warning:hover{
+                color: #ffffff;
+                background-color: #fabc43;
+                border-color: #FFA800;
+            }
+            .btn-metronic-info{
+                color: #ffffff;
+                background-color: #8950FC;
+                border-color: #8950FC;
+            }
+            .btn-metronic-info:hover{
+                color: #ffffff;
+                background-color: #a173fc;
+                border-color: #8950FC;
+            }
+            .btn-metronic-dark{
+                  color: #ffffff;
+                background-color: #181C32;
+                border-color: #181C32;
+            }
+            .btn-metronic-dark:hover{
+                  color: #ffffff;
+                background-color: #232530;
+                border-color: #181C32;
+            }

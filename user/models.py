@@ -1,13 +1,10 @@
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 # from store.models import *
 import order
 import store
-from django.db.models import Q, Sum, Count, F
-from django.db.models.functions import Coalesce
-import dateutil.relativedelta
-from datetime import datetime, timedelta
-from config.format_money import format_money
+from django.db.models import Q
 from tinymce.models import HTMLField
 
 
@@ -71,18 +68,6 @@ class TryLogin(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class CashCategory(models.Model):
-    Type_choices = (
-        ('1', "Kirim"),
-        ('2', "Chiqim"),
-        ('3', "O'tkazma"),
-    )
-    type = models.CharField(max_length=50, default='1', choices=Type_choices, null=True, blank=True,
-                            verbose_name='Kategoriya turini tanlang')
-    name = models.CharField(max_length=120, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
 
 
 class CashAllowedPaymentTypes(models.Model):
@@ -97,8 +82,10 @@ class User(AbstractUser):
         ('1', 'Admin'),
         ('2', 'Haydovchi'),
         ('3', 'Operator'),
-        ('4', 'Sotuvchi'),
+        ('4', 'Marketolog'),
         ('5', "Ta'minotchi"),
+        ('6', "Seller"),
+        ('7', "Omborchi"),
     )
     Theme = (
         ('1', 'white'),
@@ -109,6 +96,9 @@ class User(AbstractUser):
     type = models.CharField(max_length=50, choices=type_choice, default='2', null=False, blank=False,
                             verbose_name='Kim')
     birthday = models.DateField(null=True, blank=True, verbose_name='Tug\'ilgin kuni')
+
+    seller = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='seller')
+
     region = models.ForeignKey(Regions, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Viloyati')
     district = models.ForeignKey(Districts, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Tumani')
     allow_districts = models.ManyToManyField(Districts, blank=True, verbose_name='Ruxsat etilgan viloyatlar',
@@ -140,15 +130,14 @@ class User(AbstractUser):
 
     @property
     def operator_data(self):
-        from config.operator.query import OperatorData
-        import config
+        from config.seller_app.operator.query import OperatorData
         # return config.operator.query.OperatorData(self.id)
         return OperatorData(self.id)
 
     @property
-    def shopkeeper_data(self):
-        from config.shopkeeper.query import ShopKeeperData
-        return ShopKeeperData(self.id)
+    def supplier_data(self):
+        from config.seller_app.supplier.query import SupplierData
+        return SupplierData(self.id)
 
     @property
     def storekeeper_data(self):
@@ -162,293 +151,13 @@ class User(AbstractUser):
         return DriverData(self.id)
 
     @property
-    def seller_data(self):
-        from config.seller.query import SellerData
-        return SellerData(self.id)
+    def marketer_data(self):
+        from config.seller_app.marketer.query import MarketerData
+        return MarketerData(self.id)
 
-    # @property
-    # def debt(self):
-    #     # delivery_product_amount = sum(list(order.models.Order.objects.filter(status=4, driver_id=self.id).values_list("site__product_price", flat=True)))
-    #     delivery_product_amount = sum(list(
-    #         order.models.OrderProduct.objects.filter(order__status=4, driver_id=self.id, status=4).values_list("price",
-    #                                                                                                            flat=True)))
-    #     return int(delivery_product_amount)
-    #
-    # @property
-    # def fee(self):
-    #     total_driver_fee = sum(
-    #         list(order.models.Order.objects.filter(driver_id=self.id, status=4).values_list("driver_fee", flat=True)))
-    #     total_driver_bonus = sum(list(
-    #         order.models.Order.objects.filter(driver_id=self.id, status=4, driver_is_bonus=True,
-    #                                           driver_bonus_amount_won__isnull=False).values_list(
-    #             "driver_bonus_amount_won", flat=True)))
-    #     if total_driver_fee:
-    #         return int(total_driver_fee) + int(total_driver_bonus)
-    #     return 0
-    #
-    # @property
-    # def balance(self):
-    #     result = self.debt - self.fee - self.total_payment
-    #     return result
-    #
-    # @property
-    # def balance_employee(self):
-    #     type = self.type
-    #     if type == '2':
-    #         return self.debt - self.fee - self.total_payment
-    #     elif type == '3':
-    #         return self.operator_data.balance
-    #     elif type == '4':
-    #         return self.shopkeeper_data.balance
-    #
-    #     if type not in ['5', '6']:
-    #         return self.total_salary_employee - self.total_payment_employee
-    #     return 0
-    #
-    # @property
-    # def balance_employee_uzs(self):
-    #     return format_money(self.balance_employee)
-    #
-    # @property
-    # def total_payment_employee(self):
-    #     import cash
-    #     cash = cash.models.Cash.objects.filter(to_user_id=self.id).aggregate(t=Coalesce(Sum("amount"), 0))['t']
-    #     return cash
-    #
-    # @property
-    # def total_payment_employee_uzs(self):
-    #     return format_money(self.total_payment_employee)
-    #
-    # @property
-    # def total_salary_employee(self):
-    #     from report.models import EmployeeSalaryReport
-    #     employee_salary_total = \
-    #     EmployeeSalaryReport.objects.filter(user_id=self.id).aggregate(t=Coalesce(Sum('amount'), 0))['t']
-    #     return employee_salary_total
-    #
-    # @property
-    # def total_salary_employee_uzs(self):
-    #     return format_money(self.total_salary_employee)
-    #
-    # @property
-    # def total_cancelled_order_price(self):
-    #     return sum(list(
-    #         order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id, order__status=5,
-    #                                                  order__cancelled_status=1, status=4).values_list("price",
-    #                                                                                                   flat=True)))
-    #
-    # @property
-    # def total_being_delivered_order_price(self):
-    #     return sum(list(
-    #         order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id, order__status=3,
-    #                                                  order__cancelled_status=1, status=4).values_list("price",
-    #                                                                                                   flat=True)))
-    #
-    # @property
-    # def total_call_back_order_price(self):
-    #     return sum(list(
-    #         order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id, order__status=6,
-    #                                                  order__cancelled_status=1, status=4).values_list("price",
-    #                                                                                                   flat=True)))
-    #
-    # @property
-    # def total_defected_products_price(self):
-    #     return order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id, status='6'
-    #                                                     ).aggregate(t=Coalesce(Sum("price"), 0))['t']
-    #
-    # @property
-    # def total_hand_product_price(self):
-    #     return sum(list(order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id, status=4,
-    #                                                              order__cancelled_status=1).exclude(
-    #         Q(order__status=4) | Q(order__status=2)).values_list("price", flat=True)))
-    #     # return self.total_being_delivered_order_price + self.total_cancelled_order_price + self.total_call_back_order_price
-    #
-    # @property
-    # def total_hand_product_input_price(self):
-    #     return order.models.OrderProduct.objects.filter(order__driver_id=self.id, driver_id=self.id,
-    #                                                     status__in=[4, 6]).exclude(order__status__in=[4, 2]).aggregate(
-    #         t=Coalesce(Sum(F('ordered_amount') * F('input_price')), 0))['t']
-    #     # return self.total_being_delivered_order_price + self.total_cancelled_order_price + self.total_call_back_order_price
-    #
-    # @property
-    # def hand_products(self):
-    #     return 0
-    # @property
-    # def total_hand_products(self):
-    #     result = self.hand_products + self.not_shipping_product_amount
-    #     return result
-    #
-    # @property
-    # def wait_product_amount(self):
-    #     waited_product_amount = sum(list(
-    #         order.models.OrderProduct.objects.filter(driver_id=self.id, order__status=1, status=1,
-    #                                                  order__output_product__isnull=True).values("ordered_amount",
-    #                                                                                             flat=True)))
-    #     return waited_product_amount
-    #
-    # @property
-    # def wait_products(self):
-    #     product = [{"id": p.id, 'driver': self.id, 'name': p.name, 'amount': self.wait_product_id_amount(p.id)} for p in
-    #                store.models.Product.objects.all() if self.wait_product_id_amount(p.id) > 0]
-    #     if product:
-    #         return product
-    #     return []
-    #
-    # def wait_product_id_amount(self, product_id):
-    #     waited_product_amount = sum(list(
-    #         order.models.OrderProduct.objects.filter(driver_id=self.id, product_id=product_id, order__status=1,
-    #                                                  status=1, order__output_product__isnull=True).values_list(
-    #             "ordered_amount", flat=True)))
-    #     return waited_product_amount
-    #
-    # # ----------------------not shipping
-    # @property
-    # def not_shipping_products(self):
-    #     product = [
-    #         {"id": p.id, 'driver': self.id, 'name': p.name, 'amount': self.not_shipping_product_amount_pro_id(p.id)} for
-    #         p in store.models.Product.objects.all() if self.not_shipping_product_amount_pro_id(p.id) > 0]
-    #     if product:
-    #         return product
-    #     return []
-    #
-    # def not_shipping_product_amount_pro_id(self, product_id):
-    #     amount = sum(list(
-    #         order.models.OrderProduct.objects.filter(order__status=5, order__cancelled_status=1, product_id=product_id,
-    #                                                  order__driver_id=self.id, status=4).values_list("amount",
-    #                                                                                                  flat=True)))
-    #
-    #     # delivery_product_amount = sum([i.amount for i in order.models.OrderProduct.objects.filter(driver_id=self.id,
-    #     #                                                                                           product_id=product_id).exclude(Q(order__status=5) | Q(order__isnull=True))])
-    #     # output_total = self.get_total_output_product(product_id)
-    #     # return_total = self.get_total_return_product(product_id)
-    #     # result = (int(output_total) - int(return_total)) - delivery_product_amount
-    #     return int(amount)
-    #
-    # @property
-    # def not_shipping_product_amount(self):
-    #     import order
-    #     amount = sum(list(order.models.OrderProduct.objects.filter(order__status=5, order__cancelled_status=1,
-    #                                                                order__driver_id=self.id, status=4).values_list(
-    #         "amount", flat=True)))
-    #
-    #     # output_total = sum(
-    #     #     [i.amount for i in order.models.OutputProductItems.objects.filter(output_product__driver_id=self.id,
-    #     #                                                                       output_product__is_shipping=True)])
-    #     # delivery_product_amount = sum([i.amount for i in
-    #     #                                order.models.OrderProduct.objects.filter(driver_id=self.id).exclude(Q(order__status=5) | Q(order__isnull=True))])
-    #     # return_products = sum(list(order.models.OrderProduct.objects.filter(status=5).values_list("amount", flat=True)))
-    #     # result = (int(output_total)- return_products) - delivery_product_amount
-    #     return int(amount)
-    #
-    # def get_total_return_product(self, product_id):
-    #     # return sum([i.amount for i in store.models.ReturnProductItems.objects.filter(product_id=product_id, return_product__driver_id=self.id)])
-    #     return sum(list(
-    #         order.models.OrderProduct.objects.filter(status=5, product_id=product_id).values_list("amount", flat=True)))
-    #
-    # @property
-    # def order_status(self):
-    #     get = self.get_order_amount
-    #     return {"send_products": get(2), 'being_delivered': get(3), 'delivered': get(4), 'canceled': get(5),
-    #             'call_back': get(6), 'wait': get(1), 'delete': get(0)}
-    #
-    # def get_order_amount(self, order_status_id):
-    #     total = order.models.Order.objects.filter(driver_id=self.id, status=str(order_status_id)).count()
-    #     return total
-    #
-    # @property
-    # def delay_orders(self):
-    #     import datetime
-    #     today = datetime.date.today()
-    #     total = order.models.Order.objects.filter(driver_id=self.id, delivered_date__lte=today).exclude(
-    #         Q(status=5) | Q(status=4)).count()
-    #     return total
-    #
-    # @property
-    # def total_expenses(self):
-    #     return 0
-    #
-    # @property
-    # def total_payment(self):
-    #     import cash
-    #     cash = cash.models.Cash.objects.filter(from_user_id=self.id).aggregate(t=Coalesce(Sum("amount"), 0))['t']
-    #     return cash
-    #
-    # @property
-    # def total_payment_this_mont(self):
-    #     import datetime
-    #     import cash
-    #     today = datetime.date.today()
-    #     cash = cash.models.Cash.objects.filter(from_user_id=self.id, created_at__year=today.year,
-    #                                            created_at__month=today.month).aggregate(t=Coalesce(Sum("amount"), 0))[
-    #         't']
-    #
-    #
-    #     # today = datetime.date.today()
-    #     # total = sum([i.amount for i in DriverPayment.objects.filter(user_id=self.id, created_at__year=today.year,
-    #     #                                                             created_at__month=today.month)])
-    #     return cash
-    #
-    # @property
-    # def total_expenses_this_mont(self):
-    #     return 0
-    #
-    # @property
-    # def total_expenses_one_mont_ago(self):
-    #     return 0
-    #
-    # def product_hand_amount(self, product_id):
-    #     order_pro = sum(list(order.models.OrderProduct.objects.filter(
-    #         Q(order__status=3) | Q(order__status=5, order__cancelled_status=1) | Q(status=6),
-    #         status=4, order__driver_id=self.id, product_id=product_id).values_list("amount", flat=True)))
-    #     # result = (self.get_total_output_product(product_id) - self.get_total_return_product(product_id)) - self.get_order_status_total(4, product_id)
-    #     return order_pro
-    #
-    # def set_pro_id_order_status_by_result_this_driver_id(self, product_id):
-    #     not_shipping_pro_amount = self.not_shipping_product_amount_pro_id(product_id)
-    #     query = self.get_order_status_total
-    #     total_amount = self.product_hand_amount(product_id)
-    #     wait = self.wait_product_id_amount(product_id)
-    #     way = sum([i.amount for i in order.models.OutputProductItems.objects.filter(product_id=product_id,
-    #                                                                                 output_product__driver_id=self.id,
-    #                                                                                 output_product__is_shipping=False)])
-    #     dict = {'total': total_amount, 'being_delivered': query(3, product_id), 'call_back': query(6, product_id),
-    #             'stock': not_shipping_pro_amount, 'wait': wait, 'way': query(2, product_id)}
-    #     return dict
-    #
-    # def get_total_output_product(self, product_id):
-    #     output_total = sum([i.amount for i in
-    #                         order.models.OutputProductItems.objects.filter(output_product__driver_id=self.id,
-    #                                                                        product_id=product_id,
-    #                                                                        output_product__is_shipping=True)])
-    #     return output_total
-    #
-    # def get_order_status_total(self, status, product_id):
-    #     return sum([o.ordered_amount for o in
-    #                 order.models.OrderProduct.objects.filter(driver_id=self.id, order__status=status,
-    #                                                          product_id=product_id)])
-    #
-    # @property
-    # def order(self):
-    #     import order
-    #     return order.models
-    #
-    # @property
-    # def operator_order_amount_total(self):
-    #     order = self.order.Order.objects.filter(operator_id=self.id).count()
-    #     return int(order)
-    #
-    # @property
-    # def operator_order_amount_one_month_ago(self):
-    #     d2 = self.today - dateutil.relativedelta.relativedelta(months=1)
-    #     order = self.order.Order.objects.filter(operator_id=self.id, created_at__year=d2.year,
-    #                                             created_at__month=d2.month).count()
-    #     return int(order)
-    #
-    # @property
-    # def operator_order_amount_this_month(self):
-    #     order = self.order.Order.objects.filter(operator_id=self.id, created_at__year=self.today.year,
-    #                                             created_at__month=self.today.month).count()
-    #     return int(order)
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def today(self):
@@ -465,6 +174,27 @@ class DriverUser(models.Model):
     allowed_cashier = models.ManyToManyField(User, blank=True, related_name="allowed_cashier",
                                              verbose_name="Tanlashi mumkin bo'lgan kassirlar")
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CashCategory(models.Model):
+    Type_choices = (
+        ('1', "Kirim"),
+        ('2', "Chiqim"),
+        ('3', "O'tkazma"),
+    )
+    for_who_choices = (
+        ('1', "Admin uchun"),
+        ('2', "Seller uchun"),
+    )
+    type = models.CharField(max_length=50, default='1', choices=Type_choices, null=True, blank=True,
+                            verbose_name='Kategoriya turini tanlang')
+    name = models.CharField(max_length=120, null=True, blank=True)
+    for_who = models.CharField(max_length=2, default='1', choices=for_who_choices, null=False, blank=False,
+                            verbose_name='Kim uchun')
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CashierUser(models.Model):
@@ -486,6 +216,19 @@ class Token(models.Model):
 
 
 
+class ExportedFile(models.Model):
+#     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    file = models.FileField(upload_to="exports/")  # dosyalar buraya kaydolur
+    name = models.CharField(max_length=250, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="exported_files")
+    is_view_user = models.BooleanField(default=False, null=False, blank=False, verbose_name="Foydalanuvchi faylni ko'rdimi")
+    created_at = models.DateTimeField(auto_now_add=True)
+#
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.file.name}"
 
 
 

@@ -2,25 +2,31 @@
 {% load static %}
 {% block content %}
 <section class="content-main" id="app">
-    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
-        {% csrf_token %}
-        <div class="content-header">
-            <div>
-                <h3 class="content-title card-title">Yangi sotuvchi qo'shish</h3>
-            </div>
-            <div>
-                <a href="{% url 'seller_list' %}" class="btn btn-brand">
+    <div class="content-header">
+        <h3 class="content-title">Seller qo'shish</h3>
+        <div>
+        </div>
+    </div>
 
-                    <i class="material-icons md-left-arrow"></i> Qaytish
-                </a>
-                <button class="btn btn-brand " id="submit_button" type="submit">
-                    <i class="material-icons md-add"></i> Saqlash
-                </button>
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_list' %}">Sellerlar ro'yxati</a></li>
+                            <li class="breadcrumb-item d-inline active">Seller qo'shish</li>
+                        </ol>
+                    </div>
+                </div>
             </div>
         </div>
+
+
+
         <div class="card">
             <header class="card-header">
-                <h4>Sotuvchi qo'shish uchun ma'lumotlarni to'ldiring</h4>
+                <h4>Ma'lumotlarni to'ldiring</h4>
                 {% if messages_error %}
                 <div class="alert alert-danger" role="alert">
                     {{messages_error}}
@@ -28,50 +34,82 @@
                 {% endif %}
             </header>
             <div class="card-body">
-                <div class="row mb-50 mt-20 order-info-wrap">
+                <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+                        {% csrf_token %}
+                    <div class="row mb-30 mt-10 order-info-wrap">
                     <div class="col-md-6">
-                        <label>Sotuvchi ismi</label>
-                        <input type="text" name="first_name" placeholder="Sotuvchi ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
+                        <label>Ismi</label>
+                        <input type="text" name="first_name" placeholder="Ismi" {% if r %}value="{{r.first_name}}" {% endif %} required
                                class="form-control">
 
-                        <label>Sotuvchi familiyasi</label>
-                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Sotuvchi familiyasi"
+                        <label>Familiyasi</label>
+                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Familiyasi"
                                class="form-control">
-                        <label>Parol</label>
-                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+
+                        <label>Manzili</label>
+                        <input type="text" name="address" {% if r %}value="{{r.address}}" {% endif %} placeholder="Manzili"
+                               class="form-control">
+                        <label>Standart pochta yetkazish narxi</label>
+                        <input type="number" name="special_fee_amount" {% if r %}value="{{r.special_fee_amount}}" {% endif %} placeholder="Standart pochta yetkazish narxi"
                                class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label>Sotuvchi karta raqami</label>
-                        <input type="number" class="form-control" {% if r %}value="{{r.payment_card}}" {% endif %} name="payment_card" placeholder="Sotuvchi karta raqami">
+                        <label>Telefon raqami</label>
+                            {% if r %}
+                         <input inputmode="numeric"
+                                value="{{r.username}}"
+                                   oninput="this.value = this.value.replace(/\D+/g, '')"
+                                   class="form-control"
+                                    name="username"
+                                   placeholder="Telefon raqami"
+                                   maxlength="12"
+                                   minlength="12"
+                                   required
+                                   pattern="^998[0-9]{9}$"
+                                   title="Telefon raqami faqat 998 bilan boshlanishi kerak va 12 ta raqam bo'lishi kerak.">
+                                {% else %}
+                         <input inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/\D+/g, '')"
+                                   class="form-control"
+                                    name="username"
+                                   placeholder="Telefon raqami"
+                                   maxlength="12"
+                                   minlength="12"
+                                   required
+                                   pattern="^998[0-9]{9}$"
+                                   title="Telefon raqami faqat 998 bilan boshlanishi kerak va 12 ta raqam bo'lishi kerak.">
+                                {% endif %}
 
-                        <label>Sotuvchi telefon raqami</label>
-                         {% if r %}
-                        <input type="text" name="phone" value="{{r.phone}}" 
-                               class=" form-control" placeholder="Sotuvchi telefon raqami">
-                        {% else %}
-                        
-                        <input type="text" name="phone" id="phone_inputmask" 
-                               class="js-phone-input form-control" placeholder="Sotuvchi telefon raqami">
-                        {% endif %}
-                        <label class="text-sm">Sotuvchi aktivmi</label>
+                        <label class="text-sm">aktivmi</label>
                         <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active == "on" %} checked{% endif %}{% endif %}>
-
+                        <hr>
+                        <label>Parol</label>
+                        <input type="text" name="password_text" required minlength="8" {% if r %}value="{{r.password_text}}"{% endif %} placeholder="Parol"
+                               class="form-control" title="Parol uzunligi kamida 8 ta bo'lishi kerak">
                     </div>
+
+                    <div class="col-md-12 mt-10">
+                            <button class="btn btn-brand " id="submit_button" type="submit">
+                                <i class="material-icons md-add"></i> Saqlash
+                            </button>
+                    </div>
+
                 </div>
+                </form>
             </div>
         </div>
-    </form>
+
+
 </section>
-<script type='text/javascript'>
-    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});
-
-</script>
-
 {% endblock %}
 {% block header %}
-<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
-<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
-{% endblock %}
-{% block footer %}
+<style>
+    th {
+        white-space: nowrap
+    }
+    td {
+        white-space: nowrap
+    }
+    #dataTable tr:nth-child(odd){background:#3c4252}
+</style>
 {% endblock %}

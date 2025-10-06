@@ -38,38 +38,48 @@ class OperatorStream(models.Model):
 #     pass
 
 
-class SellerStream(models.Model):
+class MarketerStream(models.Model):
     name = models.CharField(max_length=250, verbose_name='Oqim nomi', null=False)
     product = models.ForeignKey(Product, verbose_name='Mmahsulot', on_delete=models.CASCADE)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Sotuvchi', related_name="seller_stream")
+    marketer = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Sotuvchi', related_name="marketer_stream")
     is_delete = models.BooleanField(default=False, null=True, blank=True)
     url = models.CharField(max_length=20, null=True, blank=True, unique=True)
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
+# class MarketerStreamClick():
+#     pass
 
-class SellerStreamClick(models.Model):
-    seller_stream = models.ForeignKey(SellerStream, on_delete=models.SET_NULL, null=True, blank=True)
+class MarketerStreamClick(models.Model):
+    marketer_stream = models.ForeignKey(MarketerStream, on_delete=models.SET_NULL, null=True, blank=True)
     create_at = models.DateTimeField(auto_now_add=True)
 
 
 Status = (
         ("0", "O'chirib yuborilgan"),
-        ("1", "Qabul qilindi"),
-        ("2", "Mahsulot yuborildi"),
-        ("3", "Yetkazilmoqda"),
-        ("4", "Sotildi"),
-        ("5", "Bekor qilindi"),
-        ("6", "Qayta qo'ng'iroq"),
-        ("7", "Mahsulot belgilandi"),
-        ("8", "Qadoqlanmoqda"),
 
         ("9", "Yangi"),
         ("10", "Arxivlanmoqda"),
         ("11", "Arxivlandi"),
         ("12", "Double"),
 
-    )
+        ("1", "Mahsulot kutilmoqda"),
+        ("7", "Mahsulot belgilandi"),
+        ("8", "Qadoqlanmoqda"),
+        ("2", "Yuborishga tayyor"),
+
+        ("13", "Filialda"),
+
+        ("3", "Yetkazilmoqda"),
+        ("4", "Sotildi"),
+        ("5", "Bekor qilindi"),
+        ("6", "Qayta qo'ng'iroq"),
+
+
+        ("14", "Haydovchi filealga qaytardi"),
+        ("15", "Seller filealdan qaytarib oldi"),
+
+)
 
 
 
@@ -77,8 +87,15 @@ class Order(models.Model):
     CancelledStatus = (
         ("0", "Bekor qilinmagan"),
         ("1", "Mahsulotlar haydovchida"),
-        ("2", "Mahsulotini boshqa buyurtmaga belgilandi"),
+        # ("2", "Mahsulotini boshqa buyurtmaga belgilandi"),
         ("3", "Mahsulotini qaytib olindi"),
+    )
+    driver_status_choice = (
+        ("0", "--------"),
+        ("1", "Yetkazilmoqda"),
+        ("2", "Sotildi"),
+        ("3", "Bekor qilindi"),
+        ("4", "Qayta qo'ng'iroq"),
     )
     where_come_from_select = (
         ("1", "Oqim orqali landing pagedan keldi"),
@@ -86,9 +103,16 @@ class Order(models.Model):
         ("3", "Liddan api orqali keldi"),
         ("4", "Liddan tushgan elituvchidan kiritildi"),
     )
+    PaymentStatus = (
+        ("1", "To'lanmagan"),
+        ("2", "Qisman to'langan"),
+        ("3", "To'liq to'langan"),
+    )
 
     barcode = models.BigIntegerField(null=True, db_index=True, blank=True, unique=True)
     is_print = models.BooleanField(default=False, null=True, blank=True, verbose_name="Chop etildimi")
+    transaction_lock = models.BooleanField(default=False, null=True, blank=True)
+    logistic_branch_id = models.IntegerField(db_index=True, null=True, blank=True)
 
     responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='Masul')
     operator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='operator')
@@ -96,6 +120,8 @@ class Order(models.Model):
     operator_note = models.TextField(null=True, blank=True)
 
     status = models.CharField(choices=Status, max_length=50, verbose_name='Holati', null=False, blank=False)
+    driver_status = models.CharField(choices=driver_status_choice, max_length=50, default='0', verbose_name='Haydovchi holati', null=False, blank=False)
+
     customer_name = models.CharField(max_length=150, verbose_name='Xaridor ismi', null=False, blank=False)
     customer_phone = models.CharField(max_length=50, db_index=True, verbose_name='Xaridor telefon raqami', null=False,
                                       blank=False)
@@ -106,9 +132,18 @@ class Order(models.Model):
                                           verbose_name='Tumani')
     customer_street = models.TextField(null=True, blank=True, verbose_name="Ko'cha mo'ljal")
 
+    marketer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordered_marketer')
+    marketer_fee = models.IntegerField(null=True, blank=True, verbose_name='admin to\'lovi', default=0)
+    marketer_stream = models.ForeignKey(MarketerStream, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+    total_logistic_fee = models.IntegerField(null=True, blank=True, verbose_name='Pochta narxi', default=0)
+    postage_fee = models.IntegerField(null=True, blank=True, verbose_name='Pochta narxi', default=0)
+
     seller_fee = models.IntegerField(null=True, blank=True, verbose_name='admin to\'lovi', default=0)
     seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordered_seller')
-    seller_stream = models.ForeignKey(SellerStream, on_delete=models.SET_NULL, null=True, blank=True)
+    seller_fee_paid = models.IntegerField(null=True, blank=True, verbose_name='admin to\'lovi', default=0)
+    seller_fee_paid_status = models.CharField(choices=PaymentStatus, default='1', max_length=50, verbose_name="Sellerga qilingan to'lov holati", null=False, blank=False)
 
     where_come_from = models.CharField(choices=where_come_from_select, max_length=50, verbose_name='Qayerdan kelgan', null=True, blank=True)
     ip = models.CharField(max_length=25, null=True, blank=True)
@@ -143,35 +178,63 @@ class Order(models.Model):
     order_date = models.DateField(null=True, blank=True, verbose_name='Buyurtma kelgan sana', default=now)
     delivered_date = models.DateField(null=True, blank=True, verbose_name='Yetkazib berish sanasi', default=now)
     driver_shipping_start_date = models.DateField(null=True, blank=True, verbose_name='Haydovchiga berilgan sana')
+    driver_status_changed_at = models.DateTimeField(null=True, blank=True, verbose_name='Haydovchi statusi o\'zgargan sana')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     def update_driver_fee(self):
-        if self.defective_product_order is None:
-            district = self.customer_district
-            driver_fee_amount = district.driver_fee
-            if self.driver:
-                if self.driver.fee_is_special:
-                    driver_fee_amount = self.driver.special_fee_amount
+        '''
+        hamma order productlarni olish kerak
+        '''
 
-            products_id = list(OrderProduct.objects.filter(product_type__in=[1, 2], order_id=self.id).values_list("product_id", flat=True))
+        total_big_product_diff = 0
+        big_product = OrderProduct.objects.filter(order_id=self.id, size_type='2')
 
-            big_products = ProductDeliveryPrice.objects.filter(product_id__in=products_id, type="1").exists()
-            if big_products:
-                new_driver_fee = driver_fee_amount
-                for p in OrderProduct.objects.filter(type=[1, 2], order_id=self.id):
-                    check_big_product = ProductDeliveryPrice.objects.filter(product_id=p.product.id)
-                    if check_big_product:
-                        amount = int(check_big_product.first().price) * int(p.total_quantity)
-                        new_driver_fee += amount
-                driver_fee_amount = new_driver_fee
-            order = Order.objects.get(id=self.id)
 
-            order.driver_fee = driver_fee_amount
-            order.save()
-            return driver_fee_amount
-        return self.driver_fee
+        # products_id = list(OrderProduct.objects.filter(order_id=self.id).values_list("product_id", flat=True))
+        # big_products = ProductDeliveryPrice.objects.filter(product_id__in=products_id, type="1").exists()
+        # if big_products:
+        #     new_driver_fee = driver_fee_amount
+        #     for p in OrderProduct.objects.filter(type=[1, 2], order_id=self.id):
+        #         check_big_product = ProductDeliveryPrice.objects.filter(product_id=p.product.id)
+        #         if check_big_product:
+        #             amount = int(check_big_product.first().price) * int(p.total_quantity)
+        #             new_driver_fee += amount
+        #     driver_fee_amount = new_driver_fee
+        # order = Order.objects.get(id=self.id)
+        #
+        # order.driver_fee = driver_fee_amount
+        # order.save()
+        # return driver_fee_amount
+        pass
+
+    # def update_driver_fee(self):
+    #     if self.defective_product_order is None:
+    #         district = self.customer_district
+    #         driver_fee_amount = district.driver_fee
+    #         if self.driver:
+    #             if self.driver.fee_is_special:
+    #                 driver_fee_amount = self.driver.special_fee_amount
+    #
+    #         products_id = list(OrderProduct.objects.filter(product_type__in=[1, 2], order_id=self.id).values_list("product_id", flat=True))
+    #
+            # big_products = ProductDeliveryPrice.objects.filter(product_id__in=products_id, type="1").exists()
+            # if big_products:
+            #     new_driver_fee = driver_fee_amount
+            #     for p in OrderProduct.objects.filter(type=[1, 2], order_id=self.id):
+            #         check_big_product = ProductDeliveryPrice.objects.filter(product_id=p.product.id)
+            #         if check_big_product:
+            #             amount = int(check_big_product.first().price) * int(p.total_quantity)
+            #             new_driver_fee += amount
+            #     driver_fee_amount = new_driver_fee
+            # order = Order.objects.get(id=self.id)
+            #
+            # order.driver_fee = driver_fee_amount
+            # order.save()
+            # return driver_fee_amount
+    #     return self.driver_fee
 
 
     def update_product_total_price(self):
