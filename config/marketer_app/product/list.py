@@ -24,7 +24,8 @@ def generate_unique_stream_url():
 @login_required(login_url='/login')
 @permission_required('admin.marketer_app_product', login_url="/home")
 def marketer_app_product_list(request):
-    product = Product.objects.filter(approval_status='2', seller=request.user.seller, is_active=True).order_by("-id")
+    seller = get_seller(request.user)
+    product = Product.objects.filter(approval_status='2', seller=seller, is_active=True).order_by("-id")
     if request.GET.get("search", None):
         query = request.GET["search"]
         product = product.filter(name__icontains=query)
