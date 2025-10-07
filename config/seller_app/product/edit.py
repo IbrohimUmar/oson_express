@@ -113,7 +113,7 @@ def seller_app_product_edit(request, id):
                 product.bonus_amount = r['product_bonus_amount']
                 product.save()
                 messages.success(request, "Ma'lumotlar saqlandi")
-                return redirect("setting_product_edit", id)
+                return redirect("seller_app_product_edit", id)
         except IntegrityError as e:
             handle_exception(e)
             messages.error(request, f"Sizda hatolik mavjud {e}")
