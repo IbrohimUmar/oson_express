@@ -114,11 +114,11 @@ def seller_app_product_create(request):
                     collection.collection.set(selected_collection)
 
                 messages.success(request, "Ma'lumotlar saqlandi")
-                return redirect("setting_product_list")
+                return redirect("seller_app_product_list")
         except IntegrityError as e:
             print(e)
             messages.error(request, f"Sizda hatolik mavjud {e}")
-            return redirect("setting_product_list")
+            return redirect("seller_app_product_list")
     data_json = {
         "product_list": list(Product.objects.filter(is_collection=False, is_active=True).values("id", "name")),
         "color_list": list(Colors.objects.all().values("id", "name", "color")),

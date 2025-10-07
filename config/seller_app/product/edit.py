@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 import json
 
 from config.setting.process_image import process_image
+from services.handle_exception import handle_exception
 from store.models import Product, ProductVariable, Colors, Measure, MeasureItem, ProductDeliveryPrice, \
     ProductCollectionItem, ProductApprovalNote
 
@@ -114,8 +115,9 @@ def seller_app_product_edit(request, id):
                 messages.success(request, "Ma'lumotlar saqlandi")
                 return redirect("setting_product_edit", id)
         except IntegrityError as e:
+            handle_exception(e)
             messages.error(request, f"Sizda hatolik mavjud {e}")
-            return redirect("setting_product_list")
+            return redirect("seller_app_product_list")
     measure = None
     measure_is_block = 1
 
