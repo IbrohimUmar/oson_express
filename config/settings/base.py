@@ -30,7 +30,9 @@ CRONJOB_TOKEN = env.CRONJOB_TOKEN
 AUTH_USER_MODEL = 'user.User'
 
 ALLOWED_HOSTS = ["*"]
-
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 INSTALLED_APPS = [
     # 'daphne',
     'django.contrib.admin',
