@@ -94,17 +94,20 @@ def create_order(v, request):
     today = datetime.datetime.today()
     old_order = Order.objects.filter(
         customer_phone=v['phone'],
-        seller_stream=stream,
+        marketer_stream=stream,
         created_at__gte=datetime.datetime.now() - datetime.timedelta(days=2)
     ).first()
     if old_order:
         return old_order.id
 
-
+    seller = stream.marketer.seller
+    if seller is None:
+        seller = stream.marketer
     order = Order.objects.create(barcode=barcode_generate(),
-                                        seller_stream=stream,
-                                        seller_id=stream.seller_id,
-                                        seller_fee=stream.product.seller_fee,
+                                        marketer_stream=stream,
+                                        marketer_fee=stream.product.seller_fee,
+                                        marketer=stream.marketer,
+                                        seller=seller,
                                         customer_name=v['name'],
                                         customer_phone=v['phone'],
                                         status='9',
