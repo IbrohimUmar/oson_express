@@ -25,14 +25,9 @@ def cash_json_data(request):
     user = request.user
     g = request.GET
     if user.is_superuser:
-        data = Cash.objects.all().order_by("-created_at")
-
-    elif user.id == 202:
-        data = Cash.objects.filter(
-            Q(from_user_id__in=[1335, 2296, 17, 202]) | Q(to_user_id__in=[1335, 2296, 17, 202])).order_by("-created_at")
-
+        data = Cash.objects.filter(person_type='1').order_by("-created_at")
     else:
-        data = Cash.objects.filter(Q(from_user=user) | Q(to_user=user)).order_by("-created_at")
+        data = Cash.objects.filter(Q(from_user=user) | Q(to_user=user), person_type='1').order_by("-created_at")
 
     if request.GET.get("search", None):
         data = data.filter(desc__contains=g["search"])
@@ -78,13 +73,6 @@ def cash_report_json_data(request):
         cash_list = CashierUser.objects.all().values("user_id", "balance", "user__first_name", "user__last_name")
         total_balance = cash_list.aggregate(t=Coalesce(Sum("balance"), 0))["t"]
 
-
-    elif request.user.id == 202:
-        cash_list = CashierUser.objects.filter(user_id__in=[1335, 2296, 17, 202]).values("user_id", "balance",
-                                                                                         "user__first_name",
-                                                                                         "user__last_name")
-        total_balance = cash_list.aggregate(t=Coalesce(Sum("balance"), 0))["t"]
-
     else:
         # cash_list = CashierUser.objects.filter().values("balance", "user__first_name", "user__last_name")
         cash_list = []
@@ -96,7 +84,7 @@ def cash_report_json_data(request):
 @login_required(login_url='/login')
 @permission_required('cash.cash_list', login_url="/home")
 def cash_filter_json_data(request):
-    user_list = User.objects.filter(is_active=True).values("id", "first_name", "last_name", "username", "type")
+    user_list = User.objects.filter(type__in=['1', '2', '6'], is_active=True).values("id", "first_name", "last_name", "username", "type")
     category = CashCategory.objects.all().values("id", "name")
     # if request.user.is_superuser:
     #     user_list = User.objects.filter(is_active=True).values("id", "first_name", "last_name",

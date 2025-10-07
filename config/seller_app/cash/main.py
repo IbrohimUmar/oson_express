@@ -69,8 +69,6 @@ def seller_app_cash_json_data(request):
 def seller_app_cash_report_json_data(request):
     cash_list = CashierUser.objects.filter(user=request.user).values("user_id", "balance", "user__first_name",
                                                                      "user__last_name")
-    print(cash_list)
-    print('cash_list')
     total_balance = cash_list.aggregate(t=Coalesce(Sum("balance"), 0))["t"]
     return JsonResponse({"cash_list": list(cash_list),
                          "total_balance": total_balance})

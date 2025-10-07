@@ -26,6 +26,8 @@ async def stream_order_create(request, url):
     if request.method == 'POST':
         try:
             with transaction.atomic():
+
+
                 r = request.POST
                 # Tüm boşlukları kaldır
                 phone = request.POST['phone'].replace(' ', '')
@@ -35,11 +37,17 @@ async def stream_order_create(request, url):
                     marketer_stream=stream,
                     created_at__gte=datetime.datetime.now() - datetime.timedelta(days=2)
                 ).first()
+
+                seller = stream.marketer.seller
+                if seller is None:
+                    seller = stream.marketer
+
+
                 if not old_order:
                     order = Order.objects.create(barcode=barcode_generate(),
                                                  marketer_stream=stream,
                                                  marketer_id=stream.marketer_id,
-                                                 seller_id=stream.marketer.seller_id,
+                                                 seller_id=seller.id,
                                                  seller_fee=stream.product.seller_fee,
                                                  postage_fee=stream.product.seller.special_fee_amount,
                                                  customer_name=r['customer_name'],

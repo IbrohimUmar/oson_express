@@ -14,8 +14,6 @@ urlpatterns = [
 
     path('report/', include("config.driver.report.urls")),
 
-    path('warehouse/', include("config.driver.warehouse.urls")),
-    
     path('send-barcode/', include("config.driver.send_barcode.urls")),
 
     path('order/', include("config.driver.order.urls")),

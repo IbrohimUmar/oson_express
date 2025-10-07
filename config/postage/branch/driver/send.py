@@ -33,7 +33,6 @@ def postage_branch_driver_send(request, logistic_branch_id, driver_id):
 
     if request.method == 'POST':
         action = request.POST.get('action', None)
-        print(request.POST)
 
         '''
         tasdiqlansa 

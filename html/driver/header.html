@@ -8,9 +8,6 @@
 <a class="nav-link mt-1 {% if u == "driver_payment_list" or u == "driver_payment_create" %}active{% endif %}" style="border:1px solid #fff7f733;border-radius:10px;" {% if perms.admin.driver_payment_list %}href="{% url 'driver_payment_list' d.id %}"{% endif %}><i class="material-icons md-payments" style="vertical-align:sub;font-size:19px;"></i>
 <h6 class="d-inline"> To'lovlari</h6></a>
 {% endif %}
-{% if perms.admin.driver_warehouse %}
-<a class="nav-link mt-1 {% if u == "driver_warehouse" %}active{% endif %}" style="border:1px solid #fff7f733;border-radius:10px;"  href="{% url 'driver_warehouse' d.id %}"> <i class="material-icons md-sync" style="vertical-align:sub;font-size:19px;"></i> <h6 class="d-inline">Ombor</h6></a>
-{% endif %}
 {% if perms.admin.driver_order_history %}
 <a class="nav-link mt-1 {% if u == "driver_order_history" %}active{% endif %}" style="border:1px solid #fff7f733;border-radius:10px;" {% if perms.admin.driver_order_history %}href="{% url 'driver_order_history' d.id %}"{% endif %}><i class="material-icons md-history" style="vertical-align:sub;font-size:19px;"></i> <h6 class="d-inline">Buyurtmalari</h6></a>
 {% endif %}
