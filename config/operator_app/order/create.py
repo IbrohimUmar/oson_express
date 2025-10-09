@@ -75,6 +75,9 @@ def operator_app_order_create(request):
                 order.save()
                 order.update_product_total_price()
                 order.update_product_total_quantity()
+                order.update_driver_fee()
+                order.update_logistic_fee()
+                order.update_seller_fee()
 
                 # save_order_status_history(order, order.status, "Operator buyurtma ma'lumotlarini o'zgartirdi", request.user,
                 #                           'config.operator_app.order.edit')

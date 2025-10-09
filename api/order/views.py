@@ -28,6 +28,7 @@ def check_stream_url(value):
 class OrderStreamUrlSerializers(serializers.Serializer):
     stream = serializers.CharField(max_length=50, allow_null=False, validators=[check_stream_url])
     phone = serializers.CharField(max_length=50, allow_null=False)
+    phone2 = serializers.CharField(max_length=50, allow_null=True)
     name = serializers.CharField(max_length=100, allow_null=False)
 
 
@@ -108,8 +109,9 @@ def create_order(v, request):
                                         marketer_fee=stream.product.seller_fee,
                                         marketer=stream.marketer,
                                         seller=seller,
-                                        customer_name=v['name'],
-                                        customer_phone=v['phone'],
+                                        customer_name=v['name'][0:50],
+                                        customer_phone=v['phone'][0:25],
+                                        customer_phone2=v.get('phone', ''),
                                         status='9',
                                         ip=get_client_ip(request),
                                         user_agent=request.META['HTTP_USER_AGENT'],
@@ -123,6 +125,9 @@ def create_order(v, request):
     order.total_product_price = order.order_products_total_price
     order.total_product_quantity = order.order_products_total_ordered_amount
     order.save()
+    order.update_driver_fee()
+    order.update_logistic_fee()
+    order.update_seller_fee()
     save_order_status_history(order, order.status, "Api orqali buyurtma keldi", order.seller, 'api.order.views')
 
     return order.id

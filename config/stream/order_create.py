@@ -47,9 +47,9 @@ async def stream_order_create(request, url):
                     order = Order.objects.create(barcode=barcode_generate(),
                                                  marketer_stream=stream,
                                                  marketer_id=stream.marketer_id,
+                                                 marketer_fee=stream.product.seller_fee,
                                                  seller_id=seller.id,
-                                                 seller_fee=stream.product.seller_fee,
-                                                 postage_fee=stream.product.seller.special_fee_amount,
+                                                 total_logistic_fee=stream.product.seller.special_fee_amount,
                                                  customer_name=r['customer_name'],
                                                  customer_phone=phone,
                                                  status='9',
@@ -61,6 +61,9 @@ async def stream_order_create(request, url):
                     order.total_product_price = order.order_products_total_price
                     order.total_product_quantity = order.order_products_total_ordered_amount
                     order.save()
+                    order.update_driver_fee()
+                    order.update_logistic_fee()
+                    order.update_seller_fee()
                     save_order_status_history(order, order.status, "Oqim landing page orqali buyurtma keldi", order.marketer,
                                               'config.stream.order_create')
                     messages.success(request, f"Buyurtmangiz qabul qilindi id:{order.id}")

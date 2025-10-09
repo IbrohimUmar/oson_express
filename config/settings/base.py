@@ -59,7 +59,7 @@ INTERNAL_IPS = [
 ] # for django-debug-toolbar
 
 SITE_NAME = 'Oson.express'
-API_ALLOWED_URLS = {"127.0.0.1:8000": True, "ozar.uz": True, "Ozar.uz": True}
+API_ALLOWED_URLS = {"127.0.0.1:8000": True, "oson-express.operators.uz": True, "Oson-express.operators.uz": True}
 OPERATOR_BONUS_FOR_ADDITIONAL_SOLD = 500
 
 DEVELOPER_TG_CHAT_ID = 6937180

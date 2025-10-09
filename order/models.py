@@ -137,12 +137,9 @@ class Order(models.Model):
     marketer_stream = models.ForeignKey(MarketerStream, on_delete=models.SET_NULL, null=True, blank=True)
 
 
-    total_logistic_fee = models.IntegerField(null=True, blank=True, verbose_name='Pochta narxi', default=0)
-    postage_fee = models.IntegerField(null=True, blank=True, verbose_name='Pochta narxi', default=0)
-
-    seller_fee = models.IntegerField(null=True, blank=True, verbose_name='admin to\'lovi', default=0)
+    seller_fee = models.IntegerField(null=True, blank=True, verbose_name='Seller fee', default=0)
     seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordered_seller')
-    seller_fee_paid = models.IntegerField(null=True, blank=True, verbose_name='admin to\'lovi', default=0)
+    seller_fee_paid = models.IntegerField(null=True, blank=True, verbose_name='seller paid fee', default=0)
     seller_fee_paid_status = models.CharField(choices=PaymentStatus, default='1', max_length=50, verbose_name="Sellerga qilingan to'lov holati", null=False, blank=False)
 
     where_come_from = models.CharField(choices=where_come_from_select, max_length=50, verbose_name='Qayerdan kelgan', null=True, blank=True)
@@ -170,6 +167,10 @@ class Order(models.Model):
     is_there_product = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
                                          related_name='next_order')  # Mahsulotlarini boshqa buyurtmaga berilganmi
 
+    logistic_fee = models.IntegerField(null=True, blank=True, verbose_name="Logistika ulushi", default=0)
+    total_logistic_fee = models.IntegerField(null=True, blank=True, verbose_name="Logistika_Fee + driver_fee", default=0)
+    # postage_fee = models.IntegerField(null=True, blank=True, verbose_name='Pochta narxi', default=0)
+
     total_product_quantity = models.IntegerField(default=0, null=True, blank=True, verbose_name='total_product_quantity jami soni')
     total_product_price = models.IntegerField(default=0, null=True, blank=True, verbose_name='total_product_price jami mahsulot summasi')
     total_product_input_price = models.IntegerField(default=0, null=True, blank=True, verbose_name='total_product_input_price jami mahsulot kirim summasi')
@@ -186,55 +187,17 @@ class Order(models.Model):
 
     def update_driver_fee(self):
         '''
-        hamma order productlarni olish kerak
+        district bo'lsa hissoblansa bo'ladi
         '''
-
-        total_big_product_diff = 0
-        big_product = OrderProduct.objects.filter(order_id=self.id, size_type='2')
-
-
-        # products_id = list(OrderProduct.objects.filter(order_id=self.id).values_list("product_id", flat=True))
-        # big_products = ProductDeliveryPrice.objects.filter(product_id__in=products_id, type="1").exists()
-        # if big_products:
-        #     new_driver_fee = driver_fee_amount
-        #     for p in OrderProduct.objects.filter(type=[1, 2], order_id=self.id):
-        #         check_big_product = ProductDeliveryPrice.objects.filter(product_id=p.product.id)
-        #         if check_big_product:
-        #             amount = int(check_big_product.first().price) * int(p.total_quantity)
-        #             new_driver_fee += amount
-        #     driver_fee_amount = new_driver_fee
-        # order = Order.objects.get(id=self.id)
-        #
-        # order.driver_fee = driver_fee_amount
-        # order.save()
-        # return driver_fee_amount
-        pass
-
-    # def update_driver_fee(self):
-    #     if self.defective_product_order is None:
-    #         district = self.customer_district
-    #         driver_fee_amount = district.driver_fee
-    #         if self.driver:
-    #             if self.driver.fee_is_special:
-    #                 driver_fee_amount = self.driver.special_fee_amount
-    #
-    #         products_id = list(OrderProduct.objects.filter(product_type__in=[1, 2], order_id=self.id).values_list("product_id", flat=True))
-    #
-            # big_products = ProductDeliveryPrice.objects.filter(product_id__in=products_id, type="1").exists()
-            # if big_products:
-            #     new_driver_fee = driver_fee_amount
-            #     for p in OrderProduct.objects.filter(type=[1, 2], order_id=self.id):
-            #         check_big_product = ProductDeliveryPrice.objects.filter(product_id=p.product.id)
-            #         if check_big_product:
-            #             amount = int(check_big_product.first().price) * int(p.total_quantity)
-            #             new_driver_fee += amount
-            #     driver_fee_amount = new_driver_fee
-            # order = Order.objects.get(id=self.id)
-            #
-            # order.driver_fee = driver_fee_amount
-            # order.save()
-            # return driver_fee_amount
-    #     return self.driver_fee
+        order = Order.objects.get(id=self.id)
+        district = order.customer_district
+        driver_fee_amount = district.driver_fee
+        if order.driver:
+            if self.driver.fee_is_special:
+                driver_fee_amount = self.driver.special_fee_amount
+        order.driver_fee = driver_fee_amount
+        order.save()
+        return True
 
 
     def update_product_total_price(self):
@@ -242,6 +205,29 @@ class Order(models.Model):
         total_price = order_products.aggregate(t=Coalesce(Sum("total_price"), 0))['t']
         order = Order.objects.get(id=self.id)
         order.total_product_price=total_price
+        order.save()
+        return True
+
+    def update_logistic_fee(self):
+        '''
+        total_price hissoblanganidan dan keyin
+        driver fee hissoblanganidan keyin hissoblandi
+        '''
+        order = Order.objects.get(id=self.id)
+        seller_logistic_price = order.seller.special_fee_amount
+        order.total_logistic_fee = seller_logistic_price
+        order.logistic_fee = seller_logistic_price - order.driver_fee
+        order.save()
+        return True
+
+    def update_seller_fee(self):
+        '''
+        total_price hissoblanganidan dan keyin
+        driver fee hissoblanganidan keyin hissoblandi
+        logistic_fee hissoblanganidan keyin hissoblanadi
+        '''
+        order = Order.objects.get(id=self.id)
+        order.seller_fee = order.total_product_price - order.total_logistic_fee
         order.save()
         return True
 
