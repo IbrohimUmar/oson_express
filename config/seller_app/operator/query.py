@@ -4,7 +4,7 @@ import dateutil
 from user.models import User
 from django.shortcuts import get_object_or_404
 from cash.models import Cash
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.functions import Coalesce
 
 
@@ -104,6 +104,30 @@ class OperatorData(object):
         return order.models
 
     @property
+    def order_statuses(self):
+        # Status kodu → status ismi eşlemesi
+        from order.models import Status
+        status_map = dict(Status)
+        # Her status için sayım (tek sorguda)
+        qs = (
+            self.order.Order.objects
+            .filter(operator_id=self.id)
+            .values('status')
+            .annotate(count=Count('id'))
+        )
+        # İstenen formata dönüştür
+        result = []
+        for item in qs:
+            status_code = item['status']
+            status_name = status_map.get(status_code, 'Nomaʼlum')  # bilinmeyen kod varsa fallback
+            result.append({
+                'status_name': status_name,  # senin örneğine uygun küçük harf
+                'count': item['count']
+            })
+
+        return result
+
+    @property
     def order_status(self):
         get = self.get_order_amount
         return {"send_products": get(2), 'being_delivered': get(3), 'delivered': get(4), 'canceled': get(5),
@@ -137,7 +161,7 @@ class OperatorData(object):
     def order_amount_today(self):
         order = self.order.Order.objects.filter(operator_id=self.id, created_at__year=self.today.year,
                                                 created_at__month=self.today.month,
-                                                created_at__day=self.today.day).count()
+                                                created_at__day=self.today.day).exclude(status__in=[9, 10, 11,12, 0]).count()
         return int(order)
 
     @property

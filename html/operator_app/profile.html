@@ -73,30 +73,34 @@
                              style="border:1px solid black; border-radius:10px; padding:7px;">
                             <h6>Buyurtmalaringiz bo'yicha</h6>
 
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">O'chirilgan
-                                : {{ o.operator_data.order_status.delete }} ta
-                            </h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Mahsulot kutilmoqda
-                                : {{ o.operator_data.order_status.wait }} ta
-                            </h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Mahsuloti yuborilgan
-                                : {{ o.operator_data.order_status.send_products }} ta
-                            </h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda
-                                : {{ o.operator_data.order_status.being_delivered }} ta
-                            </h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Sotildi
-                                : {{ o.operator_data.order_status.delivered }} ta</h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Bekor qilindi
-                                : {{ o.operator_data.order_status.canceled }} ta
-                            </h6>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Qayta qo'ng'iroq
-                                : {{ o.operator_data.order_status.call_back }} ta
-                            </h6>
-                            <br>
-                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Jami kiritdi
-                                : {{ o.operator_data.total_order_amount }} ta
-                            </h6>
+                            {% for s in o.operator_data.order_statuses %}
+                         <h6 class="badge btn-dark btn-sm ml-1 readonly">{{s.status_name}} : {{s.count}} ta</h6>
+                            {% endfor %}
+<!--                            <hr>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">O'chirilgan-->
+<!--                                : {{ o.operator_data.order_status.delete }} ta-->
+<!--                            </h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Mahsulot kutilmoqda-->
+<!--                                : {{ o.operator_data.order_status.wait }} ta-->
+<!--                            </h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Mahsuloti yuborilgan-->
+<!--                                : {{ o.operator_data.order_status.send_products }} ta-->
+<!--                            </h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda-->
+<!--                                : {{ o.operator_data.order_status.being_delivered }} ta-->
+<!--                            </h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Sotildi-->
+<!--                                : {{ o.operator_data.order_status.delivered }} ta</h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Bekor qilindi-->
+<!--                                : {{ o.operator_data.order_status.canceled }} ta-->
+<!--                            </h6>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Qayta qo'ng'iroq-->
+<!--                                : {{ o.operator_data.order_status.call_back }} ta-->
+<!--                            </h6>-->
+<!--                            <br>-->
+<!--                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Jami kiritdi-->
+<!--                                : {{ o.operator_data.total_order_amount }} ta-->
+<!--                            </h6>-->
 
                         </div>
 

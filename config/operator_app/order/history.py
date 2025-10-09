@@ -18,13 +18,14 @@ async def operator_app_order_history(request):
     total_order_count = 0
     for s in Status:
         order_count = 0
-        for a in order_counts_by_status:
-            if int(a['status']) == int(s[0]):
-                total_order_count += a['order_count']
-                order_count = a['order_count']
-        statuses_with_counts.append({'id':s[0], "status_name":s[1], "order_count":order_count})
-    statuses_with_counts.append({'id':'777', "status_name":"Jami", "order_count":total_order_count})
+        if s[0] not in ['9', '6']:
+            for a in order_counts_by_status:
+                if int(a['status']) == int(s[0]):
+                    total_order_count += a['order_count']
+                    order_count = a['order_count']
 
+            statuses_with_counts.append({'id':s[0], "status_name":s[1], "order_count":order_count})
+    statuses_with_counts.append({'id':'777', "status_name":"Jami", "order_count":total_order_count})
     orders = orders.order_by("-created_at")
 
     status = request.GET.get("status", '777')
