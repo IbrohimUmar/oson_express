@@ -44,10 +44,10 @@
                     <div class="col-md-6">
                         <label>Telefon raqami</label>
                          {% if r %}
-                        <input type="text" name="phone" value="{{r.phone}}" class=" form-control" placeholder="Telefon raqami">
+                        <input type="text" name="phone" value="{{r.phone}}" class=" form-control" required placeholder="Telefon raqami">
                         {% else %}
 
-                        <input type="text" name="phone" id="phone_inputmask"
+                        <input type="text" name="phone" id="phone_inputmask" required
                                class="js-phone-input form-control" placeholder="Telefon raqami">
                         {% endif %}
                         <label class="text-sm">Aktivmi</label>

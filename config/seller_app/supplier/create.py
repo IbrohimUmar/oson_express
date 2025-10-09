@@ -11,10 +11,15 @@ from config.format_money import format_money
 def seller_app_supplier_create(request):
     if request.method == "POST":
         r=request.POST
+        phone = r.get('phone', '').strip()
+        if not phone:
+            messages.error(request, "Telefon raqam kiritilmagan.")
+            return render(request, 'seller_app/supplier/create.html', {"r": request.POST, 'messages_error':"Telefon raqam kiritilmagan"})
+
         if len(r['password_text'])<8:
-            return render(request, 'shopkeeper/manage/create.html', {"r": request.POST, 'messages_error':"Parol uzunligi kamida 8 tadan ko'p bo'lishi kerak. xafsizlik yuzasidan"})
+            return render(request, 'seller_app/supplier/create.html', {"r": request.POST, 'messages_error':"Parol uzunligi kamida 8 tadan ko'p bo'lishi kerak. xafsizlik yuzasidan"})
         if User.objects.filter(username=int(r['phone'])).exists():
-            return render(request, 'shopkeeper/manage/create.html', {"r": request.POST, 'messages_error':"Bu telefon raqamli foydalanuvchi mavjud. iltimos boshqa telefon raqam kiriting"})
+            return render(request, 'seller_app/supplier/create.html', {"r": request.POST, 'messages_error':"Bu telefon raqamli foydalanuvchi mavjud. iltimos boshqa telefon raqam kiriting"})
         User.objects.create(
             seller=request.user,
             username=int(r['phone']), first_name=r['first_name'], last_name=r['last_name'],
@@ -23,7 +28,7 @@ def seller_app_supplier_create(request):
             is_active={"on":True}.get(r.get("is_active", False), False)
         )
         messages.success(request, "Qo'shildi")
-        return redirect('shopkeeper_manage_list')
+        return redirect('seller_app_supplier_list')
     return render(request, 'seller_app/supplier/create.html')
 
 
