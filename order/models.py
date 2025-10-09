@@ -191,7 +191,10 @@ class Order(models.Model):
         '''
         order = Order.objects.get(id=self.id)
         district = order.customer_district
-        driver_fee_amount = district.driver_fee
+        if district is not None:
+            driver_fee_amount = district.driver_fee
+        else:
+            driver_fee_amount = 0
         if order.driver:
             if self.driver.fee_is_special:
                 driver_fee_amount = self.driver.special_fee_amount
