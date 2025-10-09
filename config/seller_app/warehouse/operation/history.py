@@ -36,12 +36,11 @@ def seller_app_warehouse_operation_history(request, warehouse_id):
                 status = r['status']
                 cancel_note = r.get('note', None)
                 operation_id = r.get('operation_id')
-
                 warehouse_operation = WarehouseOperation.objects.select_for_update().filter(Q(from_warehouse_id=warehouse_id)| Q(to_warehouse_id=warehouse_id),id=operation_id, status='1').first()
-
                 if not warehouse_operation:
                     messages.error(request, "Bunday amaliyot mavjud emas")
                     return redirect('seller_app_warehouse_operation_history', warehouse_id)
+
 
                 if warehouse_operation.action == '2': #omborga ta'minotchidan kirim tasdiqlandi
                     '''
@@ -59,6 +58,7 @@ def seller_app_warehouse_operation_history(request, warehouse_id):
                             status='1'
                         )
                     messages.success(request, 'Tasdiqlandi')
+                    return redirect('seller_app_warehouse_operation_history', warehouse_id)
 
                 if warehouse_operation.action == '1': # ombordan omborga o'tkazma
                     warehouse_operation.status=status
