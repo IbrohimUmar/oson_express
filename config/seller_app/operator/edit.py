@@ -48,30 +48,21 @@ def seller_app_operator_edit(request, id):
         operator.is_active = {"on": True}.get(r.get("is_active", False), False)
         operator.save()
 
-        my_group = operator_app_permission_group()
-        my_group.user_set.add(operator)
-
         advanced_perms = dict(r).get('permissions', [])
         permission = Permission.objects.filter(codename__in=advanced_perms)
-        users = User.objects.get(id=id)
         if advanced_perms and permission:
-            users.user_permissions.clear()
-            users.user_permissions.add(*permission)
+            operator.user_permissions.clear()
+            operator.user_permissions.add(*permission)
         else:
-            users.user_permissions.clear()
-        users.save()
-        # if {"on": True}.get(r.get("target_panel", False), False):
-        #     permission = Permission.objects.get(codename='operator_ads_order_panel')
-        #     users = User.objects.get(id=id)
-        #     users.user_permissions.add(permission)
-        #     users.save()
+            operator.user_permissions.clear()
+        print(permission)
+        print(advanced_perms)
 
-        # else:
-        #     users = User.objects.get(id=id)
-        #     permission = Permission.objects.get(codename='operator_ads_order_panel')
-        #     users.user_permissions.remove(permission)
-        # send_order_data_other_sites()
+        operator.save()
+        my_group = operator_app_permission_group()
+        my_group.user_set.add(operator)
         activate = r.get('activate_my_call', None)
+
         # if activate:
         #     if not users.is_registered_my_call:
         #         create_my_calls_employee(users)
@@ -83,7 +74,8 @@ def seller_app_operator_edit(request, id):
         #         activate_operator(users, activate)
 
         messages.success(request, "O'zgartirildi")
-        return redirect('seller_app_operator_list')
+        return redirect('seller_app_operator_edit', id)
     return render(request, 'seller_app/operator/edit.html',
-                  {"operator": operator, 'r': operator, 'main': True})
+                  {"operator": operator, 'r': operator, 'main': True,
+                   'selected_permission':list(operator.user_permissions.values_list('codename', flat=True))})
 

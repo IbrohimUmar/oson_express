@@ -14,7 +14,7 @@
                     <i class="material-icons md-left-arrow"></i> Qaytish
                 </a>
                 <button class="btn btn-brand " id="submit_button" type="submit">
-                    <i class="material-icons md-add"></i> Saqlash
+                    <i class="material-icons md-add"></i> O'zgartirish
                 </button>
             </div>
         </div>
@@ -55,6 +55,10 @@
                        title="Iltimos, 16 ta raqam kiriting." />
 
 
+                        <label class="text-sm">Iznlar</label>
+                          <select id="allow_districts" name="permissions" multiple row="3" style="min-height:100px;" class="form-control">
+                                <option value="operator_app_order_create" {% if 'operator_app_order_create' in selected_permission %}selected{% endif %}>Buyurtma qo'shish</option>
+                          </select>
 
                     </div>
                     <div class="col-md-6">

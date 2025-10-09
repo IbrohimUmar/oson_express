@@ -232,12 +232,6 @@
                            {% if u == 'seller_app_operator_list' or u == 'seller_app_operator_edit' or u == 'seller_app_operator_create' %}class="active"{% endif %}>
                         Operatorlarni boshqarish</a>
                         {% endif %}
-
-                    {% if perms.admin.seller_app_operator_list %}
-                        <a href="{% url 'operator_app_profile' %}"
-                           {% if u == "operator_app_profile" %}class="active"{% endif %}>Operator app</a>
-                        {% endif %}
-
                     </div>
 
 

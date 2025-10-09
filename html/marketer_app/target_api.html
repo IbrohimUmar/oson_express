@@ -1,0 +1,54 @@
+
+{% extends 'marketer_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<div class="content-main"  style="max-width: 600px;">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-4">
+      <h3 class="card-title mb-3 fw-bold text-primary d-flex align-items-center">
+        🚀 Oson Express API
+      </h3>
+
+      <div class="mb-3">
+        <label class="fw-semibold text-secondary d-block mb-1">🔗 URL:</label>
+        <div class="input-group">
+          <input
+            type="text"
+            id="apiUrl"
+            class="form-control"
+            value="https://oson-express.operators.uz/order_api/"
+            readonly
+          />
+          <button class="btn btn-outline-primary" onclick="copyUrl()">
+            📋 Kopyala
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="fw-semibold text-secondary mb-2 d-block">
+          📦 Параметры HTTP-запроса:
+        </label>
+        <ul class="list-group small">
+          <li class="list-group-item bg-dark"><strong>name</strong></li>
+          <li class="list-group-item bg-dark"><strong>phone</strong></li>
+          <li class="list-group-item bg-dark"><strong>stream</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyUrl() {
+    const urlInput = document.getElementById("apiUrl");
+    urlInput.select();
+    urlInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(urlInput.value);
+    const btn = event.target;
+    btn.innerText = "✅ Kopyalandi!";
+    setTimeout(() => (btn.innerText = "📋 Kopyala"), 2000);
+  }
+</script>
+
+{% endblock %}

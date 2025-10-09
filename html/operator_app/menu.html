@@ -72,6 +72,14 @@
                                 </li>
 
 
+                                {% if perms.admin.operator_app_order_create %}
+                                    <li style="border:1px solid #ffffff63;border-radius:14px;" class="menu-item">
+                                        <a class="menu-link" href="{% url 'operator_app_order_create' %}">
+                                            <i class="icon fas fa-add"></i>
+                                            <span class="text">Buyurtma qo'shish</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
                             </ul>
                         </nav>

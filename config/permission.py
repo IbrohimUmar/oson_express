@@ -97,6 +97,7 @@ operator_app_permission = [
     ("Operator app | Buyurtmani qabul qilish", 'operator_app_order_details'),
 
     ("Operator app | Buyurtmani o'zgartirish", 'operator_app_order_edit'),
+    ("Operator app | Buyurtma qo'shish", 'operator_app_order_create'),
 
     ("Operator app | Kiritigan buyurtmalarim", 'operator_app_order_history'),
     ("Operator app | Mening buyurtmalarim", 'operator_app_my_order'),
@@ -180,7 +181,6 @@ cash_permission = [
 
 def cash_seller_permission():
     from user.models import CashCategory
-
     name = [
         "Operatorga to'lov",
         "Marketologga to'lov",
@@ -194,11 +194,10 @@ def cash_seller_permission():
             for_who='2',
             type='2',
         )
-        print(i)
 
 def sync_permission():
     all_permissions = marketer_app_permission + operator_app_permission + driver_permission + report_permission + cash_permission
-    cash_seller_permission()
+    # cash_seller_permission()
     all_permissions += seller_app_cash_permission + seller_app_warehouse_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission + seller_app_postage_permission + seller_app_supplier_permission + seller_app_product_permission
     created_permissions = get_or_create_permissions('admin', 'logentry', all_permissions)
     sync_permission_group()

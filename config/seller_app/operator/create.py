@@ -33,6 +33,13 @@ def seller_app_operator_create(request):
         )
         my_group = operator_app_permission_group()
         my_group.user_set.add(operator)
+
+        advanced_perms = dict(r).get('permissions', [])
+        permission = Permission.objects.filter(codename__in=advanced_perms)
+        if advanced_perms and permission:
+            operator.user_permissions.clear()
+            operator.user_permissions.add(*permission)
+        operator.save()
         messages.success(request, "Operator qo'shildi")
         return redirect('seller_app_operator_list')
     return render(request, 'seller_app/operator/create.html')

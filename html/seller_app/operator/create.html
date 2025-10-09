@@ -55,6 +55,10 @@
                        title="Iltimos, 16 ta raqam kiriting." />
 
 
+                        <label class="text-sm">Iznlar</label>
+                          <select id="allow_districts" name="permissions" multiple row="3" style="min-height:100px;" class="form-control">
+                                <option value="operator_app_order_create" {% if 'operator_app_order_create' in selected_permission %}selected{% endif %}>Buyurtma qo'shish</option>
+                          </select>
                     </div>
                     <div class="col-md-6">
                         <label>Operator Id</label>
