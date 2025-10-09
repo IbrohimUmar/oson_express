@@ -69,7 +69,7 @@ EXCEPTION_BOT_TOKEN = "5987201267:AAHUho2camKMj25dgdrGBC6-V3FPRl8Iby4"
 def global_variables(request):
     return {
         'SITE_NAME': SITE_NAME,
-        'SITE_ADDRESS': 'https://ozar.uz',
+        'SITE_ADDRESS': 'https://oson-express.operators.uz',
         'SITE_EMAIL': 'contact@mysite.com',
         'SITE_TEL': 'contact@mysite.com',
     }
@@ -191,30 +191,11 @@ CKEDITOR_CONFIGS = {
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 
-# Sites = (
-#     (1, 'premiumshop'),
-#     (2, 'airshop'),
-#     (3, 'mahsulot'),
-#     (4, 'savdo24'),
-# )
-
-Sites = (
-    ("0", "Elituvchi"),
-    ("1", "Mahsulot.com"),
-    ("2", "Airshop.uz"),
-    ("3", "Savdo24.com"),
-    ("4", "Mybazar24.uz"),
-    ("5", "Mahsulot app"),
-    ("6", "Premiumshop"),
-    ("7", "My-bazar.com"),
-
-)
-
 
 if IS_SERVER:
     # from config.connection.send_developer import send_private_message_developer
     # send_private_message_developer(f"Is server calisti {IS_SERVER}")
-    CSRF_TRUSTED_ORIGINS = ['https://megabot.uz', 'http://megabot.uz', 'https://zeno.uz', 'http://zeno.uz']
+    CSRF_TRUSTED_ORIGINS = ['https://oson-express.operators.uz', 'http://oson-express.operators.uz']
     ALLOWED_HOSTS = ["*"]
     # SESSION_COOKIE_AGE = 604800
     # os.environ['OPENBLAS_NUM_THREADS'] = '1'
@@ -287,3 +268,67 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # MEDIA_URL = '/media/'
 # # MEDIA_ROOT = BASE_DIR / 'media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media'),
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'datefmt': '%Y-%m-%d %H:%M:%S',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose',
+            },
+            # ERROR, WARNING, CRITICAL seviyeleri için ayrı Handler'lar
+            'error_file': {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'error.log'),
+                'when': 'midnight',
+                'backupCount': 30,
+                'level': 'ERROR',
+                'formatter': 'verbose',
+            },
+            'warning_file': {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'warning.log'),
+                'when': 'midnight',
+                'backupCount': 30,
+                'level': 'WARNING',
+                'formatter': 'verbose',
+            },
+            'critical_file': {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'critical.log'),
+                'when': 'midnight',
+                'backupCount': 30,
+                'level': 'CRITICAL',
+                'formatter': 'verbose',
+            },
+            # 'developer' için yeni logger ve handler ekleme
+            'developer_file': {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'developer.log'),
+                'when': 'midnight',
+                'backupCount': 30,
+                'level': 'DEBUG', # 'developer' logger'ı DEBUG gibi düşük bir seviyede ayarlıyoruz
+                'formatter': 'verbose',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console', 'error_file', 'warning_file', 'critical_file'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            # 'developer' için yeni logger ekleme
+            'developer_logger': {
+                'handlers': ['developer_file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }

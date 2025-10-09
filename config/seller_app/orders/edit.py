@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction, IntegrityError
 from order.services.client_report import ClientReportService
 from order.services.crud_service import OrderCrudService
-from config.settings.base import Sites, TOLL_AMOUNT, OPERATOR_BONUS_FOR_ADDITIONAL_SOLD
+from config.settings.base import TOLL_AMOUNT, OPERATOR_BONUS_FOR_ADDITIONAL_SOLD
 from user.models import Regions
 from order.services.calculate_operator_fee import calculate_operator_fee
 
