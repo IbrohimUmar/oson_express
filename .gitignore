@@ -157,3 +157,4 @@ migrations/
 */migrations/
 */*/migrations/
 /operators/migrations
+config/.env
