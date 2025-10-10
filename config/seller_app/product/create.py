@@ -47,6 +47,7 @@ def seller_app_product_create(request):
                 product = Product.objects.create(name=r['name'], short=r['short'],
                                                  desc=request.POST['desc'],
                                                  seller=request.user,
+                                                 approval_status='2',
                                                  # image=request.FILES.get('image', None),
                                                  seller_fee={'': 0}.get(r['seller_fee'], r['seller_fee']),
                                                  sale_price={'': 0}.get(r['sale_price'], r['sale_price']),
