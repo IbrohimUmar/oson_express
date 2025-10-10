@@ -75,12 +75,14 @@
                             {% endif %}
 
 
+                            {% if perms.admin.seller_app_setting_operator_comment_delete %}
                             <form method="post" class="d-inline">
                                 {% csrf_token %}
-                                <input type="hidden" class="action" value="delete">
-                                <input type="hidden" class="comment_id" value="delete">
-                                <button class="btn btn-sm btn-danger"><i class="material-icons md-delete"></i> O'chirish</button>
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="comment_id" value="{{o.id}}">
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Siz rostdanham o\'chirmoqchimisiz?')"><i class="material-icons md-delete"></i> O'chirish</button>
                             </form>
+                            {% endif %}
 
                         </td>
 

@@ -79,6 +79,7 @@ seller_app_setting_permission = [
     ("Seller app | Sozlamalar | Operator izohlari | Ro'yxati", 'seller_app_setting_operator_comment_list'),
     ("Seller app | Sozlamalar | Operator izohlari | Qo'shish", 'seller_app_setting_operator_comment_create'),
     ("Seller app | Sozlamalar | Operator izohlari | O'zgartirish", 'seller_app_setting_operator_comment_edit'),
+    ("Seller app | Sozlamalar | Operator izohlari | O'chirish", 'seller_app_setting_operator_comment_delete'),
 ]
 
 
@@ -214,6 +215,7 @@ def sync_permission_group():
     # get_or_create_group('Operator', operator_permission)
     get_or_create_group('Operator app', operator_app_permission)
     get_or_create_group('Marketolog Paneli', marketer_app_permission)
+    get_or_create_group('Seller app', seller_app_setting_permission + seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
     # seller_app_permission_group()
     return True
 

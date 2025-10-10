@@ -318,10 +318,11 @@
                          <a {% if u == 'excel_files_list'  %}class="active"{% endif %} href="{% url 'excel_files_list' %}">
                         <span class="text">Excel yuklamalar</span>
                         </a>
-
+                        {% if perms.admin.seller_app_setting_operator_comment_list %}
                          <a {% if u == 'seller_app_setting_operator_comment_list'  %}class="active"{% endif %} href="{% url 'seller_app_setting_operator_comment_list' %}">
                         <span class="text">Operator izohlari</span>
                         </a>
+                        {% endif %}
                     </div>
                 </li>
 
