@@ -11,7 +11,6 @@ def seller_app_setting_operator_comment_list(request):
     seller = get_seller(request.user)
     comments = SellerOperatorStatusDesc.objects.filter(seller=seller)
     if request.method == 'POST':
-        print(request.POST)
         comment = SellerOperatorStatusDesc.objects.get(seller=seller, id=request.POST['comment_id'])
         comment.delete()
         messages.success(request, "O'chirildi")

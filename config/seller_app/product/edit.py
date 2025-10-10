@@ -21,7 +21,7 @@ def seller_app_product_edit(request, id):
                 product_variable = json.loads(request.POST["product_variable_list"])
                 global_is_active = {"true": True, "false": False, 1: True, 0: False}.get(r['is_active'], r['is_active'])
 
-                product.approval_status = '1'
+                # product.approval_status = '1'
                 product.name = r['name']
                 product.short = r['short']
                 product.desc = request.POST['desc']
