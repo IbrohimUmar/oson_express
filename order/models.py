@@ -426,8 +426,8 @@ class OrderComment(models.Model):
 
 
 
-class CustomStatusDesc(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+class SellerOperatorStatusDesc(models.Model):
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=50, choices=Status)
     description = models.TextField()
 
@@ -435,8 +435,21 @@ class CustomStatusDesc(models.Model):
         return self.status
 
     class Meta:
-        verbose_name = "Holat izohi"
-        verbose_name_plural = "Holat izohlari"
+        verbose_name = "Seller holat izohi"
+        verbose_name_plural = "Seller holat izohlari"
+
+
+# class CustomStatusDesc(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     status = models.CharField(max_length=50, choices=Status)
+#     description = models.TextField()
+#
+#     def __str__(self):
+#         return self.status
+#
+#     class Meta:
+#         verbose_name = "Holat izohi"
+#         verbose_name_plural = "Holat izohlari"
 
 
 

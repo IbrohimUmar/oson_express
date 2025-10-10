@@ -1,0 +1,66 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h4 class="content-title card-title">Yangi operatorlar uchun izoh qo'shish</h4>
+            </div>
+            <div>
+                <a href="{% url 'seller_app_setting_operator_comment_list' %}" class="btn btn-brand">
+
+                    <i class="material-icons md-left-arrow"></i> Qaytish
+                </a>
+                <button class="btn btn-brand " id="submit_button" type="submit">
+                    <i class="material-icons md-add"></i> Saqlash
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <h4>Ma'lumotlarni to'ldiring</h4>
+                {% if messages_error %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages_error}}
+                </div>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row  order-info-wrap">
+                    <div class="col-md-6">
+                        <label>Izoh</label>
+                        <input type="text" name="desc" placeholder="Izohni kiriting" required
+                               class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Izoh tanlanganida buyurtma holati</label>
+                        <select name="status" class="form-control">
+                            <option value="9">Yangi</option>
+                            <option value="11">Arxivlandi</option>
+                            <option value="10">Arxivlanmoqda</option>
+                            <option value="12">Dubl buyurtma</option>
+                            <option value="6">Qayta qo'ng'iroq</option>
+                        </select>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<script type='text/javascript'>
+    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});
+
+</script>
+
+{% endblock %}
+{% block header %}
+<script type='text/javascript' src='{% static "js/jquery-3.6.0.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/jquery.inputmask.bundle.js" %}'></script>
+{% endblock %}
+{% block footer %}
+{% endblock %}

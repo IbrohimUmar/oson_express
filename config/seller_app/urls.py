@@ -11,5 +11,6 @@ urlpatterns = [
     path('product/', include('config.seller_app.product.urls')),
     path('cash/', include('config.seller_app.cash.urls')),
     path('orders/', include('config.seller_app.orders.urls')),
+    path('setting/', include('config.seller_app.setting.urls')),
 
 ]

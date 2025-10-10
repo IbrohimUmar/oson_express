@@ -1,0 +1,121 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h3 class="content-title">Operatorlar uchun izohlar ro'yxati</h3>
+        <div>
+            {% if perms.admin.seller_app_setting_operator_comment_create %}
+            <a href="{% url 'seller_app_setting_operator_comment_create' %}" class="btn btn-sm btn-brand">Yangi qo'shish</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_app_home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline active">Operator izohlari ro'yxati</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Qidiruv</h5>
+                  <form method="get">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 col-sm-8 col-10 mb-md-0">
+                                        <input type="text" class="form-control" placeholder="id, tel, ism bo'yicha qidiruv" name="search"
+                                               {% if request.GET.search %}value="{{ request.GET.search }}" {% endif %}>
+                                    </div>
+                                    <div class="col-md-4 col-2">
+                                        <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                        </button>
+                                        {% if request.GET %}
+
+                                        <a href="" class=" btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </form>
+
+
+            <h6 class="text-muted">Jami sellerlar soni : {{count}} ta</h6>
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Holati</th>
+                        <th>Izoh</th>
+                        <th>#</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for o in page_obj %}
+                    <tr>
+                        <td>
+                           <span class="badge badge-primary">{{ o.get_status_display }}</span>
+                        </td>
+                        <td>
+                            {{ o.description }}
+                        </td>
+
+                        <td>
+                            {% if perms.admin.seller_app_setting_operator_comment_edit %}
+                            <a href="{% url 'seller_app_setting_operator_comment_edit' o.id %}" class="btn btn-brand btn-sm">
+                                <i class="material-icons md-edit"></i> O'zgartirish</a>
+                            {% endif %}
+
+
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" class="action" value="delete">
+                                <input type="hidden" class="comment_id" value="delete">
+                                <button class="btn btn-sm btn-danger"><i class="material-icons md-delete"></i> O'chirish</button>
+                            </form>
+
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+                                        <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block header %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+{% endblock %}

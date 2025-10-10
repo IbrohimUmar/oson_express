@@ -308,7 +308,7 @@
                 {% endif %}
 
 
-                <li class="menu-item has-submenu {% if u == 'excel_files_list' %}active{% endif %}">
+                <li class="menu-item has-submenu {% if u == 'excel_files_list' or u == 'seller_app_setting_operator_comment_list' %}active{% endif %}">
                     <a class="menu-link" href="">
 <!--                        <i class="icon material-icons md-settings"></i>-->
                         <i class="icon material-icons md-settings"></i>
@@ -317,7 +317,11 @@
                     <div class="submenu">
                          <a {% if u == 'excel_files_list'  %}class="active"{% endif %} href="{% url 'excel_files_list' %}">
                         <span class="text">Excel yuklamalar</span>
-                    </a>
+                        </a>
+
+                         <a {% if u == 'seller_app_setting_operator_comment_list'  %}class="active"{% endif %} href="{% url 'seller_app_setting_operator_comment_list' %}">
+                        <span class="text">Operator izohlari</span>
+                        </a>
                     </div>
                 </li>
 

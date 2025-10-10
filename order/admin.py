@@ -59,11 +59,6 @@ class ContentTypeAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(CustomStatusDesc)
-class CustomStatusDescAdmin(admin.ModelAdmin):
-    list_filter = ('user', 'status', 'description')
-    search_fields = ['description']
-    list_filter = ['status']
 
 
 @admin.register(Permission)

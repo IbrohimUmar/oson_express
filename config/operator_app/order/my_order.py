@@ -7,16 +7,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 
 from config.operator_app.permission import check_work_hours
-from order.models import Order, CustomStatusDesc
+from order.models import Order, SellerOperatorStatusDesc
 from services.order.history import save_order_status_history
+from services.seller.get_seller import get_seller
 
 
 @login_required(login_url='/login')
 @permission_required('admin.operator_app_my_order', login_url="/home")
 @check_work_hours
 def operator_app_my_order(request):
-    order = Order.objects.filter(status__in=[9, 6], operator=request.user).order_by('-updated_at')
-    statistic = Order.objects.filter(status__in=[9, 6], operator=request.user).aggregate(
+    seller = get_seller(request.user)
+    order = Order.objects.filter(status__in=[9, 6], driver=None, operator=request.user).order_by('-updated_at')
+    statistic = Order.objects.filter(status__in=[9, 6], driver=None, operator=request.user).aggregate(
         taked_new_order=models.Count("id", filter=models.Q(status=9)),
         call_back=models.Count("id", filter=models.Q(status=6)),
         total_order=models.Count("id"),
@@ -29,7 +31,7 @@ def operator_app_my_order(request):
                 r = request.POST
                 order = Order.objects.filter(id=r['id'], status__in=[9, 6], operator=request.user).first()
                 if order:
-                    status_and_desc = get_object_or_404(CustomStatusDesc, id=r['status_description'])
+                    status_and_desc = get_object_or_404(SellerOperatorStatusDesc, seller=seller, id=r['status_description'])
                     order.status = status_and_desc.status
                     order.note = status_and_desc.description
                     order.save()
@@ -43,7 +45,7 @@ def operator_app_my_order(request):
             messages.error(request, f"Saqlashda xatolik yuzaga keldi {e}")
             return redirect('operator_app_my_order')
 
-    descriptions = CustomStatusDesc.objects.filter(Q(user=request.user) | Q(user=None))
+    descriptions = SellerOperatorStatusDesc.objects.filter(seller=seller)
     order_object = Paginator(order, 25)
     page_number = request.GET.get('page')
     order = order_object.get_page(page_number)
