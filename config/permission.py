@@ -75,6 +75,11 @@ seller_app_warehouse_permission = [
 ]
 
 
+seller_app_setting_permission = [
+    ("Seller app | Sozlamalar | Operator izohlari | Ro'yxati", 'seller_app_setting_operator_comment_list'),
+    ("Seller app | Sozlamalar | Operator izohlari | Qo'shish", 'seller_app_setting_operator_comment_create'),
+    ("Seller app | Sozlamalar | Operator izohlari | O'zgartirish", 'seller_app_setting_operator_comment_edit'),
+]
 
 
 marketer_app_permission = [
@@ -198,7 +203,7 @@ def cash_seller_permission():
 def sync_permission():
     all_permissions = marketer_app_permission + operator_app_permission + driver_permission + report_permission + cash_permission
     # cash_seller_permission()
-    all_permissions += seller_app_cash_permission + seller_app_warehouse_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission + seller_app_postage_permission + seller_app_supplier_permission + seller_app_product_permission
+    all_permissions += seller_app_setting_permission + seller_app_cash_permission + seller_app_warehouse_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission + seller_app_postage_permission + seller_app_supplier_permission + seller_app_product_permission
     created_permissions = get_or_create_permissions('admin', 'logentry', all_permissions)
     sync_permission_group()
     print('successfully created permissions')
@@ -273,10 +278,15 @@ def seller_app_warehouse_permission_group():
     group = get_or_create_group('Seller app warehouse', seller_app_warehouse_permission)
     return group
 
+def seller_app_setting_permission_group():
+    sync_permission()
+    group = get_or_create_group('Seller app setting', seller_app_setting_permission)
+    return group
+
 
 def seller_app_permission_group():
     sync_permission()
-    group = get_or_create_group('Seller app', seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
+    group = get_or_create_group('Seller app', seller_app_setting_permission + seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
     return group
 
 
