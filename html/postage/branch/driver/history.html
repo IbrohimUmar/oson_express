@@ -109,20 +109,11 @@
                     {% for o in page_obj %}
                     <tr>
                         <td>
-                            {% if o.action == '1' and o.to_logistic_branch and o.to_user_status == '1' and o.from_user_status == '2' %}
-                            <a href="{% url 'postage_branch_seller_input' o.to_logistic_branch.id o.id %}" class="btn btn-brand btn-sm">
-                                <i class="material-icons md-info"></i>Qabul qilish</a>
-                            {% endif %}
-
-
-
-
-                            <form method="post" class="d-inline">
+                                {% if o.action == '3' and o.from_user_status == '1' %}
+                            <form class="d-inline" method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="postage_id" value="{{o.id}}">
-
-                                {% if o.action == '3' and o.from_user_status == '1' %}
-                                <input type="hidden" name="action" value="none" id="action">
+                                <input type="hidden" name="action" value="confirm" id="action_confirm">
 
                                 <button class="btn btn-sm btn-brand d-inline" type="button" name="type" value="confirm"
                                 onclick="return Swal.fire({
@@ -134,14 +125,22 @@
                                     confirmButtonColor: '#3BB77E',
                             }).then(function(result) {
                               if (result.value) {
-                                  document.getElementById('action').value = 'confirm'
+
                                 form.submit();
                               }
                             })"><i class="material-icons md-check"></i> Tasdiqlash</button>
+                                </form>
                                 {% endif %}
 
+
+
                         {% if o.action == '3' and o.from_user_status == '1'  %}
-                                <input type="hidden" name="action" value="none" id="action">
+
+
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postage_id" value="{{o.id}}">
+                                <input type="hidden" name="action" value="cancel">
 
                                 <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"
                                 onclick="return Swal.fire({
@@ -153,16 +152,20 @@
                                     confirmButtonColor: '#F30000',
                             }).then(function(result) {
                               if (result.value) {
-                              document.getElementById('action').value = 'cancel'
                                 form.submit();
                               }
                             })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
+                            </form>
                                 {% endif %}
 
 
 
                                 {% if o.action == '3' and o.from_user_status == '2' and o.to_user_status == '3' %}
-                                <input type="hidden" name="action" value="none" id="action">
+
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postage_id" value="{{o.id}}">
+                                <input type="hidden" name="action" value="cancel_because_to_user_cancel">
 
                                 <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"
                                 onclick="return Swal.fire({
@@ -174,21 +177,22 @@
                                     confirmButtonColor: '#F30000',
                             }).then(function(result) {
                               if (result.value) {
-                              document.getElementById('action').value = 'cancel_because_to_user_cancel'
                                 form.submit();
                               }
                             })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
+                            </form>
                                 {% endif %}
 
 
 
 
-                            </form>
 
+                            {% if o.action == '3' and o.from_user_status == '1' and o.to_user_status == '1' %}
 
-
-
-
+                            <a href="{% url 'postage_branch_driver_send' logistic_branch.id o.to_user.id %}" class="btn btn-sm btn-brand">
+                                <i class="fas fa-barcode"></i>
+                                Skannerlash</a>
+                            {% endif %}
 
                             {% if o.action == '4' and o.from_user_status == '2' and o.to_user_status == '1' %}
                             <a class="btn btn-sm btn-brand" href="{% url 'postage_branch_driver_return' logistic_branch.id o.id %}"><i class="material-icons md-check"></i> Qabul qilish</a>

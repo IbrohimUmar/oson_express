@@ -38,7 +38,6 @@ def postage_branch_driver_history(request, logistic_branch_id):
         postage_qs = postage_qs.filter(to_user_status=to_user_status)
 
     if request.method == 'POST':
-
         try:
             with transaction.atomic():
                 '''
@@ -52,6 +51,7 @@ def postage_branch_driver_history(request, logistic_branch_id):
                                                  id=request.POST.get('postage_id', 0)).first()
                 if not postage:
                     messages.error(request, "Bunday pochta mavjud emas")
+                    return redirect('postage_branch_driver_history', logistic_branch_id)
 
                 if postage.action == '3' and action == 'confirm':     # pochta haydovchiga chiqim tasdiqlansa
                     if postage.from_user_status != '1':
@@ -97,6 +97,7 @@ def postage_branch_driver_history(request, logistic_branch_id):
                                   logistic_branch_id=logistic_branch_id)
                     messages.success(request, "Qaytarildi")
                     return redirect('postage_branch_driver_history', logistic_branch_id)
+                messages.error(request, "Action aniq emas")
                 return redirect('postage_branch_driver_history', logistic_branch_id)
 
         except Exception as e:
