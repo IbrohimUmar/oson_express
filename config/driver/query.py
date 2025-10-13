@@ -20,9 +20,8 @@ class DriverData(object):
 
     @property
     def debt(self):
-        delivery_product_amount = sum(list(order.models.OrderProduct.objects.filter(order__status=4, driver_id=self.id).values_list("total_price", flat=True)))
-        return int(delivery_product_amount)
-
+        orders = Order.objects.filter(driver_status=2, driver_id=self.id).aggregate(t=Coalesce(Sum('total_product_price'), 0))['t']
+        return orders
 
     @property
     def debt_uzs(self):
@@ -35,11 +34,8 @@ class DriverData(object):
 
     @property
     def fee(self):
-        total_driver_fee = sum(list(order.models.Order.objects.filter(driver_id=self.id, status=4).values_list("driver_fee", flat=True)))
-        total_driver_bonus = sum(list(order.models.Order.objects.filter(driver_id=self.id, status=4, driver_is_bonus=True, driver_bonus_amount_won__isnull=False).values_list("driver_bonus_amount_won", flat=True)))
-        if total_driver_fee:
-            return int(total_driver_fee) + int(total_driver_bonus)
-        return 0
+        total_driver_fee = Order.objects.filter(driver_status=2, driver_id=self.id).aggregate(t=Coalesce(Sum('driver_fee'), 0))['t']
+        return total_driver_fee
 
     @property
     def balance(self):
@@ -67,28 +63,21 @@ class DriverData(object):
     @property
     def order_status_by(self):
         order_status_dict = Order.objects.filter(driver_id=self.id).aggregate(
-            send_products=Count('id', filter=Q(status=2)),
-            being_delivered=Count('id', filter=Q(status=3)),
-            delivered=Count('id', filter=Q(status=4)),
+            being_delivered=Count('id', filter=Q(driver_status=1)),
+            delivered=Count('id', filter=Q(driver_status=2)),
 
-            canceled_driver=Count('id', filter=Q(status=5, cancelled_status='1')),
-            canceled_returned=Count('id', filter=Q(status=5, cancelled_status="3")),
-            canceled_given_other_order=Count('id', filter=Q(status=5,cancelled_status="2")),
-
-            call_back=Count('id', filter=Q(status=6)),
-            wait=Count('id', filter=Q(status=1)),
-            delete=Count('id', filter=Q(status=0))
+            canceled_driver=Count('id', filter=Q(driver_status=3, status=5)),
+            canceled_returned=Count('id', filter=Q(driver_status=3, status__in=["14", '15'])),
+            canceled_total=Count('id', filter=Q(driver_status=3)),
         )
         return order_status_dict
 
     @property
     def order_product_by(self):
-        order_status_dict = OrderProduct.objects.filter(driver_id=self.id, order__driver_id=self.id).aggregate(
-            send_product=Coalesce(Sum("total_price", filter=Q(order__status=2, order__cancelled_status=1)), 0),
-            cancelled_driver=Coalesce(Sum("total_price", filter=Q(order__status=5, order__cancelled_status=1)), 0),
-            being_delivered=Coalesce(Sum("total_price", filter=Q(order__status=3,order__cancelled_status=1)), 0),
-            call_back=Coalesce(Sum("total_price", filter=Q(order__status=6,order__cancelled_status=1)), 0),
-            total=Coalesce(Sum("total_price", filter=~Q(order__status__in=[4, 2]) & Q(order__cancelled_status=1)), 0),
+        order_status_dict = Order.objects.filter(driver_id=self.id).aggregate(
+            cancelled_driver=Coalesce(Sum("total_product_price", filter=Q(driver_status=3, status=5)), 0),
+            being_delivered=Coalesce(Sum("total_product_price", filter=Q(driver_status=1)), 0),
+            total=Coalesce(Sum("total_product_price", filter=Q(status__in=[3, 5])), 0)
         )
         return order_status_dict
 
@@ -105,10 +94,10 @@ class DriverData(object):
 
 
     def get_sold_precentega(self, date):
-        order_status_dict = Order.objects.filter(driver_id=self.id, updated_at__date=date).aggregate(
-            delivered=Count('id', filter=Q(status=4)),
-            canceled=Count('id', filter=Q(status=5)),
-            total=Count('id', filter=Q(status__in=[4, 5])),
+        order_status_dict = Order.objects.filter(driver_id=self.id, driver_status_changed_at__date=date).aggregate(
+            delivered=Count('id', filter=Q(driver_status=2)),
+            canceled=Count('id', filter=Q(driver_status=3)),
+            total=Count('id', filter=Q(status__in=[2, 3])),
         )
         total_orders = order_status_dict['total'] or 0
         sold_orders = order_status_dict['delivered'] or 0

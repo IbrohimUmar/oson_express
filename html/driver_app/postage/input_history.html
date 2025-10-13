@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="text-center">
-                                <h5 class="badge btn-sm ml-1 readonly text-white m-auto" style="background-color:#da7713f0;">Mahsulotalr kelgan sana : {{ i.to_warehouse_confirm_date }}   </h5>
+                                <h5 class="badge btn-sm ml-1 readonly text-white m-auto" style="background-color:#da7713f0;">Mahsulotalr kelgan sana : {{ i.to_user_status_changed_at }}   </h5>
                             </div>
 
 
@@ -63,11 +63,11 @@
 
                         <hr class="m-1">
                         <div class="col-md-12 text-center mt-2">
-                            <a href="{% url 'driver_app_warehouse_operation_product_list' i.id %}" class="btn btn-sm btn-brand" style="background-color:#3b9fb7;">
-                                <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-widgets"></i> Mahsulotlar : {{i.items_total_amount}} ta</h6>
-                            </a>
+<!--                            <a href="{% url 'driver_app_warehouse_operation_product_list' i.id %}" class="btn btn-sm btn-brand" style="background-color:#3b9fb7;">-->
+<!--                                <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-widgets"></i> Mahsulotlar</h6>-->
+<!--                            </a>-->
 
-                            <a href="{% url 'driver_app_warehouse_operation_order_list' i.id %}" class=" btn btn-sm btn-brand">
+                            <a href="{% url 'driver_app_postage_order_list' i.id %}" class=" btn btn-sm btn-brand">
                                 <h6 style="font-size:11px;"><i style="vertical-align:text-top;" class="icon material-icons md-shopping_basket"></i> Buyurtmalar : {{i.postage_details_count}} ta</h6>
                             </a>
                         </div>
@@ -108,14 +108,9 @@
                     <h1>{{ page_obj.count }}</h1>
                 </div>
                         {% else %}
-                        <h5 class="text-center">To'lov topilmadi!</h5>
+                        <h5 class="text-center">Pochta topilmadi!</h5>
                         {% endif %}
             </div>
-
-        </div>
-
-
-
     </section>
     <br>
     <br>
@@ -137,17 +132,8 @@ td, th {
   text-align: left;
   padding: 8px;
 }
-
-
-
 </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-
-<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
-<!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>-->
-
 {% endblock %}
 {% block footer %}
 <script>

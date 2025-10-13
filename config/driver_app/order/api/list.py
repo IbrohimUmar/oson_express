@@ -6,6 +6,7 @@ from order.models import Order, DefectiveOrderDriverFee, OrderProduct
 from config.driver_app.permission import is_driver
 from django.http import JsonResponse
 from order.models import DefectiveOrderDriverFee
+from postage.models import Postage
 from warehouse.models import WarehouseOperation
 
 
@@ -15,15 +16,17 @@ def driver_app_order_api_list(request):
     orders = Order.objects.filter(driver_id=request.user.id).order_by("-updated_at")
 
 
-    warehouse_operation_id = request.GET.get("warehouse_operation_id", None)
-    if warehouse_operation_id:
-        warehouse_operation = get_object_or_404(WarehouseOperation, id=warehouse_operation_id)
-        orders = orders.filter(id__in=warehouse_operation.relation_orders_id)
+    postage_id = request.GET.get("postage_id", None)
+    if postage_id:
+        postage = get_object_or_404(Postage, id=postage_id)
+        orders = postage.postage_orders
 
-    print(request.GET)
     status = int(request.GET.get('status', 1))
     if status:
-        orders = orders.filter(driver_status=status)
+        if status == '33':
+            orders = orders.filter(driver_status=status).exclude(status=5)
+        else:
+            orders = orders.filter(driver_status=status)
 
     search_terms = request.GET.get("search", None)
     if search_terms:
@@ -78,20 +81,34 @@ def driver_app_order_api_list(request):
                                     } for i in OrderProduct.objects.filter(Q(product_variable__color__isnull=False)|Q(product_variable__measure_item__isnull=False), main_order_product=o, product_variable__isnull=False,
                                                                            )],
                           })
+
+        has_edit = True
+        status_name = r.get_driver_status_display()
+        if r.driver_status == '3' and r.status != '5':
+            status_name = f"{status_name} (Qaytarildi)"
+            has_edit = False
+        elif r.driver_status == '3' and r.status == '5':
+            status_name = f"{status_name} (Haydovchida)"
+
+
+        if r.driver_status == '2':
+            has_edit = False
         order_list.append(
             {
                 'id': r.id,
                 'customer_name': r.customer_name, 'customer_phone': r.customer_phone,
                 'barcode': r.barcode,
+                'has_edit': has_edit,
                 'customer_phone2': r.customer_phone2,
                 'customer_street': r.customer_street,
                 'customer_district': r.customer_district.name,
                 'operator': get_not_none_operator_username(r.operator),
                 'status': r.driver_status,
-                'status_name': r.get_driver_status_display(),
+                'status_name': status_name,
                 'order_date': r.order_date.strftime(("%Y-%m-%d")),
                 'delivered_date': r.delivered_date.strftime(("%Y-%m-%d")),
-                'driver_fee': r.driver_fee, 'driver_is_bonus': {True: 1, False: 0}.get(r.driver_is_bonus),
+                'driver_fee': r.driver_fee,
+                'driver_is_bonus': {True: 1, False: 0}.get(r.driver_is_bonus),
                 'bonus': r.bonus,
                 'products': products,
 
@@ -107,7 +124,6 @@ def driver_app_order_api_list(request):
                 # "defective_order_details": {"defective_sold_order":r.id, 'driver_fee':10000},
                 # "defective_order_details": '',
             })
-        print(order_list)
     return JsonResponse({
         'status':200,
         'data': order_list,

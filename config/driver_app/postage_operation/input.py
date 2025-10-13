@@ -47,8 +47,8 @@ def driver_app_postage_operation_input(request, postage_id):
                     postage.save()
 
                     orders = postage.postage_orders
-                    orders.update(status='3',
-                                  driver=driver,
+                    orders.update(
+                        status='3', driver=driver,
                                   logistic_branch_id=None, transaction_lock=False,
                              driver_shipping_start_date=datetime.datetime.today().strftime(("%Y-%m-%d")),
                              updated_at=datetime.datetime.today(),

@@ -1009,11 +1009,12 @@
 
             AddSelectedProductList: function () {
                 var product = this.all_products_json.filter(m => m.id === Number(this.checkedProduct))[0]
-                console.log('find', product)
                 vm = this
                 axios.get('{% url 'setting_product_details_api' %}', {
                     params: {product_id: product.id}
                 }).then(resp => {
+                    console.log(resp.data.data)
+
                     var values = Object.assign(product, resp.data.data);
                     values['amount'] = 1
                     values['selected_color'] = {}

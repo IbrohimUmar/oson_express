@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from order.services.crud_service import OrderCrudService
 from services.handle_exception import handle_exception
 from services.order.history import save_order_status_history
+from services.seller.get_seller import get_seller
 from user.models import Regions, Districts
 from django.db import transaction, IntegrityError
 from datetime import timedelta
@@ -30,6 +31,7 @@ developer_logger = logging.getLogger('developer_logger')
 @permission_required('admin.operator_app_order_details', login_url="/home")
 @check_work_hours
 def operator_app_order_details(request, id):
+    seller = get_seller(request.user)
     order = Order.objects.filter(id=id, operator=request.user, status__in=[9, 6]).first()
     if not order:
         messages.error(request, "Buyurtma topilmadi")
@@ -43,7 +45,7 @@ def operator_app_order_details(request, id):
     product_list_service = ProductListService()
     order_crud_services = OrderCrudService()
     selected_products_list = order_crud_services.get_order_product_product_json(id)
-    all_products_json = product_list_service.get_product_json_by_site(seller=request.user.seller)
+    all_products_json = product_list_service.get_product_json_by_site(seller=seller)
     if request.method == "POST":
         try:
             with transaction.atomic():

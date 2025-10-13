@@ -187,12 +187,6 @@ class WarehouseOperation(models.Model):
         return {"sold_percentage": int(sold_percentage), "details": order_status_dict}
 
 
-    @property
-    def relation_order_is_close(self):
-        order = Order.objects.filter(id__in=self.relation_orders_id, status__in=[3, 2, 5, 6]).exclude(status=5, cancelled_status__in=['2', '3']).exists()
-        if order:
-            return False
-        return True
 
 
 def get_or_zero(value):

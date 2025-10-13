@@ -13,6 +13,7 @@ def setting_product_details_api(request):
         if global_product:
             product_feature_services = ProductFeatureService(global_product)
             main_data = {
+                "image": global_product.image.url,
                 "is_collection": global_product.is_collection,
                 "bonus_type": global_product.bonus_type,
                 "bonus_details": product_feature_services.product_bonus_details,

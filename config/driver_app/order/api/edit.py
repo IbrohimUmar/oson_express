@@ -39,11 +39,11 @@ def driver_app_order_api_edit(request):
                             'message': f"Hato skannerlangan type {type(body['barcode'])}, val {body}",
                         })
                     barcode = body['barcode']
-                    order = Order.objects.filter(status__in=[3, 4, 5, 6], barcode=barcode, transcation_lock=False, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5], barcode=barcode, transcation_lock=False, driver_id=request.user.id)
 
                 elif body.get("order_id", None):
                     order_id = body['order_id']
-                    order = Order.objects.filter(status__in=[3, 4, 5, 6], id=order_id, transcation_lock=False, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5], id=order_id, transcation_lock=False, driver_id=request.user.id)
                 else:
                     order = None
 
@@ -74,7 +74,7 @@ def driver_app_order_api_edit(request):
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
 
                     if body['next_status'] == 5:
-                        if order_status in [3, 6, 4]:
+                        if order_status in [3, 4]:
                             order.status = 5
                             order.driver_status = '3'
                             order.driver_status_changed_at=datetime.datetime.now()
@@ -85,16 +85,6 @@ def driver_app_order_api_edit(request):
                                                       'config.driver_app.order.api.edit')
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
 
-                    if body['next_status'] == 6:
-                        if order_status in [3, 5, 4]:
-                            order.status = 6
-                            order.driver_status = '4'
-                            order.driver_status_changed_at=datetime.datetime.now()
-                            order.save()
-                            save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan qayta qo'ng'iroqga olindi",
-                                                      request.user,
-                                                      'config.driver_app.order.api.edit')
-                            return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
                     return JsonResponse({'status': 404, 'messages': "Buyurtma o'zgartirilmadi status to'g'ri kelmagani uchun"})
                 return JsonResponse({'status': 404, 'messages': "Bu buyurtma topilmadi"})
 

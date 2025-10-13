@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Q, Count
+
 from user.models import User
 from order.models import Order
 
@@ -100,6 +102,36 @@ class Postage(models.Model):
     def postage_orders(self):
         postage_details_id = list(self.postage_details.values_list("order_id", flat=True))
         return Order.objects.filter(id__in=postage_details_id)
+
+
+
+
+
+    @property
+    def relation_order_is_close(self):
+        order = self.postage_orders.filter(status__in=[3, 5]).exists()
+        if order:
+            return False
+        return True
+
+
+    @property
+    def relation_order_sold_percentage(self):
+        order_status_dict = self.postage_orders.aggregate(
+            delivered=Count('id', filter=Q(driver_status=2)),
+            canceled=Count('id', filter=Q(driver_status=3)),
+            # total=Count('id', filter=Q(status__in=[4, 5])),
+            total=Count('id'),
+        )
+
+        total_orders = order_status_dict['total'] or 0
+        sold_orders = order_status_dict['delivered'] or 0
+        sold_percentage = 0
+        if total_orders > 0 and sold_orders > 0:
+            sold_percentage = (sold_orders / total_orders) * 100
+        return {"sold_percentage": int(sold_percentage), "details": order_status_dict}
+
+
 
 class PostageDetails(models.Model):
     postage = models.ForeignKey(Postage, on_delete=models.CASCADE, null=False, blank=False)

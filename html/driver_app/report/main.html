@@ -18,7 +18,6 @@
             </div>
         </div>
 
-
         <div class="card" style="border:1px solid white;">
             <div class="card-header bg-brand-2" style="0.7rem 1.3rem">
                 <h5 class="text-center" >{% if balance < 0 %}
@@ -60,17 +59,13 @@
                          <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
                              <h6>Buyurtmalaringiz bo'yicha</h6>
 
-                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda : {{ order_status_by.being_delivered }} ta
+                                            <h6 class="badge badge-primary btn-sm ml-1 readonly">Yetkazilmoqda : {{ order_status_by.being_delivered }} ta
                                                 </h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Sotildi : {{ order_status_by.delivered }} ta</h6>
+                                            <h6 class="badge badge-success btn-sm  mt-1 ml-1 readonly" style="white-space:normal">Sotildi : {{ order_status_by.delivered }} ta</h6>
 
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsulot haydovchida ) : {{ order_status_by.canceled_driver }} ta
+                                            <h6 class="badge  badge-danger btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Haydovchida ) : {{ order_status_by.canceled_driver }} ta
                                                 </h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti qaytarildi ) : {{ order_status_by.canceled_returned }} ta
-                                                </h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti boshqa buyurtmaga berildi ) : {{ order_status_by.canceled_given_other_order }} ta
-                                                </h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ order_status_by.call_back }} ta
+                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Qaytarildi ) : {{ order_status_by.canceled_returned }} ta
                                                 </h6>
                                         </div>
 
@@ -80,20 +75,26 @@
                          <div class="col-md-12 text-center mt-2" style="border:1px solid black; border-radius:10px; padding:7px;">
                              <h6>Mahsulot summasi bo'yicha</h6>
 
-                                            <h6 class="badge btn-dark btn-sm ml-1 readonly">Yetkazilmoqda: {{order_product_by_uzs.being_delivered}} so'm
+                                            <h6 class="badge badge-primary btn-sm ml-1 readonly">Yetkazilmoqda: {{order_product_by_uzs.being_delivered}} so'm
                                                 </h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti haydovchida ): {{order_product_by_uzs.cancelled_driver}} so'm</h6>
-                                            <h6 class="badge btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Qayta qo'ng'iroq : {{order_product_by_uzs.call_back}} so'm
-                                                </h6>
+                                            <h6 class="badge badge-danger btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Haydovchida ): {{order_product_by_uzs.cancelled_driver}} so'm</h6>
                                             <h6 class="mt-1 ml-1 readonly" style="white-space:normal;font-size:11px;">Jami qo'lingizdagi mahsulotlar summasi : {{order_product_by_uzs.total}} so'm
                                                 </h6>
                                         </div>
 
-                     <h5 class="badge btn-sm ml-1 readonly text-white" style="background-color:#da7713f0;">Sana : <span id="ct5"></span>    </h5>
+<!--                     <h5 class="badge btn-sm ml-1 readonly text-white" style="background-color:#da7713f0;">Sana : <span id="ct5"></span>    </h5>-->
 
                 </div>
             </div>
         </div>
+
+
+
+  <div class="text-center mt-4">
+    <div class="badge bg-warning text-dark fs-6">
+      <h5 class="text-dark">Sana : <span id="ct5"></span></h5>
+    </div>
+  </div>
 
 
 
@@ -128,6 +129,16 @@ display_c5()
             navigator.clipboard.writeText(copyText.value);
 
         }
+
     </script>
-    </script>
+{% endblock %}
+{% block header %}
+<style>
+    .card {
+      background-color: #262c3c;
+      border: none;
+      border-radius: 15px;
+      transition: transform .2s ease;
+    }
+</style>
 {% endblock %}

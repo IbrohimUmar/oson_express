@@ -11,7 +11,7 @@ from django.db.models import Q
 @is_driver
 def driver_app_postage_input_history(request):
     driver = request.user
-    postage_qs = Postage.objects.filter(Q(from_user=driver)|Q(to_user=driver))
+    postage_qs = Postage.objects.filter(Q(from_user=driver)|Q(to_user=driver), from_user_status='2', to_user_status='2').order_by('-id')
     paginator = Paginator(postage_qs, 10)
     page_number = request.GET.get('page', 1)
     queryset = paginator.get_page(page_number)

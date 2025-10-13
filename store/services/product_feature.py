@@ -27,7 +27,11 @@ class ProductFeatureService:
 
     @property
     def get_collection_item_features(self):
-        return {"global_id": self.product.id, "name": self.product.name, 'measure': self.product_get_measure,
+        return {"global_id": self.product.id,
+                "name": self.product.name,
+                "image": self.product.image.url if self.product.image is not None else '',
+
+                'measure': self.product_get_measure,
                 "measure_item": self.product_get_measure_item_list,
                 "colors": self.product_get_color_list,
                 "product_variable": self.product_get_variable_list,

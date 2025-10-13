@@ -191,20 +191,19 @@ CKEDITOR_CONFIGS = {
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 
-
-if IS_SERVER:
+if IS_SERVER in {True, 'True'}:
     # from config.connection.send_developer import send_private_message_developer
     # send_private_message_developer(f"Is server calisti {IS_SERVER}")
     CSRF_TRUSTED_ORIGINS = ['https://oson-express.operators.uz', 'http://oson-express.operators.uz']
     ALLOWED_HOSTS = ["*"]
     # SESSION_COOKIE_AGE = 604800
-    # os.environ['OPENBLAS_NUM_THREADS'] = '1'
-    # SESSION_COOKIE_SECURE = True
-    # SECURE_SSL_REDIRECT = True
-    # CSRF_COOKIE_SECURE = True
+    os.environ['OPENBLAS_NUM_THREADS'] = '1'
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     # ACCESS_TOKEN_LIFETIME = env.ACCESS_TOKEN_LIFETIME
     # REFRESH_TOKEN_LIFETIME = env.REFRESH_TOKEN_LIFETIME
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     # ALLOWED_HOSTS = [
     #     "ahilshop.uz",
     #     "www.ahilshop.uz",
