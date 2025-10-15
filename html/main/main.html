@@ -83,6 +83,7 @@
         <div class="aside-top">
             <a href="{% url 'home' %}" class="brand-wrap">
                                <h3 class="text-center"><img src="{% static '' %}imgs/theme/fav.svg" class="mt-2" height="40px" alt=""><br> {{SITE_NAME}}</h3>
+                        <h6 class="text-dark badge d-block badge-dark"><i class="fas fa-truck-fast"></i> Logistikachi paneli</h6>
 
             </a>
             <div>
@@ -92,7 +93,6 @@
         </div>
         <nav>
             <ul class="menu-aside">
-
                 <li class="menu-item {% if "home" == u %}active{% endif %}">
                     <a class="menu-link" href="{% url 'home' %}">
                         <i class="icon material-icons md-home"></i>
@@ -121,7 +121,6 @@
                             {% endif %}
                         </div>
                     </li>
-
                 {% endif %}
 
 

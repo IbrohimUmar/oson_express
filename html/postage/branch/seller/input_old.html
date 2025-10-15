@@ -6,10 +6,10 @@
 {% block content %}
 <section class="content-main" id="app">
     <div class="content-header">
-        <h4 class="content-title">Pochatani sellerdan qabul qilish</h4>
+        <h4 class="content-title">Pochata qabul qilish </h4>
         <div>
 
-            <a href="{% url 'postage_branch_seller_history' logistic_branch.id %}" class="btn btn-sm btn-brand"><i class="material-icons md-left-arrow"></i> Qaytish</a>
+            <a href="{% url 'postage_main' %}" class="btn btn-sm btn-brand"><i class="material-icons md-left-arrow"></i> Qaytish</a>
         </div>
     </div>
 
@@ -31,39 +31,38 @@
 
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Seller: {{ seller.full_name }}</h5>
+            <h5 class="mb-0">Pochta ID: {{ postage.id }}</h5>
             <h5 class="d-inline"><i class="fas fa-user"></i> Ma'sul : {{request.user.full_name}}</h5>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <h6 class="mb-1"><strong>Yuboruvchi:</strong> {{ seller.full_name }}</h6>
-                    <h6 class="mb-1"><strong>Tel:</strong> +{{ seller.username }}</h6>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <h6 class="mb-1"><strong>Qabul qiluvchi:</strong>
-
-                        {{ logistic_branch.name }}
-                    </h6>
-                    <h6 class="mb-2">Holati:
-                        <span class="badge badge-dark">
-                        Yangi
+                    <h6 class="mb-1"><strong>Yuboruvchi:</strong> {{ postage.from_user.full_name }}</h6>
+                    <h6 class="mb-1"><strong>Tel:</strong> +{{ postage.from_user.username }}</h6>
+                    <h6 class="text-muted small">Holati:
+                        <span class="badge {% if postage.from_user_status == '2' %}badge-soft-success{% elif postage.from_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">
+                        {{ postage.get_from_user_status_display }}
                     </span>
                     </h6>
                 </div>
-
-                <div class="col-md-12 m-auto text-center" v-if="statistic_order.checked_count < 1">
-
-                    <button class="btn btn-brand btn-sm" disabled><i class="material-icons md-check"></i> Tasdiqlash</button>
-                    <button class="btn btn-danger btn-sm" disabled><i class="material-icons md-cancel"></i> Bekor qilish</button>
-                </div>
-
-                <div class="col-md-12 m-auto text-center" v-else>
-                                        <form method="post" class="d-inline">
+                <div class="col-md-6 mb-3">
+                    <h6 class="mb-1"><strong>Qabul qiluvchi:</strong>
+                        {% if postage.action == '1' %}
+                        {{ postage.to_logistic_branch.name }}
+                        {% else %}
+                        {{ postage.to_user }}
+                        {% endif %}
+                    </h6>
+                    <h6 class="text-muted small">Holati:
+                        <span class="badge {% if postage.to_user_status == '2' %}badge-soft-success{% elif postage.to_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">
+                        {{ postage.get_to_user_status_display }}
+                    </span>
+                    </h6>
+                    <form method="post" class="d-inline">
                                 {% csrf_token %}
                                 <input type="hidden" name="postage_id" value="{{o.id}}">
                                 <input type="hidden" name="action" value="none" id="action">
-                                <button class="btn btn-sm btn-brand d-inline"  type="button" name="type" value="confirm"
+                                <button class="btn btn-sm btn-brand d-inline" type="button" name="type" value="confirm"
                                 onclick="return Swal.fire({
                                   icon: 'question',
                                   title: 'Siz rostdanham tasdiqlamoqchimisiz?',
@@ -96,6 +95,17 @@
                             })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
                             </form>
 
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="mb-1"><strong>Yaratilgan:</strong> {{ postage.created_at|date:"Y-m-d H:i" }}</h6>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="mb-1"><strong>Yangilangan:</strong> {{ postage.updated_at|date:"Y-m-d H:i" }}</h6>
+                </div>
+                <div class="col-12">
+                    <p class="mb-0"><strong>Pochta soni:</strong>
+                        {{ postage.postage_details_count }} ta
+                    </p>
                 </div>
             </div>
         </div>
@@ -398,7 +408,7 @@ new Vue({
 
     get_send_product_amount:async function(){
         vm= this
-        await axios.get('{% url 'postage_branch_seller_input_api' logistic_branch.id seller.id %}').then(
+        await axios.get('{% url 'postage_branch_seller_input_api' logistic_branch.id postage.id %}').then(
                     function (response){
                         if (response.status==200){
                             console.log(response.data)
@@ -419,7 +429,7 @@ new Vue({
                      loadOrders:async function() {
                       this.loading = true;
                       this.error = null;
-                      await axios.get(`{% url 'postage_branch_seller_input_api' logistic_branch.id seller.id %}?page=${this.page}&card_type=${this.card_type}&region=${this.selected_region}&product=${this.selected_product}&order_length=${this.order_length}`,{
+                      await axios.get(`{% url 'postage_branch_seller_input_api' logistic_branch.id postage.id %}?page=${this.page}&card_type=${this.card_type}&region=${this.selected_region}&product=${this.selected_product}&order_length=${this.order_length}`,{
                       headers: {
                         'Content-Type': 'application/json'
                       }})
@@ -545,7 +555,7 @@ new Vue({
     vm=this
         console.log(vm.barcode)
 
-     await axios.post('{% url 'postage_branch_seller_input_api' logistic_branch.id seller.id %}', {
+     await axios.post('{% url 'postage_branch_seller_input_api' logistic_branch.id postage.id %}', {
      'barcode':vm.barcode,
      'type':type,
      }).then(

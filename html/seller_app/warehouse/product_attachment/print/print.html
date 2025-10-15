@@ -113,7 +113,7 @@
         <div class="card-body "  v-if="loading===false">
             <div class="mb-10 text-center">
 
-            <button type="button" class="btn btn-brand" @click="checkedPrintedOrders()"><i class="material-icons md-check"></i> Qadoqlanmoqdaga o'tkazish
+            <button type="button" class="btn btn-brand" @click="checkedPrintedOrders()"><i class="material-icons md-check"></i> Qadoqlandiga o'tkazish
             </button>
             <button class="btn" style="background-color:#1d7f7a;" @click="print_div()" type="button" >
                 <i class="material-icons md-print"></i> Chop etish
@@ -534,7 +534,7 @@ JsBarcode(".barcode").init();
                         let self = this
 
                     Swal.fire({
-                        title: "Qaoqlanmoqdaga o'tkazilsinmi?",
+                        title: "Qadoqlandiga o'tkazilsinmi?",
                         showCancelButton: true,
                         cancelButtonText: 'Yo\'q',
                         confirmButtonText: 'O\'tkazish',
@@ -556,7 +556,7 @@ JsBarcode(".barcode").init();
                                                                                                     Swal.fire({
                                                                                                   position: 'center',
                                                                                                   icon: 'success',
-                                                                                                  title: "Qadoqlanmoqdaga o'tkazildi",
+                                                                                                  title: "Qadoqlandiga o'tkazildi",
                                                                                                   showConfirmButton: false,
                                                                                                   timer: 1000
                                                                                                 })

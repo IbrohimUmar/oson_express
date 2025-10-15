@@ -14,6 +14,10 @@
                                                                     <i class="fa-solid fa-plus"></i>
                                                                     Pochta qaytarish</button>
 
+            <button id="choose-driver-input"  type="button" class="btn btn-sm btn-brand">
+                                                                    <i class="fa-solid fa-plus"></i>
+                                                                    Pochta qabul qilish</button>
+
             <a href="{% url 'postage_main' %}" class="btn btn-sm btn-brand">
                 <i class="material-icons md-left-arrow"></i> Qaytish
             </a>
@@ -307,6 +311,43 @@ document.getElementById("choose-driver").addEventListener("click", function() {
             let driverId = result.value;
             window.location.href = "/seller/return/" + driverId;
             window.location.href = "/postage/branch/seller/return/{{logistic_branch.id}}/" + driverId;
+        }
+    });
+});
+
+document.getElementById("choose-driver-input").addEventListener("click", function() {
+    Swal.fire({
+        title: 'Seller tanlang',
+        html: `
+            <select id="driver-select" style="width:100%">
+                <option value="">--------------</option>
+                {% for d in sellers %}
+                <option value="{{d.id}}">{{d.full_name}} | +{{d.username}}</option>
+                {% endfor %}
+            </select>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        cancelButtonText:'Chiqish',
+        confirmButtonText: 'Pochta qabul qilish',
+        didOpen: () => {
+            $('#driver-select').select2({
+                dropdownParent: $('.swal2-popup') // önemli!
+            });
+        },
+        preConfirm: () => {
+            const driverId = document.getElementById("driver-select").value;
+            if (!driverId) {
+                Swal.showValidationMessage("Iltimos bir haydovchi tanlang!");
+                return false;
+            }
+            return driverId;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let driverId = result.value;
+            window.location.href = "/seller/return/" + driverId;
+            window.location.href = "/postage/branch/seller/input/{{logistic_branch.id}}/" + driverId;
         }
     });
 });

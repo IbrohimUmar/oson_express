@@ -37,48 +37,147 @@
     <div class="card mb-4 shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Pochta ID: {{ postage.id }}</h5>
-        <span class="badge {% if postage.from_user_status == '2' %}bg-success{% elif postage.from_user_status == '3' %}bg-danger{% else %}bg-warning{% endif %}">
-            {{ postage.get_from_user_status_display }}
+        <span class="badge badge-dark">
+            {{ postage.get_action_display }}
         </span>
     </div>
     <div class="card-body">
         <div class="row">
+
             <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Yuboruvchi:</strong> {{ postage.from_user }}</p>
-                <p class="text-muted small">Holati:
-                    <span class="badge {% if postage.from_user_status == '2' %}badge-soft-success{% elif postage.from_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">
+
+                <h4>Yuboruvchi</h4>
+                <div style="border:1px solid white; border-radius:10px; padding:5px;">
+
+
+                {% if postage.from_logistic_branch is not None %}
+                <h6 class="mb-1"><strong class="text-muted">Yuboruvchi:</strong> {{ postage.from_logistic_branch.name }}</h6>
+                <h6 class="mb-1"><strong class="text-muted">Yuboruvchi kim:</strong> Fileal</h6>
+                <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                    <span class="badge {% if postage.from_user_status == '2' %}badge-success{% elif postage.from_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
                         {{ postage.get_from_user_status_display }}
                     </span>
-                </p>
+                </h6>
+                    <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                       {% if postage.from_user_status_changed_at %} {{postage.from_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                {% else %}
+
+                <h6 class="mb-1"><strong class="text-muted">FISH:</strong> {{ postage.from_user.full_name }}</h6>
+                <h6 class="mb-1"><strong class="text-muted">Tel:</strong> +{{ postage.from_user.username }}</h6>
+                <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> {{postage.from_user.get_type_display}}</h6>
+                <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                    <span class="badge {% if postage.from_user_status == '2' %}badge-success{% elif postage.from_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                        {{ postage.get_from_user_status_display }}
+                    </span>
+                </h6>
+                    <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                       {% if postage.from_user_status_changed_at %} {{postage.from_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                {% endif %}
+                    </div>
             </div>
+
             <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Qabul qiluvchi:</strong>
-                    {% if postage.action == '1' %}
-                        {{ postage.to_logistic_branch.name }}
+
+                <h4>Qabul qiluvchi</h4>
+                <div style="border:1px solid white; border-radius:10px; padding:5px;">
 
 
-                    {% if postage.to_user %}- {{postage.to_user.full_name}}{% endif %}
-                    {% else %}
-                        {{ postage.to_user }}
-                    {% endif %}
-                </p>
-                <p class="text-muted small">Holati:
-                    <span class="badge {% if postage.to_user_status == '2' %}badge-soft-success{% elif postage.to_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">
+                {% if postage.to_logistic_branch is not None %}
+                <h6 class="mb-1"><strong class="text-muted">Nomi:</strong> {{ postage.to_logistic_branch.name }}</h6>
+                <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> Fileal</h6>
+                <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                    <span class="badge {% if postage.to_user_status == '2' %}badge-success{% elif postage.to_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
                         {{ postage.get_to_user_status_display }}
                     </span>
-                </p>
+                </h6>
+                    <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                       {% if postage.to_user_status_changed_at %} {{postage.to_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                {% else %}
+
+                <h6 class="mb-1"><strong class="text-muted">FISH:</strong> {{ postage.to_user.full_name }}</h6>
+                <h6 class="mb-1"><strong class="text-muted">Kimligi:</strong> {{postage.to_user.get_type_display}}</h6>
+                <h6 class="text-muted small"><strong class="text-muted"> Holati:</strong>
+                    <span class="badge {% if postage.to_user_status == '2' %}badge-success{% elif postage.to_user_status == '3' %}badge-danger{% else %}badge-warning{% endif %}">
+                        {{ postage.get_to_user_status_display }}
+                    </span>
+                </h6>
+                    <h6 class="mb-1"><strong class="text-muted">Holat o'zgargan sana:</strong>
+
+                       {% if postage.to_user_status_changed_at %} {{postage.to_user_status_changed_at}}{% else %}--------------{% endif %}</h6>
+
+
+                {% endif %}
+
+                    </div>
+
+
+<!--                <p class="mb-1"><strong>Yuboruvchi:</strong> {{ postage.from_user }}</p>-->
+<!--                <p class="text-muted small">Holati:-->
+<!--                    <span class="badge {% if postage.from_user_status == '2' %}badge-soft-success{% elif postage.from_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">-->
+<!--                        {{ postage.get_from_user_status_display }}-->
+<!--                    </span>-->
+<!--                </p>-->
+
+
+            </div>
+
+
+            <div class="col-md-6 mb-3">
+                <h6 class="mb-1 text-sm text-muted"><strong>Yaratilgan:</strong> {{ postage.created_at|date:"Y-m-d H:i" }}</h6>
             </div>
             <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Yaratilgan:</strong> {{ postage.created_at|date:"Y-m-d H:i" }}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Yangilangan:</strong> {{ postage.updated_at|date:"Y-m-d H:i" }}</p>
+                <h6 class="mb-1  text-sm text-muted"><strong>Yangilangan:</strong> {{ postage.updated_at|date:"Y-m-d H:i" }}</h6>
             </div>
             <div class="col-12">
-                <p class="mb-0"><strong>Pochta soni:</strong>
-                    <span class="badge bg-info">{{ postage.postage_details_count }} ta</span>
+                <p class="mb-0">
+                    <h6 class="badge badge-dark text-dark">Pochta soni : {{ postage.postage_details_count }} ta</h6>
                 </p>
             </div>
+<!--            <div class="col-md-6 mb-3">-->
+<!--                <p class="mb-1"><strong>Yuboruvchi:</strong> {{ postage.from_user }}</p>-->
+<!--                <p class="text-muted small">Holati:-->
+<!--                    <span class="badge {% if postage.from_user_status == '2' %}badge-soft-success{% elif postage.from_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">-->
+<!--                        {{ postage.get_from_user_status_display }}-->
+<!--                    </span>-->
+<!--                </p>-->
+<!--            </div>-->
+<!--            <div class="col-md-6 mb-3">-->
+<!--                <p class="mb-1"><strong>Qabul qiluvchi:</strong>-->
+<!--                    {% if postage.action == '1' %}-->
+<!--                        {{ postage.to_logistic_branch.name }}-->
+
+
+<!--                    {% if postage.to_user %}- {{postage.to_user.full_name}}{% endif %}-->
+<!--                    {% else %}-->
+<!--                        {{ postage.to_user }}-->
+<!--                    {% endif %}-->
+<!--                </p>-->
+<!--                <p class="text-muted small">Holati:-->
+<!--                    <span class="badge {% if postage.to_user_status == '2' %}badge-soft-success{% elif postage.to_user_status == '3' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">-->
+<!--                        {{ postage.get_to_user_status_display }}-->
+<!--                    </span>-->
+<!--                </p>-->
+<!--            </div>-->
+<!--            <div class="col-md-6 mb-3">-->
+<!--                <p class="mb-1"><strong>Yaratilgan:</strong> {{ postage.created_at|date:"Y-m-d H:i" }}</p>-->
+<!--            </div>-->
+<!--            <div class="col-md-6 mb-3">-->
+<!--                <p class="mb-1"><strong>Yangilangan:</strong> {{ postage.updated_at|date:"Y-m-d H:i" }}</p>-->
+<!--            </div>-->
+<!--            <div class="col-12">-->
+<!--                <p class="mb-0"><strong>Pochta soni:</strong>-->
+<!--                    <span class="badge bg-info">{{ postage.postage_details_count }} ta</span>-->
+<!--                </p>-->
+<!--            </div>-->
         </div>
     </div>
 </div>

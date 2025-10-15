@@ -65,7 +65,7 @@ Status = (
 
         ("1", "Mahsulot kutilmoqda"),
         ("7", "Mahsulot belgilandi"),
-        ("8", "Qadoqlanmoqda"),
+        ("8", "Qadoqlandi"),
         ("2", "Yuborishga tayyor"),
 
         ("13", "Filialda"),
@@ -95,7 +95,6 @@ class Order(models.Model):
         ("1", "Yetkazilmoqda"),
         ("2", "Sotildi"),
         ("3", "Bekor qilindi"),
-        ("4", "Qayta qo'ng'iroq"),
     )
     where_come_from_select = (
         ("1", "Oqim orqali landing pagedan keldi"),

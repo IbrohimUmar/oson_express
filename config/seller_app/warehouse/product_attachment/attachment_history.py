@@ -224,7 +224,7 @@ def seller_app_warehouse_product_attachment_history(request):
     if clear_being_packed:
         try:
             with transaction.atomic():
-                orders = Order.objects.filter(seller=seller, status=8).select_for_update()
+                orders = Order.objects.filter(seller=seller, status=8, transaction_lock=False).select_for_update()
                 for order in orders:
                     order_products_return_warehouse(order, main_warehouse, request.user)
                     order.status=1
@@ -240,25 +240,6 @@ def seller_app_warehouse_product_attachment_history(request):
             messages.error(request, "Sizda xatolik mavjud")
             return redirect('seller_app_warehouse_product_attachment_history')
 
-    clear_being_packed = request.GET.get("clear_ready_to_send", None)
-    if clear_being_packed:
-        try:
-            with transaction.atomic():
-                orders = Order.objects.filter(seller=seller, status=2).select_for_update()
-                for order in orders:
-                    # order_products_return_warehouse(order, main_warehouse, request.user)
-                    order.status='8'
-                    order.save()
-                    save_order_status_history(order, order.status,
-                                              "Buyurtma xodim tarafidan qabul qilindiga olindi",
-                                              request.user,
-                                              'config.warehouse.product_attachment.attachment_history')
-                messages.success(request, "Mahsulot kutilmoqdaga o'tkazildi")
-                return redirect("seller_app_warehouse_product_attachment_history")
-        except IntegrityError as e:
-            handle_exception(e)
-            messages.error(request, "Sizda xatolik mavjud")
-            return redirect('seller_app_warehouse_product_attachment_history')
 
     product_auto_attachment = request.GET.get("region_attachment", None)
     if product_auto_attachment:

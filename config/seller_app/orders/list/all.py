@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
+
+from services.handle_exception import handle_exception
 from services.order.history import save_order_status_history
 from order.models import Order, OrderProduct, Status
 from django.core.paginator import Paginator
@@ -35,6 +37,11 @@ def seller_app_orders_list_all(request):
         try:
             with transaction.atomic():
                 order = Order.objects.filter(id=r['order_id'], status__in=[7, 8]).select_for_update().first()
+                if order.transaction_lock == True:
+                    messages.error(request, "Ushbu buyurtma fileal tomonidan belgilangan shuning uchun holatini o'zgartirolmaysiz")
+                    return redirect("seller_app_orders_list_all")
+
+
                 if order:
                     order_products = OrderProduct.objects.filter(order_id=order.id,
                                                                  product_variable__isnull=False).values(
@@ -56,6 +63,7 @@ def seller_app_orders_list_all(request):
                     messages.success(request, "O'tkazildi")
                     return redirect("seller_app_orders_list_all")
         except IntegrityError as e:
+            handle_exception(e)
             messages.error(request, f"Hatolik yuz berdi : {e}")
             return redirect('seller_app_orders_list_all')
 

@@ -13,52 +13,35 @@ from services.handle_exception import handle_exception
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from postage.models import Postage, LogisticBranch, PostageDetails
-from user.models import User
 
 
 @login_required(login_url='/login')
 @logistic_branch_permission_required('seller_input')
-def postage_branch_seller_input(request, logistic_branch_id, seller_id):
+def postage_branch_seller_input(request, logistic_branch_id, postage_id):
     logistic_branch = get_object_or_404(LogisticBranch, id=logistic_branch_id)
+    postage = get_object_or_404(Postage, id=postage_id, to_user_status='1', from_user_status='2')
     logistic_branch.perms = logistic_branch.get_user_permission(request.user)
-    seller = get_object_or_404(User, id=seller_id, type='6', is_active=True)
     '''
     sellerdan kelgan pochtalarni qabul qilib olish
-    
+
     1.postage va logistic branch yaratulgan bo'ladi
-    
+
     eng tepada input turadi barcode kiritadigan joy turadi
     pastda esa pochtalar ro'yxati chiqadi skannerlanganlar success
     skannerlanmaganlari hira rangda
     hammasini skannerlab bo'lingandan so'ng tasdiqlash tugmasi disabled false bo'lishi kerak
-    
+
     '''
+
     if request.method == 'POST':
-        print(request.POST)
         action = request.POST.get('action', None)
-        postage = Postage.objects.filter(action='1',
-                                         from_user=seller,
-                                         to_logistic_branch=logistic_branch,
-                                         from_user_status='1').last()
-
-        if not postage:
-            messages.error(request, "Bunday pochta mavjud emas")
-            return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
-
-        if postage.from_user_status != '1':
-            messages.error(request, "Pochtani holatini o'zgartirish mumkun emas")
-            return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
-
         postage_details = PostageDetails.objects.filter(postage=postage)
         try:
             with transaction.atomic():
                 if action == 'confirm':
                     if postage_details.filter(scan_to_user=False).exists():
                         messages.error(request, "Iltimos hamma pochtalarni skannerlang")
-                        return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
-
-                    postage.from_user_status = '2'
-                    postage.from_user_status_changed_at = datetime.datetime.now()
+                        return redirect('postage_branch_seller_input', logistic_branch_id, postage_id)
 
                     postage.to_user_status = '2'
                     postage.to_user = request.user
@@ -69,102 +52,78 @@ def postage_branch_seller_input(request, logistic_branch_id, seller_id):
                     ).update(status='13', logistic_branch_id=logistic_branch_id, transaction_lock=False)
                     messages.success(request, "Tasdiqlandi")
 
+
                 elif action == 'cancel':
-                    print('cancelga tushdi')
-                    postage.from_user_status = '3'
-                    postage.from_user_status_changed_at = datetime.datetime.now()
                     postage.to_user_status = '3'
                     postage.to_user = request.user
                     postage.to_user_status_changed_at = datetime.datetime.now()
                     postage.save()
-
-                    Order.objects.filter(
-                        id__in=list(postage_details.values_list('order_id', flat=True))
-                    ).update(logistic_branch_id=None, transaction_lock=False)
                     messages.success(request, "Bekor qilindi")
-                return redirect('postage_branch_seller_details', logistic_branch_id, postage.id)
+                return redirect('postage_branch_seller_history', logistic_branch_id)
         except Exception as e:
             handle_exception(e)
             messages.error(request, f"Xatolik yuz berdi: {str(e)}")
-            return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
+            return redirect('postage_branch_seller_input', logistic_branch_id, postage_id)
 
-    return render(request, 'postage/branch/seller/input.html', {"logistic_branch": logistic_branch, "seller": seller})
+    return render(request, 'postage/branch/seller/input.html', {"logistic_branch": logistic_branch, "postage": postage})
 
 
 @login_required(login_url='/login')
 @logistic_branch_permission_required('seller_input')
-def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
+def postage_branch_seller_input_api(request, logistic_branch_id, postage_id):
     logistic_branch = get_object_or_404(LogisticBranch, id=logistic_branch_id)
-    seller = get_object_or_404(User, id=seller_id, type='6', is_active=True)
-
+    postage = get_object_or_404(Postage, id=postage_id)
     '''
-    
+    jami seller tomonidan tasdiqlangan orderlar ro'yxati qaytarish kerak
+    ularni to user tomonidan check qilib qilinmaganligiga qarab filterlanishi mumkun
+
+    check qilinganlar count
+    check qilinmaganlar counti
+
+    order list
+    id, client full name barcode
+
+    -post
+    barcode
     '''
     if request.method == "POST":
         body = json.loads(request.body.decode('utf-8'))
-
         try:
             with transaction.atomic():
-                order = Order.objects.select_for_update().filter(barcode=body['barcode'], seller=seller).first()
-                if not order:
+                postage_details = PostageDetails.objects.select_for_update().filter(postage=postage,
+                                                                                    order__barcode=body[
+                                                                                        'barcode']).first()
+                if not postage_details:
                     return JsonResponse({
                         'status': 404,
-                        'message': "Bunday barcoddagi buyurtma mavjud emas",
+                        'message': f"Bunday barcoddagi {body['barcode']} pochta mavjud emas",
                     })
-                if order.status != '8':
-                    return JsonResponse({
-                        'status': 404,
-                        'message': f"Buyurtma qadoqlandi holatida emas \n Holati: {order.get_status_display()}",
-                    })
-
-
-                if body['type'] == 'cancel':
-                    order.transaction_lock = False
-                    order.logistic_branch_id = None
-                    order.save()
-                    PostageDetails.objects.filter(order=order, postage__action='1',
-                                                  postage__from_user_status='1').delete()
-                    return JsonResponse({
-                        'status': 200,
-                        'message': f"Qaytarildi",
-                    })
-
                 if body['type'] == 'check':
-                    if order.transaction_lock == True:
+
+                    if postage_details.scan_to_user == True:
                         return JsonResponse({
                             'status': 404,
-                            'message': f"Buyurtma skannerlab bo'lingan",
+                            'message': f"Bu barcoddagi {body['barcode']} pochta kannerlab bo'lingan",
                         })
-
-                    postage = Postage.objects.filter(
-                        action='1',
-                        from_user=seller,
-                        from_user_status='1',
-                        to_logistic_branch=logistic_branch
-                    ).last()
-                    if not postage:
-                        postage = Postage.objects.create(
-                            action='1',
-                            from_user=seller,
-                            from_user_status='1',
-                            to_logistic_branch=logistic_branch,
-                        )
-                    PostageDetails.objects.get_or_create(
-                        postage=postage,
-                        order=order,
-                        scan_from_user=True,
-                        scan_to_user=True,
-                    )
-                    order.logistic_branch_id = logistic_branch_id
-                    order.transaction_lock = True
-                    order.save()
+                    postage_details.scan_to_user = True
+                    postage_details.save()
                     return JsonResponse({
                         'status': 200,
-                        'message': f"Skannerlandi",
+                        'message': f"Muvaffaqiyatli skannerlandi",
                     })
 
-
-
+                if body['type'] == 'cancel':
+                    if postage_details.scan_to_user == False:
+                        return JsonResponse({
+                            'status': 404,
+                            'message': f"Bu barcoddagi {body['barcode']} pochta skannerlanmagan xolatda",
+                        })
+                    postage_details.scan_to_user = False
+                    postage_details.save()
+                    return JsonResponse({
+                        'status': 200,
+                        'message': f"Muvaffaqiyatli qaytarildi",
+                    })
         except Exception as e:
             handle_exception(e)
             return JsonResponse({
@@ -172,45 +131,29 @@ def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
                 'message': f"{e}",
             })
 
-
-    orders = Order.objects.filter(status='8',
-                                  seller=seller,
-                                  # logistic_branch_id=logistic_branch_id
-                                  )
-
-    postage = Postage.objects.filter(action='1',
-                                     from_user=seller,
-                                     to_logistic_branch=logistic_branch,
-                                     from_user_status='1',
-                                     ).last()
-
     postage_details = PostageDetails.objects.filter(postage=postage)
 
-    statistic_order = {
-        'checked_count': orders.filter(id__in=list(postage_details.values_list("order_id", flat=True))).count(),
-        'unchecked_count': orders.filter(transaction_lock=False).exclude(
-            id__in=list(postage_details.values_list("order_id", flat=True))).count(),
-        'total_count': 0,
-    }
-    statistic_order['total_count'] = statistic_order['checked_count'] + statistic_order['unchecked_count']
-
+    statistic_order = postage_details.aggregate(
+        checked_count=Count('id', filter=Q(scan_to_user=True)),
+        unchecked_count=Count('id', filter=Q(scan_to_user=False)),
+        total_count=Count('id')
+    )
 
     order_type = request.GET.get("card_type", '1')
     if order_type == '1':
-        orders = orders.filter(transaction_lock=False).exclude(
-            id__in=list(postage_details.values_list("order_id", flat=True)))
+        postage_details = postage_details.filter(scan_to_user=False)
     elif order_type == '2':
-        orders = orders.filter(id__in=list(postage_details.values_list("order_id", flat=True)))
+        postage_details = postage_details.filter(scan_to_user=True)
 
     page_number = request.GET.get('page', 1)
-    paginator = Paginator(orders, 20)
+    paginator = Paginator(postage_details, 20)
     page = paginator.get_page(page_number)
     order_list = []
     for obj in page.object_list:
-        i = obj
+        i = obj.order
         data = {"id": i.id, 'barcode': i.barcode, 'is_print': i.is_print,
                 'customer_name': i.customer_name,
-                'transaction_lock': obj.transaction_lock,
+                'transaction_lock': obj.scan_to_user,
                 # 'transaction_lock': True,
                 'is_there_previous_order': i.is_there_previous_order.id if i.is_there_previous_order is not None else None,
                 'customer_phone': i.customer_phone, 'customer_phone2': i.customer_phone2,
@@ -260,8 +203,6 @@ def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
         'number': page.number,
         'num_pages': paginator.num_pages,
     })
-
-
 
 
 def get_object_name_or_none(obj):

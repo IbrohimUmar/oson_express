@@ -192,6 +192,7 @@ CKEDITOR_CONFIGS = {
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 
 if IS_SERVER in {True, 'True'}:
+    print('ishladi')
     # from config.connection.send_developer import send_private_message_developer
     # send_private_message_developer(f"Is server calisti {IS_SERVER}")
     CSRF_TRUSTED_ORIGINS = ['https://oson-express.operators.uz', 'http://oson-express.operators.uz']
@@ -210,7 +211,6 @@ if IS_SERVER in {True, 'True'}:
     #     "zeno.uz",
     #     "www.zeno.uz",
     # ]
-
 # CSRF_TRUSTED_ORIGINS = ['*']
 
 # Application definition

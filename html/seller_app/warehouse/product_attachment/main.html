@@ -13,7 +13,7 @@
         <div class="card-body">
             <div class="row">
                 <h4 class="text-center">Buyurtma bo'yicha</h4>
-                 <div class="col-md-3 m-auto mt-10 mb-2">
+                 <div class="col-md-4 m-auto mt-10 mb-2">
                         <article class="box bg-light" style="border:1px solid red;">
                             <h5>
                                 Qabul qilingan : {{order_statistic.product_pending}} ta</h5>
@@ -48,7 +48,7 @@
 
 
                     </div>
-                         <div class="col-md-3 m-auto mt-10 mb-2">
+                         <div class="col-md-4 m-auto mt-10 mb-2">
                         <article class="box bg-light" style="border:1px solid #ff7f00;">
                             <h5>
                                 Mahsuloti belgilangan: {{order_statistic.product_checked}} ta</h5>
@@ -64,12 +64,12 @@
                         </article>
                     </div>
 
-                         <div class="col-md-3 m-auto mt-10 mb-2">
+                         <div class="col-md-4 m-auto mt-10 mb-2">
                         <article class="box bg-light" style="border:1px solid #75997f;">
                             <h5>
-                                Qadoqlanmoqdadagi : {{order_statistic.product_being_packed}} ta</h5>
-                            <small class="text-muted d-block ">Jami barcodi chop etilib qadoqlaniyotgan buyurtmalar soni </small>
-                                <a href="?clear_being_packed=1" onclick="return confirm('Siz rostdanham avto belgilangan mahsulotlarni mahsulot kutilmoqdaga qaytarmoqchimisiz');"
+                                Qadoqlandi : {{order_statistic.product_being_packed}} ta</h5>
+                            <small class="text-muted d-block ">Jami barcodi chop etilib qadoqlangan buyurtmalar soni </small>
+                                <a href="?clear_being_packed=1" onclick="return confirm('Siz rostdanham avto buyurtmalarni kutilmoqdaga qaytarmoqchimisiz');"
                                  class="btn btn-sm btn-danger">
                                 <i class="material-icons md-minus"></i> Qabul qilindiga o'tkazish
                             </a>
@@ -79,23 +79,6 @@
                     
                         </article>
 
-                    </div>
-                         <div class="col-md-3  mt-10 mb-2">
-                             <article class="box bg-light" style="border:1px solid green;">
-                                 <h5>
-                                     Yuborishga tayyor : {{order_statistic.packed}} ta</h5>
-                                 <small class="text-muted d-block ">Jami Yuborishga tayyor buyurtmalar soni </small>
-                                 <a href="?clear_ready_to_send=1"
-                                    onclick="return confirm('Siz rostdanham qadoqlanmoqdaga qaytarmoqchimisiz');"
-                                    class="btn btn-sm btn-danger">
-                                     <i class="material-icons md-minus"></i> Qadoqlanmoqdaga o'tkazish
-                                 </a>
-                                 <a href="{% url 'seller_app_warehouse_product_attachment_scanned_for_packaging' %}"
-                                    class="btn btn-sm btn-brand">
-                                     <i class="material-icons md-barcode"></i>
-                                     Yuborishga tayyorga olish
-                                 </a>
-                             </article>
                     </div>
             </div>
             <div>

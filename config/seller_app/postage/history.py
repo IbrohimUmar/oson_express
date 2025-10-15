@@ -19,7 +19,7 @@ from postage.models import Postage, PostageDetails
 @permission_required('admin.seller_app_postage_history', login_url="/home")
 def seller_app_postage_history(request):
     seller = get_seller(request.user)
-    postage_qs = Postage.objects.filter(Q(from_user=seller, action='1') | Q(to_user=seller, action='2'))
+    postage_qs = Postage.objects.filter(Q(from_user=seller, action='1') | Q(to_user=seller, action='2')).order_by("-id")
 
     if request.method == 'POST':
 
