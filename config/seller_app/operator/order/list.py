@@ -59,7 +59,7 @@ def seller_app_operator_order_list(request):
         return redirect('seller_app_operator_order_list')
 
     operators = User.objects.filter(seller=seller, type='3').order_by("-id")
-    paginator = Paginator(orders, 5)
+    paginator = Paginator(orders, 50)
     orders_qs = paginator.get_page(int(request.GET.get("page", 1)))
     return render(request, 'seller_app/operator/order/list.html', {
         'page_obj': orders_qs,
