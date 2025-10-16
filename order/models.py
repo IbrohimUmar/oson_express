@@ -179,6 +179,7 @@ class Order(models.Model):
     delivered_date = models.DateField(null=True, blank=True, verbose_name='Yetkazib berish sanasi', default=now)
     driver_shipping_start_date = models.DateField(null=True, blank=True, verbose_name='Haydovchiga berilgan sana')
     driver_status_changed_at = models.DateTimeField(null=True, blank=True, verbose_name='Haydovchi statusi o\'zgargan sana')
+    operator_status_changed_at = models.DateTimeField(null=True, blank=True, verbose_name='operator statusi o\'zgargan sana')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

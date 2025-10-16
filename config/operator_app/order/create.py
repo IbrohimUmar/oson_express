@@ -64,6 +64,7 @@ def operator_app_order_create(request):
                 order.customer_street = r['street']
                 order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
+                order.operator_status_changed_at = datetime.now()
                 # order.driver_is_bonus = district.driver_is_bonus
                 # order.driver_one_day_bonus = district.driver_one_day_bonus
                 # order.driver_two_day_bonus = district.driver_two_day_bonus

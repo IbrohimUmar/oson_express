@@ -9,6 +9,7 @@ from .date_by_statistic_list import seller_app_operator_date_by_statistic
 
 urlpatterns = [
 
+    path('order/', include('config.seller_app.operator.order.urls')),
     path('payment/', include('config.seller_app.operator.payment.urls')),
 
     path('statistic-list/', seller_app_operator_statistic_list, name='seller_app_operator_statistic_list'),

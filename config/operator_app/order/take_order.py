@@ -29,7 +29,10 @@ def operator_app_take_order(request):
     if request.method == "POST":
         try:
             with transaction.atomic():
-                order = Order.objects.filter(id=request.POST['id'], operator=None, seller=seller).update(operator=request.user, updated_at=datetime.datetime.now())
+                order = Order.objects.filter(id=request.POST['id'], operator=None, seller=seller).update(operator=request.user,
+                                                                                                         updated_at=datetime.datetime.now(),
+                                                                                                         operator_status_changed_at=datetime.datetime.now()
+                                                                                                         )
                 if order:
                     order = Order.objects.get(id=request.POST['id'])
                     save_order_status_history(order, order.status, "Operator buyurtmani uziga belgiladi", request.user,

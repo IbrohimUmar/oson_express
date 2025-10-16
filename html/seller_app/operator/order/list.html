@@ -1,0 +1,399 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+    <section class="content-main" id="app">
+        <div class="content-header">
+            <h3 class="content-title">Barcha buyurtmalar</h3>
+            <div>
+                <h5>Soni : {{ count }} ta</h5>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+<!--                <h5 class="card-title">Qidiruv</h5>-->
+                <div class="align-items-center">
+                        <form method="get">
+
+                            <div class="row">
+                                <div class="col-3">
+                                    <h6>Qidiruv</h6>
+                                    <input type="number" class="form-control" placeholder="id, klient tel, barcode bo'yicha qidiruv" name="filter" {% if request.GET.filter %}value="{{ request.GET.filter }}" {% endif %}>
+                                </div>
+                                <div class="col-md-2">
+                                    <h6>Holati</h6>
+                                    <select class="form-control" name="status">
+                                         <option value="None">---------</option>
+                                         <option value="99" {% if request.GET.status == '99' %}selected{% endif %}>Yangi(Olingan)</option>
+                                        {% for i in Status %}
+                                        <option value="{{i.0}}" {% if request.GET.status is not None and request.GET.status == i.0 %}selected{% endif %}>{{i.1}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <h6>Operator</h6>
+                                    <select class="form-control" name="operator_id">
+                                         <option value="0">---------</option>
+                                        {% for o in operators %}
+                                        <option value="{{o.id}}" {% if request.GET.operator_id|add:"0" == o.id %}selected{% endif %}>{{o.full_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <h6>Qo'llash</h6>
+                                    <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                    </button>
+                                    {% if request.GET %}
+                                        <a href="{% url 'seller_app_operator_order_list' %}" class="btn btn-danger"
+                                           type="submit"><i class="material-icons md-search_off"></i></a>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </form>
+                </div>
+            </header>
+
+            <div class="card-body">
+
+
+                <form method="post" id="myForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Harakat</h6>
+                            <select name="action" class="form-control">
+                                <option value="0">---------------</option>
+                                <option value="1">Tanlanganlarni yangiga olish va operatorini o'chirib yuborish</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Qo'llash</h6>
+                            <button class="btn btn-brand ">Qo'llash</button>
+                        </div>
+                    </div>
+                    <span class="d-inline mt-2"> {{ count }} dan <span id="selected-counter">0</span> tanlandi</span>
+                    <div style="overflow-x:auto;">
+                        <table class="table" id="dataTable">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="main_check" >
+                                </th>
+                                <th>id</th>
+                                <th>Holati</th>
+                                 <th>Barcodi</th>
+                                <th>Viloyati</th>
+                                <th>Operator</th>
+                                <th>Operator ulushi</th>
+                                <th>Mijoz</th>
+                                <th>Mahsulot</th>
+                                <th>Operator O'zgartirilgan sana</th>
+                                <th>Kelgan sana</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for o in page_obj %}
+                                <tr>
+                                    <td>
+                                            <input type="checkbox" class="row-check" name="check" value="{{ o.id }}">
+                                    </td>
+
+                                    <td>
+                                        #{{ o.id }}
+                                     {% if o.operator_order_id %}<br> <span class="badge badge-soft-success">operator-id: {{o.operator_order_id}}</span>{% endif %}
+
+                                    </td>
+                                    <td>
+
+
+                                        <h6>
+                                        <span class="badge" style="border:1px solid white"> {{ o.get_status_display }}</span>
+                                        </h6>
+                                        {% if o.status == '0' %}
+                                       <span class="badge badge-soft-info"> O'chirdi : {{o.responsible.first_name}} {{o.responsible.last_name}}</span>
+                                        <br>
+                                        Sababi : {{o.delete_desc}}
+                                        {% endif %}
+
+
+                                        {% if o.defective_product_order is not None %}
+                                         <span class="badge badge-soft-info">Nosoz alishtirishga ID : {{o.defective_product_order.id}} </span>
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                     {% if o.barcode %}{{o.barcode}}{% endif %}
+
+                                    </td>
+
+
+                                    <td>
+                                        {% if o.customer_region %}
+                                        {{ o.customer_region.name }}
+                                        {% else %}
+                                        ---------------
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <h6>
+                                        {% if o.operator %}
+                                        {{ o.operator.first_name }} {{ o.operator.last_name }}
+                                        <br> +{{o.operator.username}}
+                                        {% else %}
+                                        ----------------
+                                        {% endif %}
+                                            </h6>
+
+                                    </td>
+                                    <td>
+                                        {{o.operator_fee}}
+                                    </td>
+
+                                    <td>{{ o.customer_name }} <br>
+                                        {{ o.customer_phone }}
+                                        {% if o.customer_phone2 %} <br>
+                                            {{ o.customer_phone2 }}
+                                        {% endif %}
+
+                                    </td>
+                                    <td>
+
+                                         {% for p in o.order_products %}
+                                    <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.total_quantity}}ta, {{p.total_price|format_money}} so'm</span> <br>
+                                {% endfor %}
+                                    <p>Jami : {{o.total_product_price|format_money}} uzs, {{o.total_product_quantity}} ta</p>
+                                    </td>
+                                    <td>
+                                                        {% if o.operator_status_changed_at %}
+                                                        {{ o.operator_status_changed_at }}
+                                                        {% else %}
+                                                        --------------
+                                                        {% endif  %}
+
+                                                    </td>
+                                    <td>{{ o.created_at|date:"Y-m-d H:i" }}</td>
+
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </form>
+
+                           <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+            </div>
+            <!-- card-body end// -->
+        </div>
+    </section>
+{% endblock %}
+{% block header %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+
+{% endblock %}
+{% block footer %}
+<!--<script>-->
+<!--document.addEventListener('DOMContentLoaded', function () {-->
+<!--    const mainCheck = document.querySelector('#main_check');-->
+<!--    const rowChecks = document.querySelectorAll('.row-check');-->
+<!--    const counterEl = document.querySelector('#selected-counter');-->
+
+<!--    // Dinamik olarak "Hammasini tanlash" butonu oluştur-->
+<!--    const selectAllBtn = document.createElement('button');-->
+<!--    selectAllBtn.textContent = "Hammasini tanlash";-->
+<!--    selectAllBtn.className = "btn btn-sm btn-warning ms-2";-->
+<!--    selectAllBtn.type = "button";-->
+<!--    selectAllBtn.style.display = "none";-->
+<!--    counterEl.insertAdjacentElement('afterend', selectAllBtn);-->
+
+<!--    let globalSelected = false; // bütün sayfalar seçildi mi?-->
+
+<!--    function updateCount() {-->
+<!--        const selectedOnPage = document.querySelectorAll('.row-check:checked').length;-->
+<!--        const totalCount = parseInt('{{ count }}');-->
+
+<!--        if (globalSelected) {-->
+<!--            counterEl.textContent = `Tanlangan: ${totalCount} ta (barcha sahifalar)`;-->
+<!--        } else {-->
+<!--            counterEl.textContent = `Tanlangan: ${selectedOnPage} ta`;-->
+<!--        }-->
+
+<!--        // Eğer mevcut sayfada en az 1 tane seçilmişse buton görünsün-->
+<!--        selectAllBtn.style.display = (selectedOnPage > 0 && !globalSelected) ? 'inline-block' : 'none';-->
+<!--    }-->
+
+<!--    // Ana checkbox sadece bu sayfadaki satırları seçsin-->
+<!--    if (mainCheck) {-->
+<!--        mainCheck.addEventListener('change', function () {-->
+<!--            rowChecks.forEach(ch => ch.checked = mainCheck.checked);-->
+<!--            globalSelected = false;-->
+<!--            updateCount();-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Tek tek seçim olunca güncelle-->
+<!--    rowChecks.forEach(ch => {-->
+<!--        ch.addEventListener('change', function () {-->
+<!--            globalSelected = false;-->
+<!--            const allChecked = Array.from(rowChecks).every(c => c.checked);-->
+<!--            const someChecked = Array.from(rowChecks).some(c => c.checked);-->
+<!--            mainCheck.checked = allChecked;-->
+<!--            mainCheck.indeterminate = !allChecked && someChecked;-->
+<!--            updateCount();-->
+<!--        });-->
+<!--    });-->
+
+<!--    // "Hammasini tanlash" butonuna tıklanınca tüm veriler seçilmiş gibi say-->
+<!--    selectAllBtn.addEventListener('click', function () {-->
+<!--        globalSelected = true;-->
+<!--        selectAllBtn.style.display = "none";-->
+<!--        mainCheck.checked = true;-->
+<!--        mainCheck.indeterminate = false;-->
+<!--        rowChecks.forEach(ch => ch.checked = true);-->
+<!--        updateCount();-->
+<!--    });-->
+
+<!--    updateCount();-->
+<!--});-->
+<!--</script>-->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mainCheck = document.querySelector('#main_check');
+    const rowChecks = document.querySelectorAll('.row-check');
+    const counterEl = document.querySelector('#selected-counter');
+
+    // Dinamik olarak "Hammasini tanlash" butonu oluştur
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.textContent = "Hammasini tanlash";
+    selectAllBtn.className = "btn btn-sm btn-warning ms-2";
+    selectAllBtn.type = "button";
+    selectAllBtn.style.display = "none";
+    counterEl.insertAdjacentElement('afterend', selectAllBtn);
+
+    // Gizli input (formda olacak)
+    const formEl = document.querySelector('#myForm');  // 'myForm' yerine senin form ID'ni yaz
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'select_all';
+    hiddenInput.value = '0'; // varsayılan: seçilmedi
+    formEl.appendChild(hiddenInput);
+
+    let globalSelected = false; // bütün sayfalar seçildi mi?
+
+    function updateCount() {
+        const selectedOnPage = document.querySelectorAll('.row-check:checked').length;
+        const totalCount = parseInt('{{ count }}');
+
+        if (globalSelected) {
+            counterEl.textContent = `Tanlangan: ${totalCount} ta (barcha sahifalar)`;
+            hiddenInput.value = '1'; // input aktif
+        } else {
+            counterEl.textContent = `Tanlangan: ${selectedOnPage} ta`;
+            hiddenInput.value = '0'; // sadece sayfadakiler
+        }
+
+        // Eğer mevcut sayfada en az 1 tane seçilmişse buton görünsün
+        selectAllBtn.style.display = (selectedOnPage > 0 && !globalSelected) ? 'inline-block' : 'none';
+    }
+
+    // Ana checkbox sadece bu sayfadaki satırları seçsin
+    if (mainCheck) {
+        mainCheck.addEventListener('change', function () {
+            rowChecks.forEach(ch => ch.checked = mainCheck.checked);
+            globalSelected = false;
+            updateCount();
+        });
+    }
+
+    // Tek tek seçim olunca güncelle
+    rowChecks.forEach(ch => {
+        ch.addEventListener('change', function () {
+            globalSelected = false;
+            const allChecked = Array.from(rowChecks).every(c => c.checked);
+            const someChecked = Array.from(rowChecks).some(c => c.checked);
+            mainCheck.checked = allChecked;
+            mainCheck.indeterminate = !allChecked && someChecked;
+            updateCount();
+        });
+    });
+
+    // "Hammasini tanlash" butonuna tıklanınca tüm veriler seçilmiş gibi say
+    selectAllBtn.addEventListener('click', function () {
+        globalSelected = true;
+        selectAllBtn.style.display = "none";
+        mainCheck.checked = true;
+        mainCheck.indeterminate = false;
+        rowChecks.forEach(ch => ch.checked = true);
+        updateCount();
+    });
+
+    updateCount();
+});
+</script>
+
+<!--<script>-->
+<!--document.addEventListener('DOMContentLoaded', function () {-->
+<!--    const mainCheck = document.querySelector('#main_check');-->
+<!--    const rowChecks = document.querySelectorAll('.row-check');-->
+<!--    const counterEl = document.querySelector('#selected-counter');-->
+
+<!--    function updateCount() {-->
+<!--        const selectedCount = document.querySelectorAll('.row-check:checked').length;-->
+<!--        counterEl.textContent = `Tanlangan: ${selectedCount} ta`;-->
+<!--    }-->
+
+<!--    // Ana checkbox-->
+<!--    if (mainCheck) {-->
+<!--        mainCheck.addEventListener('change', function () {-->
+<!--            rowChecks.forEach(ch => ch.checked = mainCheck.checked);-->
+<!--            updateCount();-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Tek tek seçim olunca güncelle-->
+<!--    rowChecks.forEach(ch => {-->
+<!--        ch.addEventListener('change', function () {-->
+<!--            const allChecked = Array.from(rowChecks).every(c => c.checked);-->
+<!--            const someChecked = Array.from(rowChecks).some(c => c.checked);-->
+<!--            mainCheck.checked = allChecked;-->
+<!--            mainCheck.indeterminate = !allChecked && someChecked;-->
+<!--            updateCount();-->
+<!--        });-->
+<!--    });-->
+
+<!--    // Sayfa ilk yüklendiğinde sıfırla-->
+<!--    updateCount();-->
+<!--});-->
+<!--</script>-->
+
+{% endblock %}

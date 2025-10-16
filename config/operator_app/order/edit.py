@@ -61,6 +61,7 @@ def operator_app_order_edit(request, id):
                 order.driver_is_bonus = district.driver_is_bonus
                 order.driver_one_day_bonus = district.driver_one_day_bonus
                 order.driver_two_day_bonus = district.driver_two_day_bonus
+                order.operator_status_changed_at = datetime.now()
 
                 OrderProduct.objects.filter(order_id=id).delete()
                 order_crud_services.order_product_create(order, products)

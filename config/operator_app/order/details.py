@@ -61,6 +61,7 @@ def operator_app_order_details(request, id):
                 order.street = r['street']
                 order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
+                order.operator_status_changed_at = datetime.now()
                 OrderProduct.objects.filter(order_id=r['order_id']).delete()
                 order_crud_services.order_product_create(order, d)
                 operator_fee_amount = calculate_operator_fee(OrderProduct.objects.filter(order_id=r['order_id']), operator_standard_fee)

@@ -5,6 +5,7 @@ from django.apps import apps
 
 
 
+
 seller_app_order_permission = [
     ("Seller app | Buyurtmalar | Barcha buyurtmalar | ro'yxati", 'seller_app_orders_list_all'),
     ("Seller app | Buyurtmalar | Barcha buyurtmalar | sotilganlar", 'seller_app_orders_list_sold'),
@@ -63,6 +64,8 @@ seller_app_operator_permission = [
     ("Seller app | Operator | To'lov | Ro'yxati", 'seller_app_operator_payment_list'),
 
     ("Seller app | Operator | To'lov | Qo'shish", 'seller_app_operator_payment_create'),
+
+    ("Seller app | Operator | Buyurtmalar boshqaruvi | Ro'yxati", 'seller_app_operator_order_list'),
 ]
 
 
