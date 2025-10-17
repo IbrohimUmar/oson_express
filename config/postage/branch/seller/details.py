@@ -30,7 +30,7 @@ def postage_branch_seller_details(request, logistic_branch_id, postage_id):
     pasda belgilan pochtalar va kim tasdiqlab kim tasdiqlamagan ekanligi
     '''
 
-    paginator = Paginator(details, 50)
+    paginator = Paginator(details, 100)
     page_number = request.GET.get('page')
     queryset = paginator.get_page(page_number)
     return render(request, 'postage/branch/seller/details.html', {
