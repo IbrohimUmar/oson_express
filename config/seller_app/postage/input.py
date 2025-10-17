@@ -38,7 +38,8 @@ def seller_app_postage_input(request):
      -yuborishga tayyorlar ro'yxati va tanlanganlar yashil tanlanmaganlar qizilda chiqishi kerak
          
     '''
-    return render(request, 'seller_app/postage/input.html', {'seller': seller})
+    return redirect('seller_app_postage_history')
+    # return render(request, 'seller_app/postage/input.html', {'seller': seller})
 
 @login_required(login_url='/login')
 @permission_required('admin.seller_app_postage_input', login_url="/home")
