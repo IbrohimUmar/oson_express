@@ -101,7 +101,7 @@
                     <tr>
                         <td>
                             {% if o.action == '1' and o.to_logistic_branch and o.to_user_status == '1' and o.from_user_status == '2' %}
-                            <a href="{% url 'postage_branch_seller_input' o.to_logistic_branch.id o.id %}" class="btn btn-brand btn-sm">
+                            <a href="{% url 'postage_branch_seller_input' o.to_logistic_branch.id o.from_user.id %}" class="btn btn-brand btn-sm">
                                 <i class="material-icons md-info"></i>Qabul qilish</a>
                             {% endif %}
 

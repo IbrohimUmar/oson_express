@@ -20,7 +20,7 @@ def postage_branch_driver_history(request, logistic_branch_id):
     logistic_branch = get_object_or_404(LogisticBranch, id=logistic_branch_id)
     logistic_branch.perms = logistic_branch.get_user_permission(request.user)
     drivers = User.objects.filter(type='2')
-    postage_qs = Postage.objects.filter(Q(from_logistic_branch=logistic_branch) | Q(to_logistic_branch=logistic_branch), action__in=['3', '4'])
+    postage_qs = Postage.objects.filter(Q(from_logistic_branch=logistic_branch) | Q(to_logistic_branch=logistic_branch), action__in=['3', '4']).order_by("-id")
     driver = request.GET.get("driver", '0')
     if driver != '0':
         postage_qs = postage_qs.filter(Q(from_user_id=driver)|Q(to_user_id=driver))

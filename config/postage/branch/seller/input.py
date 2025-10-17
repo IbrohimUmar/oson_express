@@ -67,6 +67,7 @@ def postage_branch_seller_input(request, logistic_branch_id, seller_id):
                     Order.objects.filter(
                         id__in=list(postage_details.values_list('order_id', flat=True))
                     ).update(status='13', logistic_branch_id=logistic_branch_id, transaction_lock=False)
+
                     messages.success(request, "Tasdiqlandi")
 
                 elif action == 'cancel':

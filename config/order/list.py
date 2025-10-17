@@ -16,6 +16,7 @@ from user.models import Regions
 @login_required(login_url='/login')
 @permission_required('admin.order_list', login_url="/home")
 def order_list(request):
+    # orders = Order.objects.all().exclude(status__in=['9', '10', '11', '12', '1', '7', '8', '2']).order_by("-created_at")
     orders = Order.objects.all().exclude(status__in=['9', '10', '11', '12', '1', '7', '8', '2']).order_by("-created_at")
     region = request.GET.get("region", 'None')
     if region != 'None':

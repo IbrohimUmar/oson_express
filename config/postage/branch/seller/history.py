@@ -18,7 +18,7 @@ from config.postage.permission import logistic_branch_permission_required
 def postage_branch_seller_history(request, logistic_branch_id):
     logistic_branch = get_object_or_404(LogisticBranch, id=logistic_branch_id)
     logistic_branch.perms = logistic_branch.get_user_permission(request.user)
-    postage_qs = Postage.objects.filter(Q(from_logistic_branch=logistic_branch)|Q(to_logistic_branch=logistic_branch), action__in=['1','2'])
+    postage_qs = Postage.objects.filter(Q(from_logistic_branch=logistic_branch)|Q(to_logistic_branch=logistic_branch), action__in=['1','2']).order_by("-id")
     sellers = User.objects.filter(type='6', is_active=True)
     '''
     buyerdan fileal tasdiqlariham bo'lishi kerak pochta qabul qilish ni tasdiqlash
