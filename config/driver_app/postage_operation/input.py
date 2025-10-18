@@ -37,9 +37,9 @@ def driver_app_postage_operation_input(request, postage_id):
         try:
             with transaction.atomic():
                 if action == 'confirm':
-                    if postage_details.filter(scan_to_user=False).exists():
-                        messages.error(request, "Iltimos hamma pochtalarni skannerlang")
-                        return redirect('driver_app_postage_operation_input', postage_id)
+                    # if postage_details.filter(scan_to_user=False).exists():
+                    #     messages.error(request, "Iltimos hamma pochtalarni skannerlang")
+                    #     return redirect('driver_app_postage_operation_input', postage_id)
 
                     postage.to_user_status = '2'
                     postage.to_user = request.user
