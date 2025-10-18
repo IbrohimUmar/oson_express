@@ -152,13 +152,6 @@
                                         {% for o in order %}
                                             <tr>
                                                 <td>
-                                                    {% if perms.admin.order_details %}
-                                                    <h6><a href="{% url 'order_details' o.id %}"
-                                                           class="btn btn-brand btn-sm"><i
-                                                            class="material-icons md-edit"></i></a> #{{ o.id }}
-                                                            
-                                                            </h6>
-                                                    {% endif %}
                                                 </td>
                                                 <td>
 

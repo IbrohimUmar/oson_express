@@ -149,7 +149,6 @@ def postage_branch_driver_send_api(request, logistic_branch_id, driver_id):
                             'message': f"Bu pochta bu filealda emas",
                         })
 
-
                 postage, create = Postage.objects.get_or_create(
                     action='3',
                     from_logistic_branch_id=logistic_branch_id,
@@ -186,8 +185,6 @@ def postage_branch_driver_send_api(request, logistic_branch_id, driver_id):
                 'message': f"Xatolik {e}"})
 
 
-
-
     driver_districts = list(driver.allow_districts.values_list("id", flat=True))
     orders = Order.objects.filter(status='13',
                                   customer_region=driver.region,
@@ -197,12 +194,7 @@ def postage_branch_driver_send_api(request, logistic_branch_id, driver_id):
     postage = Postage.objects.filter(action='3', from_logistic_branch=logistic_branch,
                                           from_user_status='1',
                                           to_user=driver).last()
-
     postage_details = PostageDetails.objects.filter(postage=postage)
-
-
-
-
     statistic_order = {
         'checked_count': orders.filter(id__in=list(postage_details.values_list("order_id", flat=True))).count(),
         'unchecked_count':orders.filter(transaction_lock=False).exclude(id__in=list(postage_details.values_list("order_id", flat=True))).count(),

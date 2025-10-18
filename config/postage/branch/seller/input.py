@@ -183,10 +183,9 @@ def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
                                      from_user=seller,
                                      to_logistic_branch=logistic_branch,
                                      from_user_status='1',
-                                     ).last()
+                                     ).order_by('-id').last()
 
     postage_details = PostageDetails.objects.filter(postage=postage)
-
     statistic_order = {
         'checked_count': orders.filter(id__in=list(postage_details.values_list("order_id", flat=True))).count(),
         'unchecked_count': orders.filter(transaction_lock=False).exclude(
@@ -195,7 +194,7 @@ def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
     }
     statistic_order['total_count'] = statistic_order['checked_count'] + statistic_order['unchecked_count']
 
-
+    print(request.GET)
     order_type = request.GET.get("card_type", '1')
     if order_type == '1':
         orders = orders.filter(transaction_lock=False).exclude(

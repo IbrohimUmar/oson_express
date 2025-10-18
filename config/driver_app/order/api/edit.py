@@ -39,11 +39,11 @@ def driver_app_order_api_edit(request):
                             'message': f"Hato skannerlangan type {type(body['barcode'])}, val {body}",
                         })
                     barcode = body['barcode']
-                    order = Order.objects.filter(status__in=[3, 4, 5], barcode=barcode, transcation_lock=False, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5], barcode=barcode, transaction_lock=False, driver_id=request.user.id)
 
                 elif body.get("order_id", None):
                     order_id = body['order_id']
-                    order = Order.objects.filter(status__in=[3, 4, 5], id=order_id, transcation_lock=False, driver_id=request.user.id)
+                    order = Order.objects.filter(status__in=[3, 4, 5], id=order_id, transaction_lock=False, driver_id=request.user.id)
                 else:
                     order = None
 
