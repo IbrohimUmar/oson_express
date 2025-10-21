@@ -82,16 +82,17 @@
                             {% for o in order %}
                                 <tr>
                                     <td>
-                                        {% if o.driver %}
-                                        <a href="{% url 'seller_app_order_details' o.id %}"
-                                           class="btn  btn-brand rounded font-sm btn-sm"><i
-                                                class="material-icons md-settings"></i></a>
-                                        {% elif o.driver == None and o.status == '1' and o.defective_product_order is None  %}
+<!--                                        <a href="{% url 'seller_app_order_details' o.id %}"-->
+<!--                                           class="btn  btn-brand rounded font-sm btn-sm"><i-->
+<!--                                                class="material-icons md-settings"></i></a>-->
+<!--                                        perms.admin.seller_app_orders_edit -->
 
-                                        <a href="{% url 'seller_app_order_edit' o.id %}"
+                                        {% if  o.status in allow_edit_status %}
+                                        <a href="{% url 'seller_app_orders_edit' o.id %}"
                                            class="btn  btn-success rounded font-sm btn-sm"><i
                                                 class="material-icons  md-edit"></i></a>
                                         {% endif %}
+
 
                                         <a href="{% url 'seller_app_order_print' o.id %}"
                                            class="btn  btn-brand rounded font-sm btn-sm"><i

@@ -70,5 +70,6 @@ def seller_app_orders_list_all(request):
     paginator = Paginator(orders, 50)
     order = paginator.get_page(int(request.GET.get("page", 1)))
     return render(request, 'seller_app/orders/list/all.html', {'quary': filter_query,'page_obj': order, "order": order, 'count': orders.count(),
-                                                           "statuses":Status, "regions":Regions.objects.all()
+                                                           "statuses":Status, "regions":Regions.objects.all(),
+                                                               "allow_edit_status": ['0', '9', '6', '10', '11', '12', '1']
                                                           })

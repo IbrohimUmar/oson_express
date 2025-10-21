@@ -7,12 +7,16 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+
+from config.seller_app.orders.edit import allow_edit_seller_status
 from config.settings.base import OPERATOR_BONUS_FOR_ADDITIONAL_SOLD
 from order.models import Order, OrderProduct
 from order.services.calculate_operator_fee import calculate_operator_fee
 from order.services.client_report import ClientReportService
 from order.services.crud_service import OrderCrudService
+from services.handle_exception import handle_exception
 from services.order.history import save_order_status_history
+from services.seller.get_seller import get_seller
 from store.services.product_list import ProductListService
 from user.models import Districts, Regions
 from datetime import datetime, timedelta, timezone
@@ -22,8 +26,9 @@ import datetime
 @permission_required('admin.operator_app_order_edit', login_url="/home")
 def operator_app_order_edit(request, id):
     # order = get_object_or_404(Order.objects.exclude(status=0), id=id, status=1,driver__isnull=True)
+    seller = get_seller(request.user)
     try:
-        order = get_object_or_404(Order, id=id, operator=request.user, status=1)
+        order = get_object_or_404(Order, id=id, operator=request.user, seller=seller, status__in=allow_edit_seller_status)
     except ObjectDoesNotExist:
         messages.info(request, "Bu buyurtmaga mahsulot belglangan")
         return redirect("operator_app_order_history")
@@ -35,7 +40,6 @@ def operator_app_order_edit(request, id):
 
     product_list_service = ProductListService()
     all_products_json = product_list_service.get_product_json_by_site(seller=request.user.seller)
-    client_history_services = ClientReportService()
     order_crud_services = OrderCrudService()
     selected_product_list = order_crud_services.get_order_product_product_json(order.id)
 
@@ -43,11 +47,11 @@ def operator_app_order_edit(request, id):
         r = request.POST
         try:
             with transaction.atomic():
-                order = Order.objects.filter(id=id, status=1).select_for_update()
+                order = Order.objects.filter(id=id, status__in=allow_edit_seller_status, seller=seller, operator=request.user).select_for_update()
                 products = json.loads(request.POST["products"])
                 if not order:
                     messages.success(request, "Buyrutmani o'zgartirish mumkun emas")
-                    return redirect('operator_app_order_edit', id)
+                    return redirect('operator_app_order_history')
 
                 district = Districts.objects.get(id=r['district'])
                 order = Order.objects.get(id=id)
@@ -58,10 +62,8 @@ def operator_app_order_edit(request, id):
                 order.customer_street = r['street']
                 order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
-                order.driver_is_bonus = district.driver_is_bonus
-                order.driver_one_day_bonus = district.driver_one_day_bonus
-                order.driver_two_day_bonus = district.driver_two_day_bonus
-                order.operator_status_changed_at = datetime.now()
+                order.driver_is_bonus = False
+                order.operator_status_changed_at = datetime.datetime.now()
 
                 OrderProduct.objects.filter(order_id=id).delete()
                 order_crud_services.order_product_create(order, products)
@@ -80,6 +82,7 @@ def operator_app_order_edit(request, id):
                 return redirect('operator_app_order_edit', id)
 
         except IntegrityError as e:
+            handle_exception(e)
             messages.error(request, f"Saqlashda xatolik yuzaga keldi {e}")
             return redirect('operator_app_order_history')
 
@@ -87,8 +90,6 @@ def operator_app_order_edit(request, id):
                   {
                       "all_products_json": json.dumps(all_products_json),
                       "selected_products_json": json.dumps(selected_product_list),
-                      "client_phone_history": client_history_services.get_client_phone_order_history(
-                          order.customer_phone),
 
                       "region_list": list(Regions.objects.all().values("id", "name")),
                       "district_list": json.dumps(

@@ -1,4 +1,4 @@
-{% extends 'main/main.html' %}
+{% extends 'operator_app/main/main.html' %}
 {% load static %}
 {% block content %}
 <section class="content-main mb-20" id="app">
@@ -73,14 +73,6 @@
                         {% else %}
                             <input type="date" required name="delivered_date" value="{{default_delivered_date|date:"Y-m-d"}}" class="form-control">
                         {% endif %}
-
-
-                        <h6 class="mt-3"><i class="fas fa-history"></i> Mijoz tarihi</h6>
-                        <span class="badge mt-1" style="border:1px solid white">Jami buyurma qilgan : {{client_phone_history.total}} ta</span>
-                        <span class="badge mt-1" style="border:1px solid white">Sotilgan : {{client_phone_history.total_delivered}} ta</span>
-                        <span class="badge mt-1" style="border:1px solid white">Yetkazilmoqda : {{client_phone_history.total_being_delivered}} ta</span>
-                        <span class="badge mt-1" style="border:1px solid white">Qabul qilingan : {{client_phone_history.total_accepted}} ta</span>
-
                         <hr>
  <article class="icontext align-items-start">
                                     <span class="icon icon-sm rounded-circle bg-primary-light">
