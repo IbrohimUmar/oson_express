@@ -11,8 +11,7 @@ from order.models import Order, Status
 @permission_required('admin.operator_app_order_history', login_url="/home")
 @async_to_sync
 async def operator_app_order_history(request):
-    orders = Order.objects.filter(operator=request.user).exclude(status__in=[9, 6]).order_by("-updated_at")
-
+    orders = Order.objects.filter(operator=request.user).exclude(status__in=[9, 6]).order_by("-id")
     order_counts_by_status = orders.values("status").annotate(order_count=Count("id"))
     statuses_with_counts = []
     total_order_count = 0
