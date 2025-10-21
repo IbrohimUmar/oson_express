@@ -108,6 +108,15 @@ class OrderStatusHistoryInline(admin.StackedInline):
 
 
 
+from warehouse.models import WareHouseStock
+class WareHouseStockInline(admin.StackedInline):
+    model = WareHouseStock
+    extra = 0
+    readonly_fields = ['created_at', 'updated_at']
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 
 from store.models import Product
@@ -131,7 +140,7 @@ class OrderAdmin(admin.ModelAdmin):
         return list(self.order_products.values_list("product__name", flat=True))
 
     list_display = ['id', 'status', 'driver', mahsulotlar,'created_at', 'updated_at', 'delivered_date']
-    inlines = [OrderProductInline, OrderStatusHistoryInline]
+    inlines = [OrderProductInline, OrderStatusHistoryInline, WareHouseStockInline]
     search_fields = ['id', 'customer_phone']
     list_editable = ['status']
     list_filter = ["status", "created_at", OrderProductFilter]
