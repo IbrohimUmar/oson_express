@@ -18,7 +18,7 @@ from django.db.models import F, Q
 @receiver(post_save, sender=Order)
 def save_profile(sender, instance, **kwargs):
         # print('keldi')
-        print(instance)
+        pass
         # if instance.defective_product_order is not None:
         #     if int(instance.status) == "4":
         #         try:
