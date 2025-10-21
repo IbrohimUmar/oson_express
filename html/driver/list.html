@@ -3,6 +3,8 @@
 {% block title %}
 Haydovchilar ro'yxati
 {% endblock %}
+{% load custom_filters %}
+
 {% block content %}
 <section class="content-main" id="app">
     <div class="content-header">
@@ -24,6 +26,7 @@ Haydovchilar ro'yxati
                     <tr>
                         <th>#</th>
                         <th>Haydovchi</th>
+                        <th>Maxsus daromadi</th>
                         <th>Viloyati</th>
                         <th>Aktivmi</th>
 
@@ -38,9 +41,16 @@ Haydovchilar ro'yxati
                             {% endif %}
                         </td>
                         <td>
+                            <h6>
                             {{ d.first_name }} {{ d.last_name }}
                             <br>
                             +{{ d.username }}
+                                </h6>
+                        </td>
+                        <td>
+                            <h6>
+                            {{ d.special_fee_amount|format_money }} uzs
+                            </h6>
                         </td>
                         <td>{{ d.region.name }}</td>
                          <td>
@@ -61,9 +71,13 @@ Haydovchilar ro'yxati
 {% endblock %}
 {% block header %}
 {% include 'table/head.html' %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+
 {% endblock %}
 {% block footer %}
+    <script src="{% static '' %}js/jquery.min.js"></script>
 {% include 'table/footer.html' %}
+
 <script>
         var table = $('#dataTable').DataTable({
             paging: true,
@@ -82,12 +96,12 @@ Haydovchilar ro'yxati
             ],
             dom: 'Bfrtip',
             language: {
-                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
-                zeroRecords: "Хеч нарса топилмади узр!",
+                lengthMenu: "Sahifada _MENU_ ta ma'lumot ko'rsat",
+                zeroRecords: "Xech narsa topilmadi uzr!",
                 info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
-                infoEmpty: "Маълумотлар мавжуд емас",
-                infoFiltered: "(_MAX_ та маълумот филтирланган)",
-                search: "Излаш",
+                infoEmpty: "Ma'lumotlar mavjud emas",
+                infoFiltered: "(_MAX_ ta ma'lumot filterlangan)",
+                search: "Qidiruv",
                 oPaginate: {
                     sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
                     sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
@@ -95,7 +109,7 @@ Haydovchilar ro'yxati
                     sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
                 },
                 searchPanes: {
-                    clearMessage: 'Бекор қилиш',
+                    clearMessage: 'Bekor qilish',
                     collapse: {0: 'Fliter', _: 'Filter (%d)'}
                 }
             }

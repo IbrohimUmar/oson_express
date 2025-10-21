@@ -33,10 +33,15 @@ def operator_app_my_order(request):
                 r = request.POST
                 order = Order.objects.filter(id=r['id'], status__in=[9, 6], operator=request.user).first()
                 if order:
+                    if r['status_description'] == '0':
+                        messages.error(request, "Iltimos izoh tanlang")
+                        return redirect('operator_app_my_order')
+
                     status_and_desc = get_object_or_404(SellerOperatorStatusDesc, seller=seller, id=r['status_description'])
                     order.status = status_and_desc.status
-                    order.note = status_and_desc.description
+                    order.operator_note = status_and_desc.description
                     order.operator_status_changed_at = datetime.datetime.now()
+
                     order.save()
                     save_order_status_history(order, order.status, "Operator buyurtmani izohini o'zgartirdi", request.user,
                                               'config.operator_app.order.my_order')

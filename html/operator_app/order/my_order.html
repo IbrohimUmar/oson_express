@@ -112,7 +112,7 @@
                                     <select class="form-select" name="status_description">
                                         <option value="0">--------</option>
                                         {% for i in descriptions %}
-                                        <option value="{{i.id}}" {% if o.note == i.description %}selected{% endif %}>
+                                        <option value="{{i.id}}" {% if o.operator_note == i.description %}selected{% endif %}>
                                             {{i.description}}
                                         </option>
                                         {% endfor %}

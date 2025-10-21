@@ -120,9 +120,11 @@
                                                 class="material-icons  md-edit"></i></a>
                                         {% endif %}
 
-                                        <a href="{% url 'seller_app_order_print' o.id %}"
+                                        {% if perms.admin.order_print %}
+                                        <a href="{% url 'order_print' o.id %}"
                                            class="btn  btn-brand rounded font-sm btn-sm"><i
                                                 class="material-icons md-print"></i></a>
+                                        {% endif %}
 
                                     </td>
 
