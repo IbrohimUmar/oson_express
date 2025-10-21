@@ -55,6 +55,9 @@ class MarketerStreamClick(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
 
 
+
+
+
 Status = (
         ("0", "O'chirib yuborilgan"),
 
@@ -80,6 +83,24 @@ Status = (
         ("15", "Seller filealdan qaytarib oldi"),
 
 )
+
+
+
+
+
+
+class SellerOperatorStatusDesc(models.Model):
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=Status)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.status
+
+    class Meta:
+        verbose_name = "Seller holat izohi"
+        verbose_name_plural = "Seller holat izohlari"
+
 
 
 
@@ -116,6 +137,7 @@ class Order(models.Model):
     responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='Masul')
     operator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='operator')
     operator_fee = models.IntegerField(default=0, null=True, blank=True, verbose_name='operator hizmat haqqi')
+    operator_comment = models.ForeignKey(SellerOperatorStatusDesc, on_delete=models.SET_NULL, null=True, blank=True)
     operator_note = models.TextField(null=True, blank=True)
 
     status = models.CharField(choices=Status, max_length=50, verbose_name='Holati', null=False, blank=False)
@@ -424,19 +446,6 @@ class OrderComment(models.Model):
         verbose_name_plural = "Buyurtma izohlari"
 
 
-
-
-class SellerOperatorStatusDesc(models.Model):
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=Status)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.status
-
-    class Meta:
-        verbose_name = "Seller holat izohi"
-        verbose_name_plural = "Seller holat izohlari"
 
 
 # class CustomStatusDesc(models.Model):

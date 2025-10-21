@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
@@ -25,8 +26,6 @@ def operator_app_my_order(request):
         call_back=models.Count("id", filter=models.Q(status=6)),
         total_order=models.Count("id"),
     )
-    if request.GET.get("status", None):
-        order = order.filter(status=int(request.GET["status"]))
     if request.method == "POST":
         try:
             with transaction.atomic():
@@ -39,6 +38,7 @@ def operator_app_my_order(request):
 
                     status_and_desc = get_object_or_404(SellerOperatorStatusDesc, seller=seller, id=r['status_description'])
                     order.status = status_and_desc.status
+                    order.operator_comment = status_and_desc
                     order.operator_note = status_and_desc.description
                     order.operator_status_changed_at = datetime.datetime.now()
 
@@ -54,8 +54,14 @@ def operator_app_my_order(request):
             return redirect('operator_app_my_order')
 
     descriptions = SellerOperatorStatusDesc.objects.filter(seller=seller)
+
+    if request.GET.get("comment", None):
+        order = order.filter(operator_comment_id=int(request.GET["comment"]))
+
+
     order_object = Paginator(order, 25)
     page_number = request.GET.get('page')
-    order = order_object.get_page(page_number)
+    order_pagination = order_object.get_page(page_number)
     return render(request, 'operator_app/order/my_order.html',
-                  {"order": order, "statistic": statistic, "o": request.user, "descriptions": descriptions})
+                  {"order": order_pagination, "statistic": statistic, "o": request.user, "descriptions": descriptions, "total_count": order.count()
+                   })

@@ -6,13 +6,20 @@
         <div>
     <h3>Buyurtmalarim</h3>
 
-            <a class="mt-1 mb-1 badge {% if request.GET.status == '1' %}btn-brand{% else %}badge-soft-success{% endif %}"
-               href="{% url 'operator_app_my_order' %}?status=1">Yangi : {{statistic.taked_new_order}} ta</a>
-            <a class="mt-1 mb-1 badge {% if request.GET.status == '6' %} btn-brand{% else %}badge-soft-success{% endif %}"
-               href="{% url 'operator_app_my_order' %}?status=6">Qayta qo'ng'iroq : {{statistic.call_back}} ta</a>
-            <a class="mt-1 mb-1 badge {% if request.GET.status == None %} btn-brand{% else %}badge-soft-success{% endif %}"
-               href="{% url 'operator_app_my_order' %}">Jami : {{statistic.total_order}} ta</a>
+<!--            <a class="mt-1 mb-1 badge {% if request.GET.status == '1' %}btn-brand{% else %}badge-soft-success{% endif %}"-->
+<!--               href="{% url 'operator_app_my_order' %}?status=1">Yangi : {{statistic.taked_new_order}} ta</a>-->
+<!--            <a class="mt-1 mb-1 badge {% if request.GET.status == '6' %} btn-brand{% else %}badge-soft-success{% endif %}"-->
+<!--               href="{% url 'operator_app_my_order' %}?status=6">Qayta qo'ng'iroq : {{statistic.call_back}} ta</a>-->
+<!--            <a class="mt-1 mb-1 badge {% if request.GET.status == None %} btn-brand{% else %}badge-soft-success{% endif %}"-->
+<!--               href="{% url 'operator_app_my_order' %}">Jami : {{statistic.total_order}} ta</a>-->
 
+
+            <a class="mt-1 mb-1 badge {% if request.GET.comment == None %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}">Jami : {{statistic.total_order}}</a>
+            {% for d in descriptions %}
+            <a class="mt-1 mb-1 badge {% if request.GET.comment|add:'0' == d.id %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}?comment={{d.id}}">{{d.description}} </a>
+            {% endfor %}
 
         </div>
     </div>
@@ -21,7 +28,11 @@
         <h4 class="text-center">Bajarilmoqda...</h4>
     </div>
 
+        <h6 class="text-center mt-2 mb-2">Soni : {{total_count}}</h6>
     <div id="take_order_card">
+
+
+        {% if total_count > 0 %}
 
         {% for o in order %}
         <form method="post" onsubmit="submitForm()">
@@ -38,16 +49,20 @@
                                     #ID : {{o.id}}
                                 </h6>
 
-                                {% if o.status == '9' %}
-                                <span class="text-sm f-right badge badge-soft-success">{{o.get_status_display}} </span>
-                                {% else %}
-                                <span class="text-sm f-right badge badge-soft-warning">{{o.get_status_display}} </span>
-                                {% endif %}
+
+
+                                <span class="text-sm f-right badge badge-dark">{{o.operator_comment.description}} </span>
+
 
                                 <hr style="margin: 5px;">
                                 <h6>
 <!--                                    <span style="-webkit-user-select: all; -moz-user-select: all; -ms-user-select: all; user-select: all">#ID : {{o.id}}</span>-->
 <!--                                    <br>-->
+
+                                    <i class="material-icons md-perm_identity"
+                                       style=" font-size:17px; vertical-align: text-bottom;"></i> Holati : <span class="text-sm badge " style="border:1px solid white;">{{o.get_status_display}} </span><br>
+
+
                                     <i class="material-icons md-perm_identity"
                                        style=" font-size:17px; vertical-align: text-bottom;"></i> Mijoz ismi :
                                     {{o.customer_name}}<br>
@@ -185,6 +200,12 @@
                 </ul>
             </nav>
         </div>
+        {% else %}
+        <h4 class="text-center">Ma'lumot topilmadi!</h4>
+        {% endif %}
+
+
+
     </div>
 
 
