@@ -91,6 +91,7 @@ def seller_app_postage_input_api(request):
 
                 if body['type'] == 'check':
                     if order.transaction_lock == True:
+                        order.update_total_input_price()
                         return JsonResponse({
                             'status': 404,
                             'message': f"Buyurtma skannerlab bo'lingan",

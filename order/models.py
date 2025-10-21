@@ -264,6 +264,17 @@ class Order(models.Model):
         order.save()
         return True
 
+    def update_total_input_price(self):
+        from warehouse.models import WareHouseStock
+        warehouse_stock = WareHouseStock.objects.filter(order=self, status='2').aggregate(
+            t=Coalesce(Sum(ExpressionWrapper(F("input_price") * F("quantity"),
+                                             output_field=models.IntegerField())), 0))['t']
+        print('stock', warehouse_stock)
+        order = Order.objects.get(id=self.id)
+        order.total_product_input_price = warehouse_stock
+        order.save()
+        return True
+
     @property
     def check_order(self):
         site = Order.objects.filter(customer_phone=self.customer_phone,

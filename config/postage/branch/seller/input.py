@@ -31,7 +31,6 @@ def postage_branch_seller_input(request, logistic_branch_id, seller_id):
     pastda esa pochtalar ro'yxati chiqadi skannerlanganlar success
     skannerlanmaganlari hira rangda
     hammasini skannerlab bo'lingandan so'ng tasdiqlash tugmasi disabled false bo'lishi kerak
-    
     '''
     if request.method == 'POST':
         print(request.POST)
@@ -132,6 +131,7 @@ def postage_branch_seller_input_api(request, logistic_branch_id, seller_id):
 
                 if body['type'] == 'check':
                     if order.transaction_lock == True:
+                        order.update_total_input_price()
                         return JsonResponse({
                             'status': 404,
                             'message': f"Buyurtma skannerlab bo'lingan",
