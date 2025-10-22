@@ -1,6 +1,8 @@
 from django.db import transaction, IntegrityError
 from django.db.models import F, Sum
 import datetime
+
+from services.handle_exception import handle_exception
 from user.models import CashierUser, User, CashCategory
 from cash.models import Cash
 from django.db.models.functions import Coalesce
@@ -28,7 +30,7 @@ def cash_in_create(responsible, from_user, to_user, amount, category, desc):
                                        )
             return cash
     except IntegrityError as e:
-        print(e)
+        handle_exception(e)
         return e
 
 
@@ -53,6 +55,7 @@ def cash_out_create(responsible, from_user, to_user, amount, category, desc):
                                        )
             return cash
     except IntegrityError as e:
+        handle_exception(e)
         return e
 
 

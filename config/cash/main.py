@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from cash.models import Cash
+from services.handle_exception import handle_exception
 from user.models import User, CashCategory, CashierUser
 from django.db import transaction, IntegrityError
 from django.db.models import F
@@ -70,7 +71,7 @@ def cash_json_data(request):
 @permission_required('cash.cash_list', login_url="/home")
 def cash_report_json_data(request):
     if request.user.is_superuser:
-        cash_list = CashierUser.objects.all().values("user_id", "balance", "user__first_name", "user__last_name")
+        cash_list = CashierUser.objects.exclude(user__type='6').values("user_id", "balance", "user__first_name", "user__last_name")
         total_balance = cash_list.aggregate(t=Coalesce(Sum("balance"), 0))["t"]
 
     else:
@@ -85,7 +86,7 @@ def cash_report_json_data(request):
 @permission_required('cash.cash_list', login_url="/home")
 def cash_filter_json_data(request):
     user_list = User.objects.filter(type__in=['1', '2', '6'], is_active=True).values("id", "first_name", "last_name", "username", "type")
-    category = CashCategory.objects.all().values("id", "name")
+    category = CashCategory.objects.filter(for_who='1').values("id", "name")
     # if request.user.is_superuser:
     #     user_list = User.objects.filter(is_active=True).values("id", "first_name", "last_name",
     #                                                                           "username", "type")
@@ -120,6 +121,7 @@ def cash_in_data_json(request):
                                                                                                         "username",
                                                                                                         "type")
             category = CashCategory.objects.filter(
+                for_who='1',
                 id__in=list(request.user.cashieruser.cash_category.all().values_list("id", flat=True))).values("id",
                                                                                                                "name")
         return JsonResponse({'data': {"from_user_data": list(from_user_list),
@@ -146,6 +148,7 @@ def cash_in_data_json(request):
                 return JsonResponse({'status': 200, "message": "created"})
 
         except IntegrityError as e:
+            handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
 
 
@@ -184,6 +187,7 @@ def cash_transfer_data_json(request):
                                            )
                 return JsonResponse({'status': 200, "message": "created"})
         except IntegrityError as e:
+            handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
 
 
@@ -197,10 +201,10 @@ def cash_out_data_json(request):
         if user.is_superuser:
             from_user_list = User.objects.filter(cashier=True, is_active=True).values("id", "first_name", "last_name",
                                                                                       "username", "type")
-            to_user_list = User.objects.filter(cashier=False, is_active=True, type=5).values("id", "first_name",
+            to_user_list = User.objects.filter(cashier=False, is_active=True, type=6).values("id", "first_name",
                                                                                              "last_name",
                                                                                              "username", "type")
-            category = CashCategory.objects.all().values("id", "name")
+            category = CashCategory.objects.filter(for_who='1').values("id", "name")
 
 
         else:
@@ -211,7 +215,7 @@ def cash_out_data_json(request):
                 type__in=user.cashieruser.cash_allowed_payment_types.all().values_list("id", flat=True),
                 cashier=False, is_active=True).values("id", "first_name", "last_name",
                                                       "username", "type")
-            category = CashCategory.objects.filter(
+            category = CashCategory.objects.filter(for_who='1',
                 id__in=user.cashieruser.cash_category.all().values_list("id", flat=True)).values("id", "name")
 
         return JsonResponse({'data': {"from_user_data": list(from_user_list),
@@ -248,6 +252,7 @@ def cash_out_data_json(request):
                                            )
                 return JsonResponse({'status': 200, "message": "created"})
         except IntegrityError as e:
+            handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
 
 

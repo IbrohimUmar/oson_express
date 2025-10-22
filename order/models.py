@@ -177,6 +177,10 @@ class Order(models.Model):
                                                verbose_name='2 kunda yetib borsa beriladigan bonus')
     driver_bonus_amount_won = models.IntegerField(default=0, null=True, blank=True,
                                                   verbose_name='Berilgan bonus miqdori')
+
+    total_driver_payment = models.IntegerField(null=True, blank=True, verbose_name="Haydovchiga to'langan summa", default=0)
+    total_driver_payment_status = models.CharField(choices=PaymentStatus, default='1', max_length=50, verbose_name="Haydovchiga to'lov holati", null=False, blank=False)
+
     delete_desc = models.TextField(null=True, blank=True, verbose_name="O'chirishi sababi")
 
     is_send_barcode = models.BooleanField(default=False, null=True, blank=True,
@@ -459,17 +463,17 @@ class OrderComment(models.Model):
 
 
 
-# class CustomStatusDesc(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     status = models.CharField(max_length=50, choices=Status)
-#     description = models.TextField()
-#
-#     def __str__(self):
-#         return self.status
-#
-#     class Meta:
-#         verbose_name = "Holat izohi"
-#         verbose_name_plural = "Holat izohlari"
+class CashOrderRelation(models.Model):
+    Type_choice = (
+        ("1", "Haydovchi to'lovi"),
+        ("2", "Seller to'lovi"),
+    )
+    type = models.CharField(choices=Type_choice, default="1", max_length=50, verbose_name='Turi', null=False, blank=False)
+    cash = models.ForeignKey(Cash, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name="cash_order_relation")
+    amount = models.IntegerField(default=0, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 

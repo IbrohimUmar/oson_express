@@ -25,7 +25,7 @@ def seller_app_postage_return(request, postage_id):
 
     if request.method == 'POST':
         action = request.POST.get('action', None)
-        print(request.POST)
+        # print(request.POST)
         postage_details = PostageDetails.objects.filter(postage=postage)
         try:
             with transaction.atomic():
