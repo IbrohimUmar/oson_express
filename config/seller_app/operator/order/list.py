@@ -56,6 +56,22 @@ def seller_app_operator_order_list(request):
                 operator_note=''
             )
             messages.success(request, "O'zgartirildi")
+
+        if r['action'] == '2' and r.get("select_all") == '1':
+            order = orders.filter(status='9', operator__isnull=False).update(
+                status='6',
+                updated_at=datetime.datetime.now(),
+            )
+            messages.success(request, "O'zgartirildi")
+        elif r['action'] == '2' and r.get("select_all") == '0':
+            order = orders.filter(id__in=check_ids, status=9,
+                                   operator__isnull=False).update(
+                status='6',
+                updated_at=datetime.datetime.now(),
+            )
+            messages.success(request, "O'zgartirildi")
+
+
         return redirect('seller_app_operator_order_list')
 
     operators = User.objects.filter(seller=seller, type='3').order_by("-id")
