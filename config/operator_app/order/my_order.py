@@ -20,7 +20,8 @@ from services.seller.get_seller import get_seller
 @check_work_hours
 def operator_app_my_order(request):
     seller = get_seller(request.user)
-    order = Order.objects.filter(status__in=[9, 6], driver=None, operator=request.user).order_by('-updated_at')
+    # order = Order.objects.filter(status__in=[9, 6], driver=None, operator=request.user).order_by('-updated_at')
+    order = Order.objects.filter(driver=None, operator=request.user).order_by('-updated_at')
     statistic = Order.objects.filter(status__in=[9, 6], driver=None, operator=request.user).aggregate(
         taked_new_order=models.Count("id", filter=models.Q(status=9)),
         call_back=models.Count("id", filter=models.Q(status=6)),
@@ -55,8 +56,14 @@ def operator_app_my_order(request):
 
     descriptions = SellerOperatorStatusDesc.objects.filter(seller=seller)
 
-    if request.GET.get("comment", None):
-        order = order.filter(operator_comment_id=int(request.GET["comment"]))
+    comment = request.GET.get("comment", None)
+    if comment:
+        if comment == '011':
+            order = order.filter(status__in=[9, 6])
+        else:
+            order = order.filter(operator_comment_id=int(request.GET["comment"]))
+    else:
+        order = order.filter(status=9)
 
 
     order_object = Paginator(order, 25)

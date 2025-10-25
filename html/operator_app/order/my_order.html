@@ -15,11 +15,14 @@
 
 
             <a class="mt-1 mb-1 badge {% if request.GET.comment == None %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
-               href="{% url 'operator_app_my_order' %}">Jami : {{statistic.total_order}}</a>
+               href="{% url 'operator_app_my_order' %}">Yangi : {{statistic.taked_new_order}}</a>
             {% for d in descriptions %}
             <a class="mt-1 mb-1 badge {% if request.GET.comment|add:'0' == d.id %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
                href="{% url 'operator_app_my_order' %}?comment={{d.id}}">{{d.description}} </a>
             {% endfor %}
+
+            <a class="mt-1 mb-1 badge {% if request.GET.comment == '011' %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
+               href="{% url 'operator_app_my_order' %}?comment=011">Jami : {{statistic.total_order}}</a>
 
         </div>
     </div>
@@ -51,8 +54,11 @@
 
 
 
+                                {% if o.operator_comment is not None %}
                                 <span class="text-sm f-right badge badge-dark">{{o.operator_comment.description}} </span>
-
+                                {% else %}
+                                                                <span class="text-sm f-right badge badge-dark">{{o.get_status_display}} </span>
+                                {% endif %}
 
                                 <hr style="margin: 5px;">
                                 <h6>
