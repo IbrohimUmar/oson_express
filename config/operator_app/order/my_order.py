@@ -56,6 +56,10 @@ def operator_app_my_order(request):
 
     descriptions = SellerOperatorStatusDesc.objects.filter(seller=seller)
 
+    for d in descriptions:
+        d.order_count = order.filter(operator_comment=d).count()
+        print(d)
+
     comment = request.GET.get("comment", None)
     if comment:
         if comment == '011':

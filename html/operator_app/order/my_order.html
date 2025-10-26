@@ -18,7 +18,7 @@
                href="{% url 'operator_app_my_order' %}">Yangi : {{statistic.taked_new_order}}</a>
             {% for d in descriptions %}
             <a class="mt-1 mb-1 badge {% if request.GET.comment|add:'0' == d.id %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
-               href="{% url 'operator_app_my_order' %}?comment={{d.id}}">{{d.description}} </a>
+               href="{% url 'operator_app_my_order' %}?comment={{d.id}}">{{d.description}} : {{d.order_count}}</a>
             {% endfor %}
 
             <a class="mt-1 mb-1 badge {% if request.GET.comment == '011' %} badge-dark text-dark{% else %}badge-soft-success{% endif %}"
