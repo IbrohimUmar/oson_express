@@ -18,7 +18,7 @@ from order.models import Status
 def seller_app_operator_order_list(request):
     seller = get_seller(request.user)
     # orders = Order.objects.filter(seller=seller)
-    orders = Order.objects.all()
+    orders = Order.objects.filter(seller=seller)
     status = request.GET.get("status", 'None')
     if status != 'None':
         if status == '99':
