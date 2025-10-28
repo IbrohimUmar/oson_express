@@ -89,6 +89,10 @@
                                             {% endif %}
                                         </h6>
 
+                                        {% if i.from_user_status == '1' and i.action == '4' %}
+                                        <hr>
+                                        <a href="{% url 'driver_app_postage_operation_return' %}" class="btn btn-sm btn-warning">Skannerlash</a>
+                                        {% endif %}
                                     </div>
                                 </div>
 
