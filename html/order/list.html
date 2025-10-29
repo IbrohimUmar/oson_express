@@ -38,6 +38,15 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="col-md-3">
+                                    <h6>Seller</h6>
+                                    <select class="form-control" name="seller">
+                                         <option value="None">---------</option>
+                                        {% for i in sellers %}
+                                        <option value="{{i.id}}" {% if request.GET.seller is not None and request.GET.seller|add:"0" == i.id %}selected{% endif %}>{{i.first_name}} {{i.last_name}} +{{i.username}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
 
                                 <div class="col-md-2">
                                     <h6>Qo'llash</h6>

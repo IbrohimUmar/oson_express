@@ -10,7 +10,7 @@ from django.db import transaction, IntegrityError
 from services.seller.get_seller import get_seller
 from warehouse.models import WareHouseStock
 from django.db.models.functions import Coalesce
-from user.models import Regions
+from user.models import Regions, User
 
 
 @login_required(login_url='/login')
@@ -18,6 +18,8 @@ from user.models import Regions
 def order_list(request):
     # orders = Order.objects.all().exclude(status__in=['9', '10', '11', '12', '1', '7', '8', '2']).order_by("-created_at")
     orders = Order.objects.all().exclude(status__in=['6', '0', '9', '10', '11', '12', '1', '7', '8', '2']).order_by("-created_at")
+    sellers = User.objects.filter(type=6)
+
     region = request.GET.get("region", 'None')
     if region != 'None':
         orders = orders.filter(customer_region=region)
@@ -26,6 +28,10 @@ def order_list(request):
     if status != 'None':
         orders = orders.filter(status=status)
 
+    seller = request.GET.get("seller", 'None')
+    if seller != 'None':
+        orders = orders.filter(seller_id=seller)
+
     filter_query = request.GET.get("filter", None)
     if filter_query:
         orders = orders.filter(Q(id__icontains=filter_query) | Q(customer_phone__icontains=filter_query) | Q(barcode__icontains=filter_query))
@@ -33,5 +39,7 @@ def order_list(request):
     paginator = Paginator(orders, 50)
     order = paginator.get_page(int(request.GET.get("page", 1)))
     return render(request, 'order/list.html', {'quary': filter_query,'page_obj': order, "order": order, 'count': orders.count(),
-                                                           "statuses":LogisticBranchStatus, "regions":Regions.objects.all()
+                                                           "statuses":LogisticBranchStatus,
+                                               "regions":Regions.objects.all(),
+                                               "sellers":sellers,
                                                           })
