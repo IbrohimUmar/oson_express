@@ -21,38 +21,12 @@
                                 </div>
                                 <div class="col-md-2">
                                     <h6>Holati</h6>
-<!--                                    <select class="form-control" name="status">-->
-<!--                                         <option value="None">-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</option>-->
-<!--                                        {% for i in statuses %}-->
-<!--                                        <option value="{{i.0}}" {% if request.GET.status is not None and request.GET.status == i.0 %}selected{% endif %}>{{i.1}}</option>-->
-<!--                                        {% endfor %}-->
-<!--                                    </select>-->
-<!--                                    -->
-
                                     <select class="form-control" name="status">
                                          <option value="None">---------</option>
-
-                                        <option value="0" {% if request.GET.status == '0' %}selected{% endif %}>O'chirib yuborilgan</option>
-
-                                        <option value="2" {% if request.GET.status == '2' %}selected{% endif %}>Yuborishga tayyor</option>
-
-                                        <option value="13" {% if request.GET.status == '13' %}selected{% endif %}>Filialda</option>
-
-                                        <option value="3" {% if request.GET.status == '3' %}selected{% endif %}>Yetkazilmoqda</option>
-
-                                        <option value="4" {% if request.GET.status == '4' %}selected{% endif %}>Sotildi</option>
-
-                                        <option value="5" {% if request.GET.status == '5' %}selected{% endif %}>Bekor qilindi</option>
-
-                                        <option value="6" {% if request.GET.status == '6' %}selected{% endif %}>Qayta qo'ng'iroq</option>
-
-                                        <option value="14" {% if request.GET.status == '14' %}selected{% endif %}>Haydovchi filealga qaytardi</option>
-
-                                        <option value="15" {% if request.GET.status == '15' %}selected{% endif %}>Seller filealdan qaytarib oldi</option>
-
+                                        {% for i in statuses %}
+                                        <option value="{{i.0}}" {% if request.GET.status is not None and request.GET.status == i.0 %}selected{% endif %}>{{i.1}}</option>
+                                        {% endfor %}
                                     </select>
-
-
 
                                 </div>
                                 <div class="col-md-2">
@@ -102,7 +76,6 @@
                                 <th>Yaratilgan sana</th>
                                 <th>O'zgartirilgan sana</th>
                                 <th>Yetkazilmoqdaga o'tgan sana</th>
-                                <th>#</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -207,31 +180,6 @@
                                                         {% endif  %}
 
                                                     </td>
-                                    <td>
-                                                      {% if o.status == '7' or o.status == '8' %}
-                                        <form method="post" class="d-inline">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="order_id" value="{{o.id}}">
-                                            <input type="hidden" name="type" value="1">
-
-                                        <button type="button" onclick="return Swal.fire({
-                                                                              title: 'Mahsulot kutilmoqdaga olinsinmi',
-                                                                              text:'Ombordan belgilangan mahsulotlar bekor qilinadi',
-                                                                              showDenyButton: true,
-                                                                              showCancelButton: false,
-                                                                              confirmButtonText: 'Tasdiqlash',
-                                                                              denyButtonText: `Qaytish`,
-                                                                            }).then((result) => {
-                                                                              /* Read more about isConfirmed, isDenied below */
-                                                                              if (result.isConfirmed) {
-                                                                                  form.submit();
-                                                                                   }
-                                                                            })" class="btn  btn-danger rounded font-sm btn-sm"><i
-                                                class="material-icons md-cancel"></i> Kutilmoqdaga olish</button>
-
-                                        </form>
-                                        {% endif %}
-                                    </td>
                                 </tr>
 
                             {% endfor %}

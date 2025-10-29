@@ -57,6 +57,16 @@ class MarketerStreamClick(models.Model):
 
 
 
+LogisticBranchStatus = (
+        ("13", "Filialda"),
+
+        ("3", "Yetkazilmoqda"),
+        ("4", "Sotildi"),
+        ("5", "Bekor qilindi"),
+
+        ("14", "Haydovchi filealga qaytardi"),
+        ("15", "Seller filealdan qaytarib oldi"),
+)
 
 Status = (
         ("0", "O'chirib yuborilgan"),
@@ -180,6 +190,7 @@ class Order(models.Model):
 
     total_driver_payment = models.IntegerField(null=True, blank=True, verbose_name="Haydovchiga to'langan summa", default=0)
     total_driver_payment_status = models.CharField(choices=PaymentStatus, default='1', max_length=50, verbose_name="Haydovchiga to'lov holati", null=False, blank=False)
+    total_driver_payment_paid_at = models.DateField(null=True, blank=True, verbose_name="Haydovchi to'liq to'lagan sana")
 
     delete_desc = models.TextField(null=True, blank=True, verbose_name="O'chirishi sababi")
 
@@ -475,6 +486,138 @@ class CashOrderRelation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+
+    @property
+    def order_payment_interest(self):
+        order_sold_price = self.order._int_order_products_total_price - self.order.driver_fee
+        # order_sold_price = self.order._int_order_products_total_input_price
+
+        if order_sold_price == 0:
+            return 100
+        if order_sold_price == self.amount:
+            return 100
+        # result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        return result
+
+    @property
+    def interest_rate(self):
+        order_sold_price = self.order._int_order_products_total_price - self.order.driver_fee
+        # order_sold_price = self.order._int_order_products_total_input_price
+        if order_sold_price == 0:
+            return 100
+
+        if order_sold_price == self.amount:
+            return 100
+        # result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        return result
+
+    @property
+    def interest_rate_without_driver_fee(self):
+        order_sold_price = self.order._int_order_products_total_price
+        # order_sold_price = self.order._int_order_products_total_input_price
+        if order_sold_price == self.amount:
+            return 100
+        # result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+        return result
+
+
+    # @property
+    # def interest_rate_without_driver_fee_increased(self):
+    #     driver_fee_increased = self.order.driver_fee_increased
+    #     # order_sold_price = self.order._int_order_products_total_input_price
+    #     if driver_fee_increased == self.amount:
+    #         return 100
+    #     # result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+    #     # result = (self.amount / order_sold_price) * 100  # Ödenen miktarın sipariş tutarına oranı
+    #     return result
+
+    @property
+    def order_payment_interest_round(self):
+        return round(self.order_payment_interest, 1)
+
+    @property
+    def order_sold_price(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            # return (self.order._int_order_products_total_price * self.interest_rate) / 100
+            return self.amount
+    @property
+    def order_seller_fee(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.seller_fee * self.interest_rate) / 100
+            # return self.amount
+    @property
+    def order_input_price(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order._int_order_products_total_input_price * self.interest_rate) / 100
+
+    @property
+    def order_leave_fee(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.leave_fee * self.interest_rate) / 100
+
+    @property
+    def order_leave_fee_we_mark(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.leave_fee_we_mark * self.interest_rate) / 100
+
+    @property
+    def order_driver_fee(self):
+        if self.interest_rate_without_driver_fee < 0 or self.interest_rate_without_driver_fee > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.driver_fee * self.interest_rate_without_driver_fee) / 100
+
+    @property
+    def order_driver_fee_increased(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.driver_fee_increased * self.interest_rate) / 100
+
+    @property
+    def order_driver_fee_standard(self):
+        if self.interest_rate_without_driver_fee < 0 or self.interest_rate_without_driver_fee > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.driver_fee_standard * self.interest_rate_without_driver_fee) / 100
+
+    @property
+    def order_operator_fee(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.operator_fee_standard * self.interest_rate) / 100
+
+    @property
+    def order_seller_fee(self):
+        if self.interest_rate < 0 or self.interest_rate > 100:
+            print("error interest rate!")
+            return 0
+        else:
+            return (self.order.total_seller_fee * self.interest_rate) / 100
 
 
 
