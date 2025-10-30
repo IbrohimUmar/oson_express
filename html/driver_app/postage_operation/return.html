@@ -125,7 +125,7 @@
 
                 <div class="col-md-6">
                     <h6>Buyurtma barcode raqamini kiriting</h6>
-                    <input v-on:keyup.enter="create_send_product" type="text" v-model="barcode" class="form-control"
+                    <input v-on:keyup.enter="create_send_product()" type="text" v-model="barcode" class="form-control"
                              :maxlength="13" placeholder="Barcodni kirting" ref="barcodeScanner" @blur="refocusBarcodeScanner"
                     @input="updateBarcodeValue" @keydown="allowOnlyNumbers">
                 </div>
