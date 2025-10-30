@@ -43,9 +43,9 @@ def postage_branch_driver_return(request, logistic_branch_id, postage_id):
                 --transaction lockdan chiqarib qo'yish kerak
                 '''
                 if action == 'confirm':
-                    if postage_details.filter(scan_to_user=False).exists():
-                        messages.error(request, "Iltimos hamma pochtalarni skannerlang")
-                        return redirect('postage_branch_driver_return', logistic_branch_id, postage_id)
+                    # if postage_details.filter(scan_to_user=False).exists():
+                    #     messages.error(request, "Iltimos hamma pochtalarni skannerlang")
+                    #     return redirect('postage_branch_driver_return', logistic_branch_id, postage_id)
 
                     postage.to_user_status = '2'
                     postage.to_user = request.user
