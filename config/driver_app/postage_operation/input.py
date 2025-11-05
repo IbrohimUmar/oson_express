@@ -47,12 +47,20 @@ def driver_app_postage_operation_input(request, postage_id):
                     postage.save()
 
                     orders = postage.postage_orders
-                    orders.update(
-                        status='3', driver=driver,
-                                  logistic_branch_id=None, transaction_lock=False,
-                             driver_shipping_start_date=datetime.datetime.today().strftime(("%Y-%m-%d")),
-                             updated_at=datetime.datetime.today(),
-                             driver_status='1')
+
+                    for order in orders:
+                        order.status = '3'
+                        order.driver = driver
+                        order.logistic_branch_id = None
+                        order.transaction_lock = False
+
+                        order.driver_shipping_start_date = datetime.datetime.today().strftime(("%Y-%m-%d"))
+                        order.driver_status = '1'
+                        order.save()
+
+                        order.update_driver_fee()
+                        order.update_logistic_fee()
+
                     messages.success(request, "Tasdiqlandi")
                     return redirect('driver_app_postage_operation_history')
 

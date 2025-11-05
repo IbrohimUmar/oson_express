@@ -261,22 +261,22 @@
                 </li>
                 {% endif %}
 
-<!--                {% if perms.admin.report or perms.admin.accountant or perms.admin.sites_report %}-->
-<!--                <li class="menu-item has-submenu {% if u == 'report_big_balance' or u == 'report_employee' or u == 'report_shopkeeper' or u == 'finance_department_assets' or u == 'finance_department' or u == 'accountant' or u == 'report' or u == 'sites_report' %}active{% endif %}">-->
-<!--                    <a class="menu-link">-->
-<!--                        <i class="icon material-icons md-calculate"></i>-->
-<!--                        <span class="text">Hisobotlar</span>-->
-<!--                    </a>-->
-<!--                    <div class="submenu">-->
-<!--                    {% if perms.admin.report_big_balance %}-->
-<!--                        <a href="{% url 'report_big_balance' %}"-->
-<!--                           {% if u == "report_big_balance" %}class="active"{% endif %}>Katta balans</a>-->
-<!--                        {% endif %}-->
-<!--                    </div>-->
+                {% if perms.admin.seller_app_report_main %}
+                <li class="menu-item has-submenu {% if u == 'seller_app_report_main' %}active{% endif %}">
+                    <a class="menu-link">
+                        <i class="icon material-icons md-calculate"></i>
+                        <span class="text">Hisobotlar</span>
+                    </a>
+                    <div class="submenu">
+                    {% if perms.admin.seller_app_report_main %}
+                        <a href="{% url 'seller_app_report_main' %}"
+                           {% if u == "seller_app_report_main" %}class="active"{% endif %}>Asosiy</a>
+                        {% endif %}
+                    </div>
 
 
-<!--                </li>-->
-<!--                {% endif %}-->
+                </li>
+                {% endif %}
                 
                 
  

@@ -60,6 +60,7 @@ def seller_create(request):
                     first_name=r['first_name'],
                     last_name=r['last_name'],
                     special_fee_amount=r['special_fee_amount'],
+                    seller_payment_delay_days=r['seller_payment_delay_days'],
                     password=make_password(r['password_text']),
                     password_text=r['password_text'],
                     street=r['address'],

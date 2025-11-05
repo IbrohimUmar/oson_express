@@ -40,54 +40,33 @@ class Cash(models.Model):
     def sold_order_input_price(self):
         return 0
 
+
+
     @property
     def get_cash_order_statistic(self):
         from order.models import CashOrderRelation
         cash_order_relation = CashOrderRelation.objects.filter(cash_id=self.id, amount__gt=0)
         statistic = {
-            "total_operator_fee": 0,
             "total_seller_fee": 0,
-            "total_order_sold_price": 0,
-            "total_order_input_price": 0,
+            "total_logistic_fee": 0,
             "total_driver_fee": 0,
-            "total_fee": 0,
         }
+
 
         for i in cash_order_relation:
             order = i.order
             interest = i.order_payment_interest
             if interest != 100:
-                item_total_operator_fee = int((order.operator_fee_standard * interest) / 100)
                 item_total_seller_fee = int((order.seller_fee * interest) / 100)
-                item_total_driver_fee = int((order.driver_fee * interest) / 100)
-                item_total_order_sold_price = i.amount
-                item_total_order_input_price = int((order._int_order_products_total_input_price * interest) / 100)
-                fee = item_total_order_sold_price - item_total_operator_fee - item_total_seller_fee - item_total_order_input_price
-
-                statistic['total_fee'] += fee
-                statistic['total_driver_fee'] += item_total_driver_fee
-                statistic['total_operator_fee'] += item_total_operator_fee
+                item_logistic_fee = int((order.logistic_fee * interest) / 100)
+                item_driver_fee = int((order.driver_fee * interest) / 100)
                 statistic['total_seller_fee'] += item_total_seller_fee
-                statistic['total_order_sold_price'] += item_total_order_sold_price
-                statistic['total_order_input_price'] += item_total_order_input_price
+                statistic['total_logistic_fee'] += item_logistic_fee
+                statistic['total_driver_fee'] += item_driver_fee
             else:
-                item_total_operator_fee = order.operator_fee_standard
-                item_total_seller_fee = order.seller_fee
-                item_total_driver_fee = order.driver_fee
-                item_total_order_sold_price = order._int_order_products_total_price
-                item_total_order_input_price = order._int_order_products_total_input_price
-
-                # foyda = sotilgan buyurtma narxi
-
-                fee = (
-                              item_total_order_sold_price - item_total_driver_fee) - item_total_operator_fee - item_total_seller_fee - item_total_order_input_price
-                statistic['total_fee'] += fee
-                statistic['total_driver_fee'] += item_total_driver_fee
-                statistic['total_operator_fee'] += item_total_operator_fee
-                statistic['total_seller_fee'] += item_total_seller_fee
-                statistic['total_order_sold_price'] += item_total_order_sold_price
-                statistic['total_order_input_price'] += item_total_order_input_price
-
+                statistic['total_seller_fee'] += order.seller_fee
+                statistic['total_logistic_fee'] += order.logistic_fee
+                statistic['total_driver_fee'] += order.driver_fee
         return statistic
 
 

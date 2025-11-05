@@ -91,15 +91,23 @@
                             {% for o in order %}
                                 <tr>
                                     <td>
-                                        {% if o.driver %}
-                                        <a href="{% url 'seller_app_order_details' o.id %}"
-                                           class="btn  btn-brand rounded font-sm btn-sm"><i
-                                                class="material-icons md-settings"></i></a>
-                                        {% elif o.driver == None and o.status == '1' and o.defective_product_order is None  %}
+<!--                                        {% if o.driver %}-->
+<!--                                        <a href="{% url 'seller_app_order_details' o.id %}"-->
+<!--                                           class="btn  btn-brand rounded font-sm btn-sm"><i-->
+<!--                                                class="material-icons md-settings"></i></a>-->
+<!--                                        {% elif o.driver == None and o.status == '1' and o.defective_product_order is None  %}-->
 
-                                        <a href="{% url 'seller_app_order_edit' o.id %}"
-                                           class="btn  btn-success rounded font-sm btn-sm"><i
-                                                class="material-icons  md-edit"></i></a>
+<!--                                        <a href="{% url 'seller_app_order_edit' o.id %}"-->
+<!--                                           class="btn  btn-success rounded font-sm btn-sm"><i-->
+<!--                                                class="material-icons  md-edit"></i></a>-->
+<!--                                        {% endif %}-->
+
+
+
+                                        {% if perms.admin.order_details %}
+                                        <a href="{% url 'order_details' o.id %}"
+                                           class="btn  btn-brand rounded font-sm btn-sm"><i
+                                                class="material-icons md-info"></i></a>
                                         {% endif %}
 
                                         {% if perms.admin.order_print %}

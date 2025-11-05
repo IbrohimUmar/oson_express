@@ -5,8 +5,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from cash.models import Cash
+from config.cash.crud import check_paid_orders, cashier_balance_update, update_paid_orders
 from services.handle_exception import handle_exception
-from user.models import User, CashCategory, CashierUser
+from services.logs.log_helpers import log_create, log_update
+from user.models import User, CashCategory, CashierUser, SystemLog
 from django.db import transaction, IntegrityError
 from django.db.models import F
 import json
@@ -63,7 +65,6 @@ def cash_json_data(request):
         'has_previous': page.has_previous(),
         'number': page.number,
         'num_pages': paginator.num_pages,
-
     })
 
 
@@ -136,20 +137,150 @@ def cash_in_data_json(request):
                 category = None
                 if int(data['category']) != 0:
                     category = CashCategory.objects.get(id=int(data['category']))
-                CashierUser.objects.filter(user_id=data['to_user']).update(balance=F("balance") + data_amount,
-                                                                           updated_at=datetime.datetime.now())
+
+                cashier_old = CashierUser.objects.filter(user_id=data['to_user']).first()
+                if data.get("to_user", None) or cashier_old:
+                    CashierUser.objects.filter(user_id=data['to_user']).update(balance=F("balance") + data_amount,
+                                                                               updated_at=datetime.datetime.now())
+                cashier_new = CashierUser.objects.filter(user_id=data['to_user']).first()
+                if cashier_old:
+                    log_update(request, request.user, cashier_old, cashier_new, fields=['balance'], action_type='CashierUser_UPDATE_1')
+
+
+                from_user = None
+                if data.get('from_user', None):
+                    from_user = User.objects.filter(id=data['from_user']).first()
+
                 cash = Cash.objects.create(type=1, from_user_id=data['from_user'],
                                            to_user_id=data["to_user"],
                                            responsible=request.user,
                                            amount=data_amount,
+                                           leave_amount=data_amount,
                                            category=category,
                                            desc=data['desc'],
                                            )
+                log_create(request, request.user, cash, action_type='Cash_CREATE_1')
+
+                if from_user and from_user.type == '2':
+                    check_paid_orders(data['from_user'])
                 return JsonResponse({'status': 200, "message": "created"})
 
         except IntegrityError as e:
             handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
+
+
+
+
+@login_required(login_url='/login')
+@permission_required('cash.cash_in', login_url="/home")
+def cash_in_edit_data_json(request):
+    if request.method == "POST":
+        body = json.loads(request.body.decode('utf-8'))
+        if body['type'] == 'edit':
+            try:
+                with transaction.atomic():
+                    cash = Cash.objects.filter(id=body['cash_id'], type='1').first()
+                    data = body['data']
+                    # cash = Cash.objects.filter(id=123132, type='1').first()
+                    if not cash:
+                        return JsonResponse({'status': 404, "message": "Bunday to'lov topilmadi"})
+
+                    category = None
+                    if int(data['category']) != 0:
+                        category = CashCategory.objects.get(id=int(data['category']))
+
+                    # CashierUser.objects.filter(user_id=data['to_user']).update(balance=F("balance") + data_amount,
+                    #                                                                updated_at=datetime.datetime.now())
+
+                    old_amount = cash.amount
+                    new_amount = int(data['amount'])
+
+                    if old_amount < new_amount:
+                        diff = new_amount - old_amount
+                        cash.leave_amount += diff
+                    old_cash = Cash.objects.get(id=cash.id)
+
+                    updated_cashier_balance = []
+
+                    from_user = None
+                    if data.get('from_user', None):
+                        from_user = User.objects.filter(id=data['from_user']).first()
+
+                    if cash.from_user:
+                        updated_cashier_balance.append(cash.from_user.id)
+
+                    if cash.to_user:
+                        updated_cashier_balance.append(cash.to_user.id)
+
+                    cash.from_user_id = data['from_user']
+                    cash.to_user_id = data['to_user']
+                    cash.responsible = request.user
+                    cash.amount = data['amount']
+                    cash.category = category
+                    cash.desc = data['desc']
+                    cash.save()
+
+                    log_update(
+                        request=request,
+                        created_by_user=request.user,
+                        old_instance=old_cash,
+                        new_instance=cash,
+                        fields=['from_user', 'to_user', 'amount', 'category', 'desc'],
+                        action_type="Cash_EDIT_1",
+                        path_url=request.path
+                    )
+
+                    if cash.from_user:
+                        updated_cashier_balance.append(cash.from_user.id)
+
+                    if cash.to_user:
+                        updated_cashier_balance.append(cash.to_user.id)
+
+
+                    if cash.from_user and cash.from_user.type == '2':
+                        if old_amount > new_amount:
+                            update_paid_orders(cash.id)
+                            # check_paid_orders(cash.from_user.id)
+                        else:
+                            check_paid_orders(cash.from_user.id)
+                    updated_cashier_balance = list(set(updated_cashier_balance))
+                    for u in set(updated_cashier_balance):
+                        cashier_balance_update(u)
+
+                    return JsonResponse({'status': 200, "message": "o'zgartirildi"})
+
+
+            except IntegrityError as e:
+                handle_exception(e)
+                return JsonResponse({'status': 404, "message": f"Xato : {e}"})
+            except Exception as e:
+                handle_exception(e)
+                return JsonResponse({'status': 404, "message": f"Xato : {e}"})
+
+
+        if body['type'] == 'edit_data':
+            cash = Cash.objects.filter(id=body['cash_id'], type='1').first()
+            if not cash:
+                return JsonResponse({'status': 404, "message": "Bunday to'lov topilmadi"})
+            user = request.user
+            from_user = cash.from_user
+            to_user = cash.to_user
+            return JsonResponse({'data': {
+                "cash_id": cash.id,
+                "from_user": cash.from_user.id,
+                "from_user_select_2": {"id": from_user.id, "first_name": from_user.first_name,
+                                       "last_name": from_user.last_name, "username": str(from_user.username),
+                                       "type": from_user.type},
+                "to_user": cash.to_user.id if cash.to_user else '',
+                "to_user_select_2": {"id": to_user.id, "first_name": to_user.first_name, "last_name": to_user.last_name,
+                                     "username": str(to_user.username), "type": to_user.type} if cash.to_user else {},
+                "category": cash.category.id,
+                "category_select_2": {"id": cash.category.id, "name": cash.category.name},
+                "amount": cash.amount,
+                "desc": cash.desc}, 'status':200})
+        return JsonResponse({'status': 200, "message": "created"})
+    return JsonResponse({'status': 404, "message": 'only post allowed'})
 
 
 @login_required(login_url='/login')
@@ -173,22 +304,95 @@ def cash_transfer_data_json(request):
         data_amount = int(data['amount'].replace(",", ""))
         try:
             with transaction.atomic():
-                CashierUser.objects.filter(user_id=data['from_user']).update(balance=F("balance") - data_amount,
-                                                                             updated_at=datetime.datetime.now())
-                CashierUser.objects.filter(user_id=data['to_user']).update(balance=F("balance") + data_amount,
-                                                                           updated_at=datetime.datetime.now())
-
+                update_cashier = [data['from_user'], data['to_user']]
                 cash = Cash.objects.create(type=3,
                                            from_user_id=data['from_user'],
                                            to_user_id=data["to_user"],
                                            responsible=request.user,
                                            amount=data_amount,
+                                           leave_amount=data_amount,
                                            desc=data['desc'],
                                            )
+                log_create(request, request.user, cash, action_type='Cash_CREATE_2')
+
+                for u in set(update_cashier):
+                    cashier_balance_update(u)
+
                 return JsonResponse({'status': 200, "message": "created"})
         except IntegrityError as e:
             handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
+
+
+
+
+
+
+
+@login_required(login_url='/login')
+@permission_required('cash.cash_out', login_url="/home")
+def cash_transfer_edit_data_json(request):
+    if request.method == "POST":
+        body = json.loads(request.body.decode('utf-8'))
+        if body['type'] == 'edit':
+            cash_old = Cash.objects.filter(id=body['data']['cash_id'], type='3').first()
+            cash = Cash.objects.filter(id=body['data']['cash_id'], type='3').first()
+            data = body['data']
+            if not cash:
+                return JsonResponse({'status': 404, "message": "Bunday o'tkazma topilmadi"})
+
+            updated_cashier_balance = []
+            updated_cashier_balance.append(cash.from_user.id)
+            updated_cashier_balance.append(cash.to_user.id)
+
+            cash.from_user_id = data['from_user']
+            cash.to_user_id = data['to_user']
+            cash.responsible = request.user
+            cash.amount = data['amount']
+            cash.desc = data['desc']
+            cash.save()
+
+            log_update(request, request.user, cash_old, cash,
+                       fields=['from_user', 'to_user', 'amount', 'category', 'desc'],
+                       action_type='Cash_EDIT_2')
+
+            updated_cashier_balance.append(cash.from_user.id)
+            updated_cashier_balance.append(cash.to_user.id)
+
+            updated_cashier_balance = list(set(updated_cashier_balance))
+            for u in set(updated_cashier_balance):
+                cashier_balance_update(u)
+
+
+            return JsonResponse({'status': 200, "message": "o'zgartirildi"})
+
+
+        if body['type'] == 'data':
+            cash = Cash.objects.filter(id=body['cash_id'], type='3').first()
+            # cash = Cash.objects.filter(id=123132, type='1').first()
+            if not cash:
+                return JsonResponse({'status': 404, "message": "Bunday to'lov topilmadi"})
+
+            user = request.user
+            from_user = cash.from_user
+            to_user = cash.to_user
+            return JsonResponse({'data': {
+                "cash_id": cash.id,
+                "from_user": cash.from_user.id,
+                "from_user_select_2": {"id": from_user.id, "first_name": from_user.first_name,
+                                       "last_name": from_user.last_name, "username": str(from_user.username),
+                                       "type": from_user.type},
+                "to_user": cash.to_user.id if cash.to_user else '',
+                "to_user_select_2": {"id": to_user.id, "first_name": to_user.first_name, "last_name": to_user.last_name,
+                                     "username": str(to_user.username), "type": to_user.type} if cash.to_user else {},
+                "amount": cash.amount,
+                "desc": cash.desc}, 'status':200})
+        return JsonResponse({'status': 200, "message": "created"})
+    return JsonResponse({'status': 404, "message": 'only post allowed'})
+
+
+
+
 
 
 # qabul qiluvchi bazida bo'lmaslik
@@ -199,25 +403,17 @@ def cash_out_data_json(request):
     if request.method == "GET":
         user = request.user
         if user.is_superuser:
-            from_user_list = User.objects.filter(cashier=True, is_active=True).values("id", "first_name", "last_name",
-                                                                                      "username", "type")
-            to_user_list = User.objects.filter(cashier=False, is_active=True, type=6).values("id", "first_name",
-                                                                                             "last_name",
-                                                                                             "username", "type")
+            from_user_list = User.objects.filter(cashier=True, is_active=True).values("id", "first_name", "last_name", "username", "type")
+            to_user_list = User.objects.filter(cashier=False, is_active=True, type=6).values("id", "first_name", "last_name", "username", "type")
             category = CashCategory.objects.filter(for_who='1').values("id", "name")
 
-
         else:
-            from_user_list = User.objects.filter(id=user.id, cashier=True, is_active=True).values("id", "first_name",
-                                                                                                  "last_name",
-                                                                                                  "username", "type")
+            from_user_list = User.objects.filter(id=user.id, cashier=True, is_active=True).values("id", "first_name", "last_name", "username", "type")
             to_user_list = User.objects.filter(
                 type__in=user.cashieruser.cash_allowed_payment_types.all().values_list("id", flat=True),
-                cashier=False, is_active=True).values("id", "first_name", "last_name",
-                                                      "username", "type")
+                cashier=False, is_active=True).values("id", "first_name", "last_name", "username", "type")
             category = CashCategory.objects.filter(for_who='1',
                 id__in=user.cashieruser.cash_category.all().values_list("id", flat=True)).values("id", "name")
-
         return JsonResponse({'data': {"from_user_data": list(from_user_list),
                                       "to_user_list": list(to_user_list),
                                       "category": list(category)}})
@@ -228,6 +424,7 @@ def cash_out_data_json(request):
             with transaction.atomic():
                 category = None
                 to_user = None
+                updated_cashier_balance = []
 
                 data_amount = int(data['amount'].replace(",", ""))
 
@@ -236,23 +433,113 @@ def cash_out_data_json(request):
 
                 if data.get("to_user", None):
                     to_user = User.objects.get(id=int(data['to_user']))
-                    CashierUser.objects.filter(user_id=data.get('to_user', 0)).update(
-                        balance=F("balance") + data_amount,
-                        updated_at=datetime.datetime.now())
-                CashierUser.objects.filter(user_id=data['from_user']).update(balance=F("balance") - data_amount,
-                                                                             updated_at=datetime.datetime.now())
+                    updated_cashier_balance.append(to_user.id)
+
+                updated_cashier_balance.append(data['from_user'])
+
 
                 cash = Cash.objects.create(type=2,
                                            from_user_id=data['from_user'],
                                            to_user=to_user,
                                            responsible=request.user,
                                            amount=data_amount,
+                                           leave_amount=data_amount,
                                            category=category,
                                            desc=data['desc'],
                                            )
+                log_create(request, request.user, cash, action_type='Cash_CREATE_3')
+
+                updated_cashier_balance = list(set(updated_cashier_balance))
+                for u in set(updated_cashier_balance):
+                    cashier_balance_update(u)
+
                 return JsonResponse({'status': 200, "message": "created"})
         except IntegrityError as e:
             handle_exception(e)
             return JsonResponse({'status': 404, "message": e})
 
+
+
+
+@login_required(login_url='/login')
+@permission_required('cash.cash_out', login_url="/home")
+def cash_out_edit_data_json(request):
+
+    if request.method == "POST":
+        body = json.loads(request.body.decode('utf-8'))
+        # data = body['data']
+
+        if body['type'] == 'edit':
+            try:
+                with transaction.atomic():
+                    cash_old = Cash.objects.filter(id=body['cash_id'], type='2').first()
+                    cash = Cash.objects.filter(id=body['cash_id'], type='2').first()
+                    data = body['data']
+                    if not cash:
+                        return JsonResponse({'status': 404, "message": "Bunday to'lov topilmadi"})
+
+                    category = None
+                    if int(data['category']) != 0:
+                        category = CashCategory.objects.get(id=int(data['category']))
+
+                    updated_cashier_balance = []
+
+                    from_user = None
+                    if data.get('from_user', None):
+                        from_user = User.objects.filter(id=data['from_user']).first()
+
+                    if cash.from_user:
+                        updated_cashier_balance.append(cash.from_user.id)
+
+                    cash.from_user = from_user
+                    cash.to_user_id = data['to_user']
+                    cash.responsible = request.user
+                    cash.amount = data['amount']
+                    cash.category = category
+                    cash.desc = data['desc']
+                    cash.save()
+
+                    log_update(request, request.user, cash_old, cash,
+                               fields=['from_user', 'to_user', 'amount', 'category', 'desc'],
+                               action_type='Cash_EDIT_3')
+
+                    if cash.from_user:
+                        updated_cashier_balance.append(cash.from_user.id)
+
+                    updated_cashier_balance = list(set(updated_cashier_balance))
+                    for u in set(updated_cashier_balance):
+                        cashier_balance_update(u)
+                    return JsonResponse({'status': 200, "message": "o'zgartirildi"})
+
+            except IntegrityError as e:
+                handle_exception(e)
+                return JsonResponse({'status': 404, "message": e})
+
+        if body['type'] == 'data':
+            cash = Cash.objects.filter(id=body['cash_id'], type='2').first()
+            # cash = Cash.objects.filter(id=123132, type='1').first()
+            if not cash:
+                return JsonResponse({'status': 404, "message": "Bunday to'lov topilmadi"})
+
+            user = request.user
+            from_user = cash.from_user
+            to_user = cash.to_user
+            return JsonResponse({'data': {
+                "cash_id": cash.id,
+                "from_user": cash.from_user.id,
+                "from_user_select_2": {"id": from_user.id, "first_name": from_user.first_name,
+                                       "last_name": from_user.last_name, "username": str(from_user.username),
+                                       "type": from_user.type},
+                "to_user": cash.to_user.id if cash.to_user else '',
+                "to_user_select_2": {"id": to_user.id, "first_name": to_user.first_name, "last_name": to_user.last_name,
+                                     "username": str(to_user.username), "type": to_user.type} if cash.to_user else {},
+                "category": cash.category.id,
+                "category_select_2": {"id": cash.category.id, "name": cash.category.name},
+                "amount": cash.amount,
+                "desc": cash.desc}, 'status':200})
+        return JsonResponse({'status': 200, "message": "created"})
+        # except IntegrityError as e:
+        #     handle_exception(e)
+        #     return JsonResponse({'status': 404, "message": e})
+    return JsonResponse({'status': 404, "message": 'only post allowed'})
 

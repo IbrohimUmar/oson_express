@@ -11,6 +11,39 @@ class RegionsAdmin(admin.ModelAdmin):
     list_display = ['id','name']
 
 
+from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
+from .models import SystemLog
+
+@admin.register(SystemLog)
+class SystemLogAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'action',
+        'content_object',
+        'created_by',
+        'ip_address',
+        'path',
+        'created_at',
+    )
+    list_filter = ('action', 'created_at')
+    search_fields = ('action', 'details', 'ip_address', 'user_agent', 'path', 'created_by__username')
+    readonly_fields = (
+        'action',
+        'content_type',
+        'object_id',
+        'content_object',
+        'details',
+        'ip_address',
+        'user_agent',
+        'path',
+        'created_by',
+        'created_at',
+    )
+    ordering = ('-created_at',)
+    date_hierarchy = 'created_at'
+
+
 @admin.register(ExportedFile)
 class ExportedFileAdmin(admin.ModelAdmin):
     list_display = ['user', 'file', 'is_view_user']

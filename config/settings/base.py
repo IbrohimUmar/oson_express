@@ -121,7 +121,7 @@ TEMPLATES = [
                 'config.settings.base.global_variables',
             ],
             'libraries':  {
-                'custom_filters': 'store.templatetags.custom_filters',
+                'money': 'store.templatetags.custom_filters',
             }
         },
     },

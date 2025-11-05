@@ -23,8 +23,11 @@ def driver_app_order_api_list(request):
 
     status = int(request.GET.get('status', 1))
     if status:
-        if status == '33':
-            orders = orders.filter(driver_status=status).exclude(status=5)
+        if status == 33:
+            orders = orders.filter(driver_status='3').exclude(status='5')
+        elif status == 3:
+            orders = orders.filter(driver_status='3', status='5')
+
         else:
             orders = orders.filter(driver_status=status)
 

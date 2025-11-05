@@ -19,8 +19,10 @@ def seller_edit(request, id):
         supplier.first_name = r['first_name']
         supplier.last_name = r['last_name']
         supplier.special_fee_amount = r['special_fee_amount']
-        supplier.password = make_password(r['password_text'])
-        supplier.password_text = r['password_text']
+        supplier.seller_payment_delay_days = r['seller_payment_delay_days']
+        if r['password_text'] != supplier.password_text:
+            supplier.password = make_password(r['password_text'])
+            supplier.password_text = r['password_text']
         supplier.street = r['address']
         supplier.is_active = {"on": True}.get(r.get("is_active", False), False)
         supplier.save()

@@ -80,7 +80,8 @@
                         <thead>
                         <tr class="text-center">
                             <th>id</th>
-                            <th>Operator</th>
+                            <th>Haydovchi To'lovi holati</th>
+                            <th>Sellerga To'lovimiz holati</th>
                             <th>Mijoz</th>
                             <th>Viloyati</th>
                             <th>Mahsulot</th>
@@ -99,11 +100,23 @@
                         <td>
                             #{{ o.id }}
                         </td>
-                        <td style="white-space: nowrap">
-                            <span class="badge badge-soft-info">
-                                {{ o.operator.first_name }} {{ o.operator.last_name }}
-                            </span>
-
+                        <td>
+                            {% if o.total_driver_payment_status == '1' %}
+                            <span class="badge badge-soft-danger">{{ o.get_total_driver_payment_status_display }}</span>
+                            {% elif o.total_driver_payment_status == '2' %}
+                            <span class="badge badge-soft-warning">{{ o.get_total_driver_payment_status_display }}</span>
+                            {% elif o.total_driver_payment_status == '3' %}
+                            <span class="badge badge-soft-primary">{{ o.get_total_driver_payment_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if o.seller_fee_paid_status == '1' %}
+                            <span class="badge badge-soft-danger">{{ o.get_seller_fee_paid_status_display }}</span>
+                            {% elif o.seller_fee_paid_status == '2' %}
+                            <span class="badge badge-soft-warning">{{ o.get_seller_fee_paid_status_display }}</span>
+                            {% elif o.seller_fee_paid_status == '3' %}
+                            <span class="badge badge-soft-primary">{{ o.get_seller_fee_paid_status_display }}</span>
+                            {% endif %}
                         </td>
                         <td style="white-space: nowrap">
                             {{ o.customer_name }} <br>
@@ -128,7 +141,7 @@
                         <td><h6>{{ o.driver_fee|format_money }}</h6></td>
                         <td><h6>{{o.operator_fee|format_money}}</h6></td>
                         <td><h6>{{ o.leave_fee|format_money }}</h6></td>
-                        <td>{{ o.updated_at|date:"Y-m-d" }}</td>
+                        <td>{{ o.driver_status_changed_at|date:"Y-m-d" }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>

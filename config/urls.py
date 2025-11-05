@@ -10,7 +10,7 @@ from .excel import excel
 from config.cash import main as cash_main
 from config.seller_app.orders import print_unshipped_orders
 from config.connection.sync_order_statuses import sync_all_order_statuses, sync_cahnged_order_statuses
-
+from config.cash.details import cash_details
 urlpatterns = [
     path('tinymce/', include('tinymce.urls')),
     path('api/', include('api.urls')),
@@ -50,14 +50,18 @@ urlpatterns = [
     # product wait region list shu ni details
     # order
     path('cash', cash_main.cash, name='cash'),
+    path('cash/details/<int:id>', cash_details, name='cash_details'),
 
     path('cash/json-data', cash_main.cash_json_data, name='cash_json_data'),
     path('cash/filter/json-data', cash_main.cash_filter_json_data, name='cash_filter_json_data'),
     path('cash/report/json-data', cash_main.cash_report_json_data, name='cash_report_json_data'),
 
     path('cash/in/json-data', cash_main.cash_in_data_json, name='cash_in_data_json'),
+    path('cash/in/edit/json-data', cash_main.cash_in_edit_data_json, name='cash_in_edit_data_json'),
     path('cash/out/json-data', cash_main.cash_out_data_json, name='cash_out_data_json'),
+    path('cash/out/edit/json-data', cash_main.cash_out_edit_data_json, name='cash_out_edit_data_json'),
     path('cash/transfer/json-data', cash_main.cash_transfer_data_json, name='cash_transfer_data_json'),
+    path('cash/transfer/edit/json-data', cash_main.cash_transfer_edit_data_json, name='cash_transfer_edit_data_json'),
 
 
 

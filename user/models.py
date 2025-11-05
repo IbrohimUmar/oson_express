@@ -8,6 +8,10 @@ from django.db.models import Q
 from tinymce.models import HTMLField
 
 
+
+
+
+
 class Regions(models.Model):
     name = models.CharField(max_length=200, null=False, blank=False)
 
@@ -115,6 +119,7 @@ class User(AbstractUser):
     payment_card = models.CharField(max_length=20, null=True, blank=True, verbose_name="Karta raqami")
 
     salary = models.IntegerField(blank=True, null=True, default=0, verbose_name='Oylik maoshi')
+    seller_payment_delay_days = models.PositiveIntegerField(blank=True, null=True, default=0, verbose_name="Seller to'lovni qancha kutishi kerak")
 
     photo = models.ImageField(upload_to='operators/', null=True, blank=True)
 
@@ -154,6 +159,11 @@ class User(AbstractUser):
     def marketer_data(self):
         from config.seller_app.marketer.query import MarketerData
         return MarketerData(self.id)
+
+    @property
+    def seller_data(self):
+        from config.seller.query import SellerData
+        return SellerData(self.id)
 
     @property
     def full_name(self):
@@ -281,3 +291,44 @@ class Concourse(models.Model):
 
     class Meta:
         verbose_name_plural = 'Operatorlar va haydovchilar Konkursi'
+
+
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db import models
+from django.utils import timezone
+
+
+class SystemLog(models.Model):
+    # --- 1️⃣ Aksiyon tipi (choice)
+    ACTION_CHOICES = (
+        ("CashierUser_UPDATE_1", "Logistika kassa | Kirim | Kirimni qabul qilgan kassir balansiga pul qo'shildi"),
+        ("CashierUser_UPDATE_2", "Logistika kassa | Auto hissoblash | Kassir balansini jami hisobni boshidan hissoblandi"),
+
+
+        ("Cash_CREATE_1", "Logistika kassa | Kirim | Yangi kirim yaratildi"),
+        ("Cash_CREATE_3", "Logistika kassa | Chiqim | Yangi Chiqim yaratildi"),
+        ("Cash_CREATE_2", "Logistika kassa | Transfer yaratish | Kassir tomonidan o'tkazma yaratildi"),
+
+        ("Cash_EDIT_1", "Logistika kassa | Kirim o'zgartirish | Kirim kassir tomonidan o'zgartirildi"),
+        ("Cash_EDIT_2", "Logistika kassa | Transferni o'zgartirish | O'tkazma kassir tomonidan o'zgartirildi"),
+        ("Cash_EDIT_3", "Logistika kassa | Chiqim o'zgartirish | Chiqim kassir tomonidan o'zgartirildi"),
+
+        ("Order_UPDATE_1", "Haydovchi | Kirim | Kirim qilishda to'lovdan buyurtmaga summa taqsimlanib to'landi ga o'zgartirildi"),
+    )
+    action = models.CharField(max_length=150, choices=ACTION_CHOICES)
+    # action_details = models.CharField(max_length=150, choices=ACTION_CHOICES)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    details = models.JSONField(null=True, blank=True)
+
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    path = models.CharField(max_length=255, null=True, blank=True)
+
+    # --- 4️⃣ Kim yaptı, ne zaman yaptı
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)

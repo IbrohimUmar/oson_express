@@ -1,0 +1,192 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% load money %}
+{% block content %}
+<section class="content-main" id="app">
+    <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
+        {% csrf_token %}
+        <div class="content-header">
+            <div>
+                <h3 class="content-title card-title">Asosiy hisobotlar</h3>
+            </div>
+            <div>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row  mt-20 mb-20">
+                    <div class="col-md-6  mt-10 mb-2">
+
+                        <article class="box bg-light">
+                            <h6>
+                                Balansi : {{ seller.seller_data.balance|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>
+                        </article>
+                    </div>
+                    <div class="col-md-6  mt-10 mb-2">
+                        <article class="box bg-light">
+                            <h6>
+                                Hold balans : {{ seller.seller_data.hold_seller_fee|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Sotilgan x ish kunida balansingizga o'tadigan summa</small>
+                        </article>
+                    </div>
+                    <div class="col-md-6  mt-10 mb-2">
+                        <article class="box bg-light">
+                            <h6>
+                                Qayta ishlashda : {{ seller.seller_data.processing_seller_fee|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Sotilgan lekin puli hali filealga yetib kelmagan</small>
+                        </article>
+                    </div>
+                    <div class="col-md-6  mt-10 mb-2">
+                        <article class="box bg-light">
+                            <h6>
+                                Yo'lda : {{ seller.seller_data.being_delivered_seller_fee|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Yetkaziliyatgan buyurtmalarning seller ulushi</small>
+                        </article>
+                    </div>
+
+                </div>
+
+<!--                    <div class="col-md-12 mt-10">-->
+<!--                        <h5 class="text-center">Operatorning jami kiritgan buyurtmalar bo'yicha</h5>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-12 text-center">-->
+
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">O'chirilgan buyurtmalari : {{ o.operator_data.order_status.delete }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.wait }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsuloti yuborilgan : {{ o.operator_data.order_status.send_products }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.being_delivered }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delivered }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi : {{ o.operator_data.order_status.canceled }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.call_back }} ta-->
+<!--                        </h6>-->
+<!--                        <br>-->
+<!--                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta-->
+<!--                        </h6>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <div class="row" style="border:1px dotted red;">
+                    <div class="col-md-6  mt-10 mb-2">
+                        <article class="box bg-light">
+                            <h6>
+                               <i class="fas fa-cancel text-danger"></i> Bekor qilindi (<i class="fas fa-car"></i> Haydovchida) : {{ seller.seller_data.cancelled_product_price_in_driver|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Bekor qilingan va mahsulotlar haydovchida bo'lgan buyurtmalarning jami summasi</small>
+                        </article>
+                    </div>
+                    <div class="col-md-6  mt-10 mb-2">
+                        <article class="box bg-light">
+                            <h6>
+                                <i class="fas fa-cancel text-danger"></i> Bekor qilindi (<i class="fas fa-store"></i> Filealda) : {{ seller.seller_data.cancelled_product_price_in_branch|format_money }} so'm</h6>
+                            <small class="text-muted d-block ">Bekor qilingan va filealda qaytarishga tayyor bo'lgan buyurtmalar jami summasi</small>
+                        </article>
+                    </div>
+                </div>
+
+                <hr>
+                <br>
+            </div>
+
+        </div>
+    </form>
+</section>
+<!--<script type='text/javascript'>-->
+<!--    $("#phone_inputmask").inputmask({"mask": "+\\9\\98999999999"});-->
+
+<!--</script>-->
+
+{% endblock %}
+{% block header %}
+<style>
+    .balance-card {
+      background: linear-gradient(135deg, #5e00c7, #7d00ff);
+      color: white;
+      border-radius: 20px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-card::after {
+      content: "";
+      position: absolute;
+      right: -30px;
+      bottom: -30px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 20%, transparent 20%);
+      background-size: 40px 40px;
+      border-radius: 50%;
+      opacity: 0.4;
+    }
+
+    .btn-yellow {
+      background-color: #ffcf30;
+      color: #222;
+      border: none;
+      font-weight: 600;
+    }
+
+    .btn-yellow:hover {
+      background-color: #ffc107;
+    }
+
+    .btn-outline-light-custom {
+      border: 2px solid rgba(255,255,255,0.6);
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-outline-light-custom:hover {
+      background-color: rgba(255,255,255,0.15);
+      color: white;
+    }
+  </style>
+{% endblock %}
+{% block footer %}
+{% include "table/footer.html" %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+
+            buttons: [
+                {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Филтер', _: 'Филтер (%d)'}
+                }
+            }
+        });
+
+</script>
+{% endblock %}

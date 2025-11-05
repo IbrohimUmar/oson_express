@@ -77,6 +77,10 @@ seller_app_warehouse_permission = [
     ("Seller app | Ombor | Mahsulot biriktirish ", 'seller_app_warehouse_product_attachment_history'),
 ]
 
+seller_app_report_permission = [
+    ("Seller app | Hisobotlar | Asosiy", 'seller_app_report_main'),
+]
+
 
 seller_app_setting_permission = [
     ("Seller app | Sozlamalar | Operator izohlari | Ro'yxati", 'seller_app_setting_operator_comment_list'),
@@ -207,7 +211,7 @@ def cash_seller_permission():
 def sync_permission():
     all_permissions = marketer_app_permission + operator_app_permission + driver_permission + report_permission + cash_permission
     # cash_seller_permission()
-    all_permissions += seller_app_setting_permission + seller_app_cash_permission + seller_app_warehouse_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission + seller_app_postage_permission + seller_app_supplier_permission + seller_app_product_permission
+    all_permissions += seller_app_setting_permission + seller_app_cash_permission + seller_app_report_permission + seller_app_warehouse_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission + seller_app_postage_permission + seller_app_supplier_permission + seller_app_product_permission
     created_permissions = get_or_create_permissions('admin', 'logentry', all_permissions)
     sync_permission_group()
     print('successfully created permissions')
@@ -218,7 +222,7 @@ def sync_permission_group():
     # get_or_create_group('Operator', operator_permission)
     get_or_create_group('Operator app', operator_app_permission)
     get_or_create_group('Marketolog Paneli', marketer_app_permission)
-    get_or_create_group('Seller app', seller_app_setting_permission + seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
+    get_or_create_group('Seller app', seller_app_setting_permission + seller_app_report_permission +seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
     # seller_app_permission_group()
     return True
 
@@ -291,7 +295,7 @@ def seller_app_setting_permission_group():
 
 def seller_app_permission_group():
     sync_permission()
-    group = get_or_create_group('Seller app', seller_app_setting_permission + seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
+    group = get_or_create_group('Seller app', seller_app_setting_permission + seller_app_report_permission + seller_app_warehouse_permission + seller_app_supplier_permission + seller_app_cash_permission + seller_app_product_permission + seller_app_postage_permission + seller_app_order_permission + seller_app_marketer_permission + seller_app_operator_permission)
     return group
 
 

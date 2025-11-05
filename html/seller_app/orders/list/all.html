@@ -1,6 +1,6 @@
 {% extends 'seller_app/main/main.html' %}
 {% load static %}
-{% load custom_filters %}
+{% load money %}
 {% block content %}
     <section class="content-main" id="app">
         <div class="content-header">
@@ -70,6 +70,7 @@
                                 <th>Viloyati</th>
                                 <th>Operator</th>
                                 <th>Haydovchi</th>
+                                <th>Seller ulushi</th>
                                 <th>Mahsulot</th>
                                 <th>Mijoz</th>
                                 <th>Yaratilgan sana</th>
@@ -152,6 +153,9 @@
                                         {% else %}
                                         ------------
                                         {% endif  %}
+                                    </td>
+                                    <td>
+                                        {{o.seller_fee}} uzs
                                     </td>
                                     <td>
 

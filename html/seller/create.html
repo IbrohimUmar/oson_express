@@ -52,7 +52,10 @@
                         <label>Standart pochta yetkazish narxi</label>
                         <input type="number" name="special_fee_amount" {% if r %}value="{{r.special_fee_amount}}" {% endif %} placeholder="Standart pochta yetkazish narxi"
                                class="form-control">
-                    </div>
+                        <label>Seller to'lovni necha kun kutishi kerakligi</label>
+                        <input type="number" name="seller_payment_delay_days" {% if r %}value="{{r.seller_payment_delay_days}}" {% endif %} placeholder="Seller to'lovni necha kun kutishi kerakligi"
+                               class="form-control">
+                    </div>s
                     <div class="col-md-6">
                         <label>Telefon raqami</label>
                             {% if r %}

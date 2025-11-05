@@ -148,14 +148,14 @@ Kassa menyu
                     </thead>
                     <tbody>
                     <tr v-for="(c, index) in cashList" :key="index">
-
                                       <td v-if="ifChanged">
+                                          <button type="button" v-if="c.type == '1'" @click="showCashInEditModal(c.id)" class="btn btn-sm badge-soft-success"><i class="material-icons md-edit"></i></button>
+<!--                                          <a :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/admin/cash/cash/' + c.id +'/change/'" v-if="c.model_name != 'Cash'" target="_blank" class="badge btn-sm badge-soft-success d-inline"><i class="material-icons md-edit"></i></a>-->
+                                          <a v-if="c.type === '1' && c.from_user__first_name" :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/cash/details/'+ c.id +''" target="_blank" class="badge btn-sm badge-soft-success d-inline"><i class="material-icons md-description"></i></a>
+                                          <button type="button" v-if="c.type == '2'" @click="showCashOutEditModal(c.id)" class="btn btn-sm badge-soft-success"><i class="material-icons md-edit"></i></button>
+                                          <button type="button" v-if="c.type == '3'" @click="showCashTransferEditModal(c.id)" class="btn btn-sm badge-soft-success"><i class="material-icons md-edit"></i></button>
 
-                                                    <a :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/admin/cash/cash/' + c.id +'/change/'" target="_blank" class="badge btn-sm badge-soft-success"><i class="material-icons md-edit"></i></a>
-
-
-
-                        </td>
+                                      </td>
 
                         <td><h6>[[c.created_at__date]]</h6>
                             <small>[[ c.created_at__time ]]</small>
@@ -241,95 +241,170 @@ Kassa menyu
 
     <!-- MODALS   -->
     <div v-if="in_modal" :style="{ display: in_modal ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+      <!-- Modal content -->
+      <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
 
-  <!-- Modal content -->
-  <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+        <div class="modal-header">
+                  <h4>Kirim qilish</h4>
 
-    <div class="modal-header">
-              <h4>Kirim qilish</h4>
+          <span class="close" @click="in_modal = false">&times;</span>
+        </div>
+        <div class="modal-body">
+              {% csrf_token %}
+              <input type="hidden" name="add" value="input">
+            <div class="row">
 
-      <span class="close" @click="in_modal = false">&times;</span>
-    </div>
-    <div class="modal-body">
-          {% csrf_token %}
-          <input type="hidden" name="add" value="input">
-        <div class="row">
+                <div class="col-md-12">
 
-            <div class="col-md-12">
-
-          <label class="mt-2">Kimdan</label>
-
+              <label class="mt-2">Kimdan</label>
 
 
-                <multiselect v-model="cash_in.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.from_user_data" key="id" @input="cashInFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
-                    <span slot="noResult">Topilmadi!</span>
-                </multiselect>
+
+                    <multiselect v-model="cash_in.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.from_user_data" key="id" @input="cashInFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
 
 
-<!--          <select name="cash" class="form-select" v-model="cash_in.from_user">-->
+    <!--          <select name="cash" class="form-select" v-model="cash_in.from_user">-->
 
-<!--              <option :value="d.id" v-for="(d, index) in cash_in_data.from_user_data" :key="index">[[d.first_name]] +[[d.username]] | Haydovchi</option>-->
-<!--          </select>-->
+    <!--              <option :value="d.id" v-for="(d, index) in cash_in_data.from_user_data" :key="index">[[d.first_name]] +[[d.username]] | Haydovchi</option>-->
+    <!--          </select>-->
+
+
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Kimga</label>
+
+                    <multiselect v-model="cash_in.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.to_user_list" key="id" @input="cashInToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+    <!--          <select name="cash" class="form-select"  v-model="cash_in.to_user">-->
+    <!--              <option :value="d.id" v-for="(d, index) in cash_in_data.to_user_list" :key="index">[[d.first_name]] +[[d.username]] | Kassa</option>-->
+    <!--          </select>-->
+                </div>
+                <div class="col-md-12">
+              <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
+
+
+
+                                    <multiselect v-model="cash_in.category_select_2"  :options="cash_in_data.category" key="id" @input="cashInCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+    <!--          <select name="cash" class="form-select"  v-model="cash_in.category">-->
+    <!--              <option value="0" selected>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</option>-->
+    <!--           <option :value="d.id" v-for="(d, index) in cash_in_data.category" :key="index">[[d.name]]</option>-->
+
+    <!--          </select>-->
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Summa</label>
+                    <input type="tel" v-model="cash_in.amount" @input="input_format_money" placeholder="Summa" name="amount"  class="form-control">
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Izoh</label>
+                    <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_in.desc" cols="30" rows="10"></textarea>
+                </div>
+
+                <div class="col-md-12 text-center">
+              <button type="button" @click="in_modal = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+
+              <button type="button" @click="setCashInData" :disabled="cash_in.to_user.length===0 || cash_in.from_user.length===0 || cash_in.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> Qo'shish</button>
+
+                </div>
 
 
             </div>
-            <div class="col-md-12">
-
-          <label class="mt-2">Kimga</label>
-
-                <multiselect v-model="cash_in.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.to_user_list" key="id" @input="cashInToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
-                    <span slot="noResult">Topilmadi!</span>
-                </multiselect>
-
-
-<!--          <select name="cash" class="form-select"  v-model="cash_in.to_user">-->
-<!--              <option :value="d.id" v-for="(d, index) in cash_in_data.to_user_list" :key="index">[[d.first_name]] +[[d.username]] | Kassa</option>-->
-<!--          </select>-->
-            </div>
-            <div class="col-md-12">
-          <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
-
-
-
-                                <multiselect v-model="cash_in.category_select_2"  :options="cash_in_data.category" key="id" @input="cashInCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
-                    <span slot="noResult">Topilmadi!</span>
-                </multiselect>
-
-
-<!--          <select name="cash" class="form-select"  v-model="cash_in.category">-->
-<!--              <option value="0" selected>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</option>-->
-<!--           <option :value="d.id" v-for="(d, index) in cash_in_data.category" :key="index">[[d.name]]</option>-->
-
-<!--          </select>-->
-            </div>
-            <div class="col-md-12">
-
-          <label class="mt-2">Summa</label>
-                <input type="tel" v-model="cash_in.amount" @input="input_format_money" placeholder="Summa" name="amount"  class="form-control">
-            </div>
-            <div class="col-md-12">
-
-          <label class="mt-2">Izoh</label>
-                <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_in.desc" cols="30" rows="10"></textarea>
-            </div>
-
-            <div class="col-md-12 text-center">
-          <button type="button" @click="in_modal = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
-
-          <button type="button" @click="setCashInData" :disabled="cash_in.to_user.length===0 || cash_in.from_user.length===0 || cash_in.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> Qo'shish</button>
-
-            </div>
-
 
         </div>
-
+    <!--    <div class="modal-footer">-->
+    <!--      <h3>Modal Footer</h3>-->
+    <!--    </div>-->
+      </div>
     </div>
-<!--    <div class="modal-footer">-->
-<!--      <h3>Modal Footer</h3>-->
-<!--    </div>-->
-  </div>
 
-</div>
+
+    <div v-if="in_modal_edit" :style="{ display: in_modal_edit ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+      <!-- Modal content -->
+      <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+
+        <div class="modal-header">
+                  <h4>Kirimni o'zgartirish</h4>
+
+          <span class="close" @click="in_modal_edit = false">&times;</span>
+        </div>
+        <div class="modal-body">
+              {% csrf_token %}
+              <input type="hidden" name="add" value="input">
+            <div class="row">
+
+                <div class="col-md-12">
+
+              <label class="mt-2">Kimdan</label>
+                    <multiselect v-model="cash_in_edit.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.from_user_data" key="id" @input="cashInFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+    <!--          <select name="cash" class="form-select" v-model="cash_in.from_user">-->
+
+    <!--              <option :value="d.id" v-for="(d, index) in cash_in_data.from_user_data" :key="index">[[d.first_name]] +[[d.username]] | Haydovchi</option>-->
+    <!--          </select>-->
+
+
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Kimga</label>
+
+                    <multiselect v-model="cash_in_edit.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_in_data.to_user_list" key="id" @input="cashInToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+
+
+    <!--          <select name="cash" class="form-select"  v-model="cash_in.to_user">-->
+    <!--              <option :value="d.id" v-for="(d, index) in cash_in_data.to_user_list" :key="index">[[d.first_name]] +[[d.username]] | Kassa</option>-->
+    <!--          </select>-->
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
+                    <multiselect v-model="cash_in_edit.category_select_2"  :options="cash_in_data.category" key="id" @input="cashInCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                        <span slot="noResult">Topilmadi!</span>
+                    </multiselect>
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Summa</label>
+                    <input type="tel" v-model="cash_in_edit.amount" @input="input_format_money" placeholder="Summa" name="amount"  class="form-control">
+                </div>
+                <div class="col-md-12">
+
+              <label class="mt-2">Izoh</label>
+                    <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_in_edit.desc" cols="30" rows="10"></textarea>
+                </div>
+
+                <div class="col-md-12 text-center">
+                      <button type="button" @click="in_modal_edit = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                      <button type="button" @click="setCashInEditData(cash_in_edit.cash_id)" :disabled="cash_in_edit.to_user.length===0 || cash_in_edit.from_user.length===0 || cash_in_edit.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> O'zgartirish</button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    <!--    <div class="modal-footer">-->
+    <!--      <h3>Modal Footer</h3>-->
+    <!--    </div>-->
+      </div>
+    </div>
 
 
 
@@ -432,6 +507,104 @@ Kassa menyu
 
 </div>
 
+<!--Out edit modal-->
+    <div v-if="out_modal_edit" :style="{ display: out_modal_edit ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+
+  <!-- Modal content -->
+  <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+
+    <div class="modal-header">
+              <h4>Chiqimni o'zgartirish</h4>
+
+      <span class="close" @click="out_modal_edit = false">&times;</span>
+    </div>
+     <div class="modal-body">
+        <div class="row">
+
+            <div class="col-md-12">
+
+          <label class="mt-2">Kimdan</label>
+
+
+
+                <multiselect v-model="cash_out_edit.from_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.from_user_data" key="id" @input="cashOutFromUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                    <span slot="noResult">Topilmadi!</span>
+                </multiselect>
+
+<!--          <select name="cash" class="form-select" v-model="cash_out.from_user">-->
+
+<!--&lt;!&ndash;            <multiselect v-model="cash_out.from_user" :options="cash_out_data.from_user_data"&ndash;&gt;-->
+<!--&lt;!&ndash;                         :custom-label="fromUserLabel" placeholder="Tanlash" label="first_name"&ndash;&gt;-->
+<!--&lt;!&ndash;                         track-by="name"&ndash;&gt;-->
+<!--&lt;!&ndash;                         :close-on-select="false"></multiselect>&ndash;&gt;-->
+
+<!--              <option :value="d.id" v-for="(d, index) in cash_out_data.from_user_data" :key="index">[[d.first_name]] +[[d.username]]</option>-->
+
+
+<!--          </select>-->
+            </div>
+            <div class="col-md-12" v-if="cash_out_data.to_user_list.length > 0">
+          <label class="mt-2">Kimga</label>
+<!--          <select name="cash" class="form-select"  v-model="cash_out.to_user">-->
+
+
+<!--              <option :value="d.id" v-for="(d, index) in cash_out_data.to_user_list" :key="index">[[d.first_name]] +[[d.username]]</option>-->
+<!--          </select>-->
+
+
+
+                <multiselect v-model="cash_out_edit.to_user_select_2"  :custom-label="multiSelectLibraryOptionName" :options="cash_out_data.to_user_list" key="id" @input="cashOutToUserMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="first_name" track-by="first_name">
+                    <span slot="noResult">Topilmadi!</span>
+                </multiselect>
+
+
+
+            </div>
+            <div class="col-md-12">
+
+          <label class="mt-2">Kategoriya tanlang (Ixtiyoriy)</label>
+
+
+
+                <multiselect v-model="cash_out_edit.category_select_2"  :options="cash_out_data.category" key="id" @input="cashOutCategoryMultiselectHandle" deselect-label="Bekor qilish" placeholder="--------" label="name" track-by="name">
+                    <span slot="noResult">Topilmadi!</span>
+                </multiselect>
+
+
+<!--          <select name="cash" class="form-select"  v-model="cash_out.category">-->
+<!--              <option value="0" selected>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</option>-->
+<!--=           <option :value="d.id" v-for="(d, index) in cash_out_data.category" :key="index">[[d.name]]</option>-->
+
+<!--          </select>-->
+            </div>
+            <div class="col-md-12">
+
+          <label class="mt-2">Summa</label>
+                <h6>
+                    <input type="tel" v-model="cash_out_edit.amount" @input="out_format_money"  placeholder="Summa" name="amount"  class="form-control">
+                </h6>
+            </div>
+            <div class="col-md-12">
+
+          <label class="mt-2">Izoh</label>
+                <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_out_edit.desc" cols="30" rows="10"></textarea>
+            </div>
+            <div class="col-md-12 text-center">
+                  <button type="button" @click="out_modal_edit = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+                  <button type="button" @click="setCashOutEditData(cash_out_edit.cash_id)" :disabled="cash_out_edit.category.length===0 || cash_out_edit.from_user.length===0 || cash_out_edit.amount.length===0 || cash_out_edit.category===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> O'zgartirish</button>
+            </div>
+
+
+        </div>
+
+    </div>
+<!--    <div class="modal-footer">-->
+<!--      <h3>Modal Footer</h3>-->
+<!--    </div>-->
+  </div>
+
+</div>
+
 
 
 
@@ -480,6 +653,63 @@ Kassa menyu
           <button type="button" @click="transfer_modal = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
 
           <button type="button" @click="setCashTransferData" :disabled="cash_transfer.to_user.length===0 || cash_transfer.from_user.length===0 || cash_transfer.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> Qo'shish</button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+
+
+    <div v-if="transfer_edit_modal" :style="{ display: transfer_edit_modal ? 'block' : 'none' }" style="display:none!important;" class="modal d-block">
+
+        <div class="modal-content card" style="max-width:400px;width:95% !important; padding:0px;">
+  <!-- Modal content -->
+                <div class="modal-header">
+              <h4>O'tkazmani o'zgartirish</h4>
+
+      <span class="close" @click="transfer_edit_modal = false">&times;</span>
+    </div>
+     <div class="modal-body card">
+        <div class="row">
+
+            <div class="col-md-12">
+
+          <label class="mt-2">Kimdan</label>
+          <select name="cash" class="form-select" v-model="cash_transfer_edit.from_user">
+
+              <option :value="d.id" v-for="(d, index) in cash_transfer_data.cashier_list" v-if="d.id !== cash_transfer_edit.to_user" :key="index">[[d.first_name]] +[[d.username]] | Haydovchi</option>
+          </select>
+            </div>
+            <div class="col-md-12">
+          <label class="mt-2">Kimga</label>
+          <select name="cash" class="form-select"  v-model="cash_transfer_edit.to_user">
+
+
+              <option :value="d.id" v-for="(d, index) in cash_transfer_data.cashier_list" v-if="d.id !== cash_transfer_edit.from_user" :key="index">[[d.first_name]] +[[d.username]]</option>
+          </select>
+            </div>
+            <div class="col-md-12">
+
+          <label class="mt-2">Summa</label>
+                <h6>
+                <input type="tel" v-model="cash_transfer_edit.amount" @input="transfer_format_money(cash_transfer_edit.amount)" placeholder="Summa" name="amount"  class="form-control">
+            </h6>
+            </div>
+            <div class="col-md-12">
+
+          <label class="mt-2">Izoh</label>
+                <textarea name="desc" placeholder="izoh kiriting" class="form-control" v-model="cash_transfer_edit.desc" cols="30" rows="10"></textarea>
+            </div>
+
+            <div class="col-md-12 text-center">
+          <button type="button" @click="transfer_edit_modal = false" class="btn btn-danger btn-sm mt-3 mb-3"><i class="material-icons md-cancel"></i> Bekor qilish</button>
+
+          <button type="button" @click="setCashTransferEditData(cash_id)" :disabled="cash_transfer_edit.to_user.length===0 || cash_transfer_edit.from_user.length===0 || cash_transfer_edit.amount.length===0" class="btn btn-brand btn-sm mt-3 mb-3"><i class="material-icons md-add"></i> O'zgartirish</button>
 
             </div>
 
@@ -593,9 +823,12 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
             data: {
 
+            in_modal_edit:false,
             in_modal:false,
             out_modal:false,
+            out_modal_edit:false,
             transfer_modal:false,
+            transfer_edit_modal:false,
             filter_modal:false,
             ifChanged :false,
             data_for_filter : [],
@@ -648,6 +881,12 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                 amount:'',
                 desc:'',
             },
+            cash_transfer_edit : {
+                from_user:'',
+                to_user:'',
+                amount:'',
+                desc:'',
+            },
             cash_in : {
                 from_user:'',
                 to_user:'',
@@ -658,7 +897,28 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                 amount:'',
                 desc:'',
             },
+            cash_in_edit : {
+                from_user:'',
+                to_user:'',
+                category:0,
+                from_user_select_2:'',
+                to_user_select_2:'',
+                category_select_2:0,
+                amount:'',
+                desc:'',
+            },
             cash_out : {
+                //from_user:'{{request.user.id}}',
+                from_user:'',
+                from_user_select_2:'{{request.user.id}}',
+                to_user: '',
+                to_user_select_2: '',
+                category:0,
+                category_select_2:0,
+                amount:'',
+                desc:'',
+            },
+            cash_out_edit : {
                 //from_user:'{{request.user.id}}',
                 from_user:'',
                 from_user_select_2:'{{request.user.id}}',
@@ -852,19 +1112,19 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                 },
 
                 cancelFilterData:async function(){
-                this.filter_modal=false
+                    this.filter_modal=false
 
-                this.filtered={
-                search:'',
-                type:'',
-                category:'',
-                user:'',
-                from_date:'',
-                to_date:'',
-                }
-                this.filter=this.filtered
-                this.page=1
-                await this.getCashList()
+                    this.filtered={
+                    search:'',
+                    type:'',
+                    category:'',
+                    user:'',
+                    from_date:'',
+                    to_date:'',
+                    }
+                    this.filter=this.filtered
+                    this.page=1
+                    await this.getCashList()
                 },
 
 
@@ -931,6 +1191,76 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                 this.transfer_modal=true
                 },
 
+                showCashTransferEditModal:async function(cash_id){
+                await this.getCashTransferData()
+                await this.getCashTransferEditData(cash_id)
+                },
+
+                getCashTransferEditData:async function(cash_id){
+                       vm=this
+                       response= await axios.post('{% url "cash_transfer_edit_data_json" %}', {"type":"data", "cash_id":cash_id}).then(
+                        function (response){
+                            if (response.status==200 && response.data.status == 200){
+                                vm.cash_transfer_edit =  response.data.data
+                                 vm.transfer_edit_modal=true
+                                return response.data
+                            }else if (response.data.status == 404){
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+                                                                    text:response.data.message,
+                                                                    showCancelButton: true,
+                                                                    cancelButtonText: 'Chiqish',
+                                                                    showConfirmButton: false,
+                                                                })
+                            }else{
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+
+                                                                    showConfirmButton: false,
+                                                                    timer: 600
+                                                                })
+                            }
+                            return []
+                        })
+                    return this.cashList
+                    },
+                      setCashTransferEditData:async function(cash_id){
+                   vm=this
+                        response= await axios.post('{% url "cash_transfer_edit_data_json" %}', {"data":this.cash_transfer_edit, 'type':'edit', 'cash_id':cash_id}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "O'zgartirildi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.transfer_edit_modal=false
+                            vm.getCashList()
+                            vm.getReportData()
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
+
 
                 getCashTransferData:async function(){
                         this.cash_transfer_data= await axios.get('{% url "cash_transfer_data_json" %}').then(
@@ -993,6 +1323,77 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                 },
 
 
+
+                showCashOutEditModal:async function(cash_id){
+                await this.getCashOutData()
+                await this.getCashOutEditData(cash_id)
+                },
+
+                getCashOutEditData:async function(cash_id){
+                       vm=this
+                       response= await axios.post('{% url "cash_out_edit_data_json" %}', {"type":"data", "cash_id":cash_id}).then(
+                        function (response){
+                            if (response.status==200 && response.data.status == 200){
+                                vm.cash_out_edit =  response.data.data
+                                console.log(response.data.data)
+                                 vm.out_modal_edit=true
+                                return response.data
+                            }else if (response.data.status == 404){
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+                                                                    text:response.data.message,
+                                                                    showCancelButton: true,
+                                                                    cancelButtonText: 'Chiqish',
+                                                                    showConfirmButton: false,
+                                                                })
+                            }else{
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+
+                                                                    showConfirmButton: false,
+                                                                    timer: 600
+                                                                })
+                            }
+                            return []
+                        })
+                    return this.cashList
+                    },
+                      setCashOutEditData:async function(cash_id){
+                   vm=this
+                        response= await axios.post('{% url "cash_out_edit_data_json" %}', {"data":this.cash_out_edit, 'type':'edit', 'cash_id':cash_id}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "O'zgartirildi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.out_modal_edit=false
+                            vm.getCashList()
+                            vm.getReportData()
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    })
+                return this.cashList
+                },
                 getCashOutData:async function(){
                         this.cash_out_data= await axios.get('{% url "cash_out_data_json" %}').then(
                     function (response){
@@ -1058,8 +1459,78 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
 
                 showCashInModal:async function(){
-                await this.getCashInData()
-                this.in_modal=true
+                    await this.getCashInData()
+                    this.in_modal=true
+                },
+                showCashInEditModal:async function(cash_id){
+                    await this.getCashInData()
+                    await this.getCashInEditData(cash_id)
+                },
+
+                getCashInEditData:async function(cash_id){
+                       vm=this
+                       response= await axios.post('{% url "cash_in_edit_data_json" %}', {"type":"edit_data", "cash_id":cash_id}).then(
+                        function (response){
+                            if (response.status==200 && response.data.status == 200){
+                                vm.cash_in_edit =  response.data.data
+                                 vm.in_modal_edit=true
+                                return response.data
+                            }else if (response.data.status == 404){
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+                                                                    text:response.data.message,
+                                                                    showCancelButton: true,
+                                                                    cancelButtonText: 'Chiqish',
+                                                                    showConfirmButton: false,
+                                                                })
+                            }else{
+                                Swal.fire({
+                                                                    position: 'center',
+                                                                    icon: 'error',
+                                                                    title: "Xatolik",
+
+                                                                    showConfirmButton: false,
+                                                                    timer: 600
+                                                                })
+                            }
+                            return []
+                        })
+                    return this.cashList
+                    },
+
+                           setCashInEditData:async function(cash_id){
+                   vm=this
+                        response= await axios.post('{% url "cash_in_edit_data_json" %}', {"data":this.cash_in_edit, 'type':'edit', 'cash_id':cash_id}).then(
+                    function (response){
+                        if (response.status==200){
+                            console.log(response.data)
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: "O'zgartirildi",
+                                    showConfirmButton: false,
+                                    timer: 1600
+                                })
+                            vm.in_modal_edit=false
+                            vm.getCashList()
+                            vm.getReportData()
+                            return response.data
+
+                        }else{
+                            Swal.fire({
+                                                                position: 'center',
+                                                                icon: 'error',
+                                                                title: "Xatolik",
+
+                                                                showConfirmButton: false,
+                                                                timer: 600
+                                                            })
+                        }
+                        return []
+                    })
+                return this.cashList
                 },
 
 

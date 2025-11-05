@@ -170,6 +170,13 @@ class OrderAdmin(admin.ModelAdmin):
         return False
 
 
+
+@admin.register(CashOrderRelation)
+class CashOrderRelationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'type', 'order', 'cash', 'amount', 'created_at']
+    list_filter = ['type']
+    search_fields = ['cash__id', 'order__id']
+
 #
 # @admin.register(OrderProduct)
 # class OrderProductAdmin(admin.ModelAdmin):
