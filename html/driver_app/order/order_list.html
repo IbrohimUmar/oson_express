@@ -56,7 +56,7 @@
                     <div class="row   order-info-wrap">
                         <div class="col-md-4">
                             <div class="text">
-                                <h4 style="display:inline;">[[ o.driver_fee ]] so'm </h4>
+                                <h4 style="display:inline;">[[ o.driver_fee ]] so'm sssssss</h4>
 
                                   <div v-if="IsStatusChange(o.id) == 0" style="display: inline;">
                                     <span v-if="o.status==5" class="badge badge-soft-danger bage-sm text-sm f-right">[[o.status_name]]</span>
@@ -171,16 +171,16 @@
                         <div class="row align-items-center">
                             <div class="col-lg-12 col-md-12 me-auto text-md-end" >
 
-                                <div style="display: inline;" v-if="IsStatusChange(o.id) == 0 && o.status != 4 && o.status != 5">
-
+                                <div style="display: inline;" v-if="IsStatusChange(o.id) == 0 && o.status != 2 && o.status != 3">
 
                                 <button type="button" id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status)" class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
-                                  <i class="material-icons md-cancel"></i>
-                      </button>
+                                              <i class="material-icons md-cancel"></i>
+                                  </button>
 
-                      <button type="button" id="button_submit_call_back" @click="CallBackOrder(o.id, o.status)" class="btn text-white btn-info" style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">
-                                  <span class="material-icons md-history  text-white"></span>
-                      </button>
+                                  <button type="button" id="button_submit_call_back" @click="CallBackOrder(o.id, o.status)" class="btn text-white btn-info" style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">
+                                              <span class="material-icons md-history  text-white"></span>
+                                  </button>
+
 
                       <button type="button"  style="padding-left: 16px; padding-right: 18px" @click="DeliveredOrder(o.id, o.status)" class=" btn btn-brand"><i
                               class="material-icons md-check"></i></button>
@@ -192,6 +192,10 @@
                         </div>
                     </form>
                 </header>
+
+
+
+
             </div>
         </div>
 
@@ -346,13 +350,13 @@
                         <div class="row align-items-center">
                             <div class="col-lg-12 col-md-12 me-auto text-md-end" >
 
-                                {% if o.status != '4' and o.status != '5' %}
+                                {% if o.status == '1' %}
                                 <div style="display: inline;" v-if="IsStatusChange({{o.id}}) == 0">
 
 
                                 <button type="button" id="button_submit_cancel" @click="CancelledOrder({{o.id}}, {{o.status}})" class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
                                   <i class="material-icons md-cancel"></i>
-                      </button>
+                                  </button>
 
                       <button type="button" id="button_submit_call_back text-white" @click="CallBackOrder({{o.id}}, {{o.status}})" class="btn  btn-info" style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">
                                   <span class="material-icons md-history  text-white"></span>
@@ -455,7 +459,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
       return precedingDigits.replace(/(\d{3})(?=\d)/g, '$1 ') + ' ' + lastFourDigits;
     },
                 IsStatusChange(order_id){
-                  var status_name = {3 : "Yetkazilmoqda", 4: 'Sotildi', 5: 'Bekor qilindi', 6:"Qayta qo'ng'iroq"}
+                  var status_name = {1 : "Yetkazilmoqda", 2: 'Sotildi', 3: 'Bekor qilindi'}
                   var change = this.StatusChanged.filter(m => m.order_id == order_id)
                   if (change.length >0){
                     return {'status':change[0].status,'name':status_name[change[0].status]}

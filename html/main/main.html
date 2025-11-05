@@ -174,7 +174,7 @@
 
 
                 {% if perms.admin.seller_list  %}
-                <li class="menu-item has-submenu {% if u == 'seller_list' or u == 'seller_edit' or u == 'seller_create' %}active{% endif %}">
+                <li class="menu-item has-submenu {% if u == 'seller_list' or u == 'seller_edit' or u == 'seller_create' or u == 'seller_statistic_list' %}active{% endif %}">
                     <a class="menu-link">
                         <i style="font-size:20px;" class="icon fa-solid fa-store"></i>
 <!--                        <i class="icon material-icons md-groups"></i>-->
@@ -184,6 +184,10 @@
                         {% if perms.admin.seller_list %}
                         <a href="{% url 'seller_list' %}"
                            {% if u == 'seller_list' or u == 'seller_edit' or u == 'seller_create' %}class="active"{% endif %}>Sellerlar ro'yxati</a>
+                        {% endif %}
+                        {% if perms.admin.seller_statistic_list %}
+                        <a href="{% url 'seller_statistic_list' %}"
+                           {% if u == 'seller_statistic_list' %}class="active"{% endif %}>Statistikali ro'yxat</a>
                         {% endif %}
                     </div>
                 </li>

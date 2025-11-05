@@ -57,29 +57,19 @@
                                     <option value="0">-----------</option>
                                      <option value="1">Yetkazilmoqda</option>
                                     <option value="2">Sotildi</option>
-                                    <option value="33">Bekor qilindi (Haydovchida)</option>
-                                    <option value="3">Bekor qilindi (Qaytarildi)</option>
+                                    <option value="3">Bekor qilindi (Haydovchida)</option>
+                                    <option value="33">Bekor qilindi (Qaytarildi)</option>
                                 </select>
-
                             </div>
-
 
                             <div class="col-md-12">
-<!--                                <div class="col-6"></div>-->
                                 <div class="row">
-                                <button type="button" class="btn btn-sm btn-danger col-6 d-inline" @click="end_search()"><i class="fas fa-xmark"></i> Tozalash</button>
-
-                                <button type="button" class="btn btn-sm btn-brand col-6 d-inline" @click="filter()"><i class="fas fa-search"></i> Qo'llash</button>
+                                    <button type="button" class="btn btn-sm btn-danger col-6 d-inline" @click="end_search()"><i class="fas fa-xmark"></i> Tozalash</button>
+                                    <button type="button" class="btn btn-sm btn-brand col-6 d-inline" @click="filter()"><i class="fas fa-search"></i> Qo'llash</button>
                                 </div>
                             </div>
-
-
-
-
                         </div>
                     </div>
-<!--                </div>-->
-<!--            </div>-->
         </header>
 
 
@@ -582,14 +572,14 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                               if (result.value) {
                                 axios.post('{% url 'driver_app_order_api_edit' %}', {
                                     order_id: order_id,
-                                    next_status: 5,
+                                    next_status: 3,
                                     after_status: after_status,
                                     desc: result.value,
                                   })
                                   .then(function (response) {
 
                                      if(response.data.status == 200){
-                                            vm.statusUpdater(index, 5, "Bekor qilindi")
+                                            vm.statusUpdater(index, 3, "Bekor qilindi")
 
                                            Swal.fire({
                                                         title: "O'zgartirildi",
@@ -737,13 +727,13 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                   if (result.isConfirmed) {
                                                     axios.post('{% url 'driver_app_order_api_edit' %}', {
                                                         order_id: order_id,
-                                                        next_status: 4,
+                                                        next_status: 2,
                                                         after_status: after_status,
                                                       })
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
 
-                                                            vm.statusUpdater(index, 4, 'Sotildi')
+                                                            vm.statusUpdater(index, 2, 'Sotildi')
 
 
 
@@ -810,7 +800,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
 
-                                                           vm.statusUpdater(index, 3, "Yetkazilmoqda")
+                                                           vm.statusUpdater(index, 1, "Yetkazilmoqda")
                                                               Swal.fire({
                                                                             title: "O'zgartirildi",
                                                                             showCancelButton: false,
