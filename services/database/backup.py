@@ -35,7 +35,7 @@ def backup_database():
     )
     db = settings.DATABASES['default']
     command = [
-        "pg_dump",
+        "/usr/bin/pg_dump",
         f"--dbname=postgresql://{db['USER']}:{db['PASSWORD']}@{db['HOST']}:{db['PORT']}/{db['NAME']}"
     ]
     try:
