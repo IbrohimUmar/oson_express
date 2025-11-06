@@ -325,7 +325,7 @@
 <!--                                    <i class="material-icons md-cancel"></i>-->
 <!--                                </button>-->
                                 <button type="button"
-                                        v-if="o.has_edit"
+                                        v-if="o.has_edit === true && o.status != 3 && o.status != '3'"
                                         id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status, index)"
                                         class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
                                     <i class="material-icons md-cancel"></i>
@@ -333,13 +333,13 @@
 
 
 
-<!--                                <button type="button"-->
-<!--                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 6 || o.status == 5"-->
-<!--                                        @click="ChangeOrderStatusBeingDelivered(o.id, o.status, index)" class="btn  btn-brand "-->
-<!--                                        style="padding-left: 16px; padding-right: 18px">-->
-<!--                                    <i class="fas fa-truck "></i>-->
-<!--                                    <br>-->
-<!--                                </button>-->
+                                <button type="button"
+                                        v-if="o.has_edit === true && o.status != 2 && o.status != 1"
+                                        @click="ChangeOrderStatusBeingDelivered(o.id, o.status, index)" class="btn  btn-brand "
+                                        style="padding-left: 16px; padding-right: 18px">
+                                    <i class="fas fa-truck "></i>
+                                    <br>
+                                </button>
 
                                 <button type="button" style="padding-left: 16px; padding-right: 18px"
                                         v-if="o.has_edit" @click="DeliveredOrder(o.id, o.status, index)"
@@ -554,15 +554,14 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                               if (result.value) {
                                 axios.post('{% url 'driver_app_order_api_edit' %}', {
                                     order_id: order_id,
-                                    next_status: 5,
+                                    next_status: 3,
                                     after_status: after_status,
                                     desc: result.value,
                                   })
                                   .then(function (response) {
 
                                      if(response.data.status == 200){
-                                            vm.statusUpdater(index, 5, "Bekor qilindi")
-
+                                            vm.statusUpdater(index, 3, "Bekor qilindi(Haydovchida)", true)
                                            Swal.fire({
                                                         title: "O'zgartirildi",
                                                         showCancelButton: false,
@@ -571,13 +570,14 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                         timer: 1500
                                                     })
                                                     }else if(response.data.status == 404){
-
+                                                        console.log(response.data)
                                                         Swal.fire({
                                                             title: "O'zgartirishda xatolik yuz berdi",
-                                                            showCancelButton: false,
+                                                            text:response.data['messages'],
+                                                            showCancelButton: true,
+                                                            cancelButtonText:'Tushundim',
                                                             showConfirmButton: false,
                                                             icon : 'error',
-                                                                    timer: 1500
                                                         })
                                                    }else{
                                                       Swal.fire({
@@ -610,12 +610,13 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                             });
                 },
 
-                statusUpdater(index, next_status_id, status_name){
+                statusUpdater(index, next_status_id, status_name, has_edit){
 
                     this.$set(this.order_list, index, {
                               ...this.order_list[index],
                               status: next_status_id,
-                              status_name: status_name
+                              status_name: status_name,
+                              has_edit: has_edit,
                             });
                 },
 
@@ -635,16 +636,12 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                   if (result.isConfirmed) {
                                                     axios.post('{% url 'driver_app_order_api_edit' %}', {
                                                         order_id: order_id,
-                                                        next_status: 4,
+                                                        next_status: 2,
                                                         after_status: after_status,
                                                       })
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
-
-                                                            vm.statusUpdater(index, 4, 'Sotildi')
-
-
-
+                                                            vm.statusUpdater(index, 2, 'Sotildi', false)
                                                               Swal.fire({
                                                                             title: "O'zgartirildi",
                                                                             showCancelButton: false,
@@ -680,7 +677,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
                   var title = 'Siz buyurtmani yetkazilmoqdaga olmoqchimisiz?'
                   var text = ''
-                  if (order_status === '5'){
+                  if (order_status === '3'){
                   title = 'Diqqat'
                   text = "Agar yetkazilmoqdaga olmoqchi bo'lsangiz omboringizdan shu buyurtma uchun kerakli mahsulotlar bor bo'lsa chiqim qilinadi va yetkazilmoqdaga olinadi rozimisiz?"
                   }
@@ -695,20 +692,15 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                   showCancelButton: false,
                                                   confirmButtonText: 'Xa',
                                                   denyButtonText: `Yo'q`,
-
-
-
-
                                                 }).then((result) => {
                                                   if (result.isConfirmed) {
                                                     axios.post('{% url 'driver_app_order_api_edit' %}', {
                                                         order_id: order_id,
-                                                        next_status: 3,
+                                                        next_status: 1,
                                                       })
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
-
-                                                           vm.statusUpdater(index, 3, "Yetkazilmoqda")
+                                                           vm.statusUpdater(index, 1, "Yetkazilmoqda", true)
                                                               Swal.fire({
                                                                             title: "O'zgartirildi",
                                                                             showCancelButton: false,

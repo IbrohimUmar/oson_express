@@ -50,9 +50,8 @@ def driver_app_order_api_edit(request):
                 if order:
                     order = order.first()
                     order_status = int(order.status)
-
-                    if body['next_status'] == 3:
-                        if order_status in [4, 6, 5]:
+                    if body['next_status'] == 1:
+                        if order_status == 5:
                             order.status = 3
                             order.driver_status = '1'
                             order.driver_status_changed_at=datetime.datetime.now()
@@ -62,8 +61,8 @@ def driver_app_order_api_edit(request):
                                                       'config.driver_app.order.api.edit')
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
 
-                    if body['next_status'] == 4:
-                        if order_status in [3, 6, 5]:
+                    if body['next_status'] == 2:
+                        if order_status in [3, 5]:
                             order.status = 4
                             order.driver_status = '2'
                             order.driver_status_changed_at=datetime.datetime.now()
@@ -73,7 +72,7 @@ def driver_app_order_api_edit(request):
                                                       'config.driver_app.order.api.edit')
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
 
-                    if body['next_status'] == 5:
+                    if body['next_status'] == 3:
                         if order_status in [3, 4]:
                             order.status = 5
                             order.driver_status = '3'
@@ -84,13 +83,14 @@ def driver_app_order_api_edit(request):
                                                       request.user,
                                                       'config.driver_app.order.api.edit')
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
-
                     return JsonResponse({'status': 404, 'messages': "Buyurtma o'zgartirilmadi status to'g'ri kelmagani uchun"})
                 return JsonResponse({'status': 404, 'messages': "Bu buyurtma topilmadi"})
 
         except IntegrityError as e:
             handle_exception(e)
             return JsonResponse({'status': 404, 'messages': f"Saqlashda xatolik mavjud {e}"})
+        except Exception as e:
+            handle_exception(e)
 
     return JsonResponse({'status': 404, 'messages': "faqat post qabol qilinadi"})
 

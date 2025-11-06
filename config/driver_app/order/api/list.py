@@ -15,7 +15,6 @@ def driver_app_order_api_list(request):
     # orders = Order.objects.filter(driver_id=request.user.id).order_by("driver_shipping_start_date")
     orders = Order.objects.filter(driver_id=request.user.id).order_by("-updated_at")
 
-
     postage_id = request.GET.get("postage_id", None)
     if postage_id:
         postage = get_object_or_404(Postage, id=postage_id)
@@ -27,9 +26,10 @@ def driver_app_order_api_list(request):
             orders = orders.filter(driver_status='3').exclude(status='5')
         elif status == 3:
             orders = orders.filter(driver_status='3', status='5')
-
         else:
             orders = orders.filter(driver_status=status)
+
+
 
     search_terms = request.GET.get("search", None)
     if search_terms:
@@ -90,12 +90,12 @@ def driver_app_order_api_list(request):
         if r.driver_status == '3' and r.status != '5':
             status_name = f"{status_name} (Qaytarildi)"
             has_edit = False
-        elif r.driver_status == '3' and r.status == '5':
+        elif r.driver_status == '3' and r.status == '5' and r.transaction_lock == False:
             status_name = f"{status_name} (Haydovchida)"
-
 
         if r.driver_status == '2':
             has_edit = False
+
         order_list.append(
             {
                 'id': r.id,

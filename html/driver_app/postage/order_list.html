@@ -73,8 +73,6 @@
         </header>
 
 
-
-
         <div class="card-body" v-if="loading===true">
             <div id="loading">
                 <div class="text-center mt-20 mb-20 m-auto loader"></div>
@@ -308,11 +306,34 @@
                         <div class="row align-items-center">
                             <div class="col-lg-12 col-md-12 me-auto text-md-end">
 
+<!--                                <button type="button"-->
+<!--                                        v-if="o.has_edit"-->
+<!--                                        id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status, index)"-->
+<!--                                        class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">-->
+<!--                                    <i class="material-icons md-cancel"></i>-->
+<!--                                </button>-->
+
+<!--                                <button type="button" style="padding-left: 16px; padding-right: 18px"-->
+<!--                                        v-if="o.has_edit" @click="DeliveredOrder(o.id, o.status, index)"-->
+<!--                                        class=" btn btn-brand"><i-->
+<!--                                        class="material-icons md-check"></i></button>-->
+
+
                                 <button type="button"
-                                        v-if="o.has_edit"
+                                        v-if="o.has_edit === true && o.status != 3 && o.status != '3'"
                                         id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status, index)"
                                         class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">
                                     <i class="material-icons md-cancel"></i>
+                                </button>
+
+
+
+                                <button type="button"
+                                        v-if="o.has_edit === true && o.status != 2 && o.status != 1"
+                                        @click="ChangeOrderStatusBeingDelivered(o.id, o.status, index)" class="btn  btn-brand "
+                                        style="padding-left: 16px; padding-right: 18px">
+                                    <i class="fas fa-truck "></i>
+                                    <br>
                                 </button>
 
                                 <button type="button" style="padding-left: 16px; padding-right: 18px"
@@ -320,39 +341,6 @@
                                         class=" btn btn-brand"><i
                                         class="material-icons md-check"></i></button>
 
-
-<!--                                <button type="button"-->
-<!--                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 3 || o.status == 6"-->
-<!--                                        id="button_submit_cancel1" @click="CancelledOrder(o.id, o.status, index)"-->
-<!--                                        class="btn  btn-danger" style="padding-left: 16px; padding-right: 18px">-->
-<!--                                    <i class="material-icons md-cancel"></i>-->
-<!--                                </button>-->
-
-
-<!--                                <button type="button"-->
-<!--                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 3"-->
-<!--                                        id="button_submit_call_back" @click="CallBackOrder(o.id, o.status, index)"-->
-<!--                                        class="btn text-white btn-info"-->
-<!--                                        style="background-color:#00abcd;padding-left: 16px; padding-right: 18px">-->
-<!--                                    <span class="material-icons md-history  text-white"></span>-->
-<!--                                </button>-->
-
-
-<!--                                <button type="button"-->
-<!--                                        v-if="(o.status == 4 && o.payment_status === '1') || o.status == 6 || o.status == 5"-->
-<!--                                        @click="ChangeOrderStatusBeingDelivered(o.id, o.status, index)" class="btn  btn-brand "-->
-<!--                                        style="padding-left: 16px; padding-right: 18px">-->
-<!--                                    <i class="fas fa-truck "></i>-->
-<!--                                    <br>-->
-<!--                                </button>-->
-
-<!--                                <button type="button" style="padding-left: 16px; padding-right: 18px"-->
-<!--                                        v-if="o.status == 6 || o.status == 3" @click="DeliveredOrder(o.id, o.status, index)"-->
-<!--                                        class=" btn btn-brand"><i-->
-<!--                                        class="material-icons md-check"></i></button>-->
-
-<!--                                <a :href="'{{request.scheme}}://{{request.META.HTTP_HOST}}/driver-app/order/print/' + o.id"-->
-<!--                                   target="_blank" class=" btn btn-brand"><i class="material-icons md-print"></i></a>-->
 
                                 <a type="submit" href="tel: {{o.customer_phone}}"
                                    style="padding-left: 18px; padding-right: 18px" class=" btn btn-brand"><i
@@ -579,7 +567,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                   .then(function (response) {
 
                                      if(response.data.status == 200){
-                                            vm.statusUpdater(index, 3, "Bekor qilindi")
+                                            vm.statusUpdater(index, 3, "Bekor qilindi(Haydovchida)", true)
 
                                            Swal.fire({
                                                         title: "O'zgartirildi",
@@ -658,7 +646,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                               if (result.value) {
                                 axios.post('{% url 'driver_app_order_api_edit' %}', {
                                     order_id: order_id,
-                                    next_status: 6,
+                                    next_status: 22,
                                     after_status: after_status,
                                     call_back_day: result.value,
                                   })
@@ -702,12 +690,13 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
                 },
 
-                statusUpdater(index, next_status_id, status_name){
+                statusUpdater(index, next_status_id, status_name, has_edit){
 
                     this.$set(this.order_list, index, {
                               ...this.order_list[index],
                               status: next_status_id,
-                              status_name: status_name
+                              status_name: status_name,
+                              has_edit: has_edit,
                             });
                 },
 
@@ -733,7 +722,7 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
 
-                                                            vm.statusUpdater(index, 2, 'Sotildi')
+                                                            vm.statusUpdater(index, 2, 'Sotildi', false)
 
 
 
@@ -795,12 +784,12 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
                                                   if (result.isConfirmed) {
                                                     axios.post('{% url 'driver_app_order_api_edit' %}', {
                                                         order_id: order_id,
-                                                        next_status: 3,
+                                                        next_status: 1,
                                                       })
                                                       .then(function (response) {
                                                         if(response.data.status == 200){
 
-                                                           vm.statusUpdater(index, 1, "Yetkazilmoqda")
+                                                           vm.statusUpdater(index, 1, "Yetkazilmoqda", false)
                                                               Swal.fire({
                                                                             title: "O'zgartirildi",
                                                                             showCancelButton: false,
