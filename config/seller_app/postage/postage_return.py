@@ -41,9 +41,9 @@ def seller_app_postage_return(request, postage_id):
     #             --transaction lockdan chiqarib qo'yish kerak
     #             '''
                 if action == 'confirm':
-                    if postage_details.filter(scan_to_user=False).exists():
-                        messages.error(request, "Iltimos hamma pochtalarni skannerlang")
-                        return redirect('seller_app_postage_seller_return', postage_id)
+                    # if postage_details.filter(scan_to_user=False).exists():
+                    #     messages.error(request, "Iltimos hamma pochtalarni skannerlang")
+                    #     return redirect('seller_app_postage_return', postage_id)
 
                     postage.to_user_status = '2'
                     postage.to_user = request.user

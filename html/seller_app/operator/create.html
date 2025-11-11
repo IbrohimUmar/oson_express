@@ -35,10 +35,10 @@
                                class="form-control">
 
                         <label>Operator familiyasi</label>
-                        <input type="text" name="last_name" {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi"
+                        <input type="text" name="last_name {% if r %}value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi"
                                class="form-control">
                         <label>Parol</label>
-                        <input type="text" name="password_text" {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
+                        <input type="text" name="password_text" required {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
                                class="form-control">
 
                         <label>Karta raqami</label>
@@ -66,11 +66,11 @@
 
                         <label>Operator telefon raqami</label>
                          {% if r %}
-                        <input type="text" name="phone" value="{{r.phone}}"
+                        <input type="text" name="phone" value="{{r.phone}}" required
                                class=" form-control" placeholder="Operator telefon raqami">
                         {% else %}
 
-                        <input type="text" name="phone" id="phone_inputmask"
+                        <input type="text" name="phone" id="phone_inputmask" required
                                class="js-phone-input form-control" placeholder="Operator telefon raqami">
                         {% endif %}
                         <label class="text-sm">Operator aktivmi</label>
