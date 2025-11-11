@@ -43,6 +43,13 @@
 
                         <label class="text-sm">Haydovchi aktivmi</label>
                         <input type="checkbox" name="is_active" class="form-check" {% if r %}{% if r.is_active == "on" %} checked{% endif %}{% endif %}>
+
+
+
+                        <label>Haydovchiga tovar berish necha kunda qulflanishi</label>
+                        <input type="number" class="form-control" name="driver_sales_delay_limit_in_days" required value="{{r.driver_sales_delay_limit_in_days}}">
+
+
                     </div>
                     <div class="col-md-6">
 

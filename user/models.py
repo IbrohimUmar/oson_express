@@ -121,6 +121,9 @@ class User(AbstractUser):
     salary = models.IntegerField(blank=True, null=True, default=0, verbose_name='Oylik maoshi')
     seller_payment_delay_days = models.PositiveIntegerField(blank=True, null=True, default=0, verbose_name="Seller to'lovni qancha kutishi kerak")
 
+    driver_sales_delay_limit_in_days = models.IntegerField(blank=True, null=True, default=5,
+                                             verbose_name="Haydovchiga tovar berish necha kunda bloklanishi")
+
     photo = models.ImageField(upload_to='operators/', null=True, blank=True)
 
     fee_is_special = models.BooleanField(blank=True, null=True, default=False,

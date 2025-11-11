@@ -27,6 +27,29 @@
                             Viloyat: {{ user.region.name }} <br>
                         </p>
                     </div>
+
+                     {% if user.driver_data.delayed_order_count > 0 %}
+                                        <div class="col-md-12 mt-10 mb-2">
+                                            <article class="box  bg-light" style="border:1px solid red;">
+                                                <h6 class="text-center"><i style="font-size:35px;" class="material-icons md-lock"></i> </h6>
+                                                <h4 class="text-center">Sizga tovar berish to'xtatildi</h4>
+                                                <p class="text-center text-muted">Chunki eskirgan buyurtmalaringiz soni {{ user.driver_data.delayed_order_count }} ta</p>
+
+                                                <div class="text-center">
+                                                    {% with statistic_delayed_order=user.driver_data.delayed_order_details %}
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Bekor qilindi(Haydovchida) : {{statistic_delayed_order.cancelled_count}} ta
+                                                    </span>
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Yetkazilmoqda : {{statistic_delayed_order.beng_delivered_count}} ta
+                                                    </span>
+                                                    {% endwith %}
+                                                </div>
+                                            </article>
+
+                                        </div>
+                                        {% endif %}
+
                      <div class="col-md-12 text-center" style="border:1px solid black; border-radius:10px; padding:7px;">
                              <h4>Sotuv foizi</h4>
 

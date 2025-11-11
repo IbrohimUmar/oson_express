@@ -21,29 +21,80 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
                     <div class="col-lg-9">
                         <section class="content-body p-xl-4">
                             <div class="row">
-                                <aside class="col-lg-6">
-                                    <figure class="text-lg-center">
-                                        <figcaption>
-                                            <h6 class="mt-2">Fio : {{ d.first_name }} {{ d.last_name }}</h6>
-                                            <h6 class="mt-2">Tel : +{{ d.username }}</h6>
-                                            <h6 class="mt-2">Viloyati : {{ d.region.name }}</h6>
-                                            <h6 class="mt-2">Tumani : {{ d.district.name }}</h6>
-                                            <h6 class="mt-2">Ilk tashrifi : {{ d.date_joined|date }}</h6>
-                                            <h6 class="mt-2">Xolati :
-                                                {% if d.is_active == True %}
+                                <aside class="col-lg-8 m-auto">
+                                    {% if d.driver_data.delayed_order_count > 0 %}
+                                        <div class="col-md-12 mt-10 mb-2">
+                                            <article class="box  bg-light" style="border:1px solid red;">
+                                                <h6 class="text-center"><i style="font-size:35px;" class="material-icons md-lock"></i> </h6>
+                                                <h4 class="text-center">Tovar berish qulflandi</h4>
+                                                <p class="text-center text-muted">Eskirgan buyurtmalari soni {{ d.driver_data.delayed_order_count }} ta</p>
+
+                                                <div class="text-center">
+                                                    {% with statistic_delayed_order=d.driver_data.delayed_order_details %}
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Bekor qilindi : {{statistic_delayed_order.cancelled_count}} ta
+                                                    </span>
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Yetkazilmoqda : {{statistic_delayed_order.beng_delivered_count}} ta
+                                                    </span>
+                                                    {% endwith %}
+                                                </div>
+                                            </article>
+                                        </div>
+                                        {% else %}
+                                        <div class="col-md-12 mt-10 mb-2">
+                                            <article class="box  bg-light" style="border:1px solid green;">
+                                                <h6 class="text-center"><i style="font-size:35px;" class="material-icons md-check"></i> </h6>
+                                                <h4 class="text-center">Tovar berish mumkun</h4>
+                                                <p class="text-center text-muted">Eskirgan buyurtmalari soni mavjud emas</p>
+                                            </article>
+                                        </div>
+                                        {% endif %}
+                                    <hr>
+                                    <table class="table">
+                                        <tbody class="border:1px solid white;">
+                                            <tr>
+                                                <th><h5>Fio</h5></th>
+                                                <td>{{ d.first_name }} {{ d.last_name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Tel</h5></th>
+                                                <td>+{{ d.username }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Viloyati</h5></th>
+                                                <td>{{ d.region.name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Tumani</h5></th>
+                                                <td>{{ d.district.name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Ilk tashrifi</h5></th>
+                                                <td> {{ d.date_joined|date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Qulflanishi kun limiti</h5></th>
+                                                <td> {{ d.driver_sales_delay_limit_in_days }} kun</td>
+                                            </tr>
+                                            <tr>
+                                                <th><h5>Holati</h5></th>
+                                                <td> {% if d.is_active == True %}
                                                     <span class="badge badge-soft-success">Aktiv</span>
                                                 {% else %}
                                                     <span class="badge badge-soft-danger">Aktiv emas</span>
-                                                {% endif %}
-                                            </h6>
-                                            {% if perms.admin.driver_edit %}
-                                         <a class="btn btn-light rounded font-md mt-10"
+                                                {% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                     <a class="btn btn-block btn-light rounded font-md mt-10"
                                                href="{% url 'driver_edit' d.id %}"><i
                                                     class="icons material-icons md-edit font-md mr-5"></i>
                                                 O'zgartirish </a>
-                                            {% endif %}
-                                        </figcaption>
-                                    </figure>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </aside>
                             </div>
                             <!-- row.// -->
@@ -58,4 +109,11 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
         </div>
         <!-- card end// -->
     </section>
+{% endblock %}
+{% block header %}
+<style>
+    tr {
+    border-bottom : 0.1px solid white
+    }
+</style>
 {% endblock %}

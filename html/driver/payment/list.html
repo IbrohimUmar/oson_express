@@ -3,6 +3,7 @@
 {% block title %}
 Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
 {% endblock %}
+{% load money %}
 {% block content %}
     <section class="content-main">
         <div class="content-header">
@@ -30,14 +31,13 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
                                             <h5 class="text-center">Haydovchi balansi</h5>
                                         </div>
                                         <div class="col-md-4 mt-10 mb-2">
-
                                             <article class="box bg-light">
                                                 <h6>
-                                                  {% if d.balance < 0 %}
+                                                  {% if d.driver_data.balance < 0 %}
                                                     Biz qarzmiz 
                                                     {% else %}
                                                     To'lashi kerak
-                                                    {% endif %}: {{ d.balance }} so'm</h6>
+                                                    {% endif %}: {{ d.driver_data.balance|format_money }} so'm</h6>
                                                 <small class="text-muted d-block ">Hozirza balansi</small>
                                             </article>
                                         </div>
@@ -45,14 +45,14 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
                                         <div class="col-md-4 mt-10 mb-2">
 
                                             <article class="box  bg-light">
-                                                <h6>Bu oy to'ladi : {{ d.total_payment_this_mont }} so'm</h6>
+                                                <h6>Bu oy to'ladi : {{ d.driver_data.total_payment_this_mont|format_money }} so'm</h6>
                                                 <small class="text-muted d-block ">Bu oy to'lagan pullari</small>
                                             </article>
                                         </div>
                                         <div class="col-md-4 mt-10 mb-2">
 
                                             <article class="box  bg-light">
-                                                <h6>Jami to'ladi : {{ d.total_payment }} so'm</h6>
+                                                <h6>Jami to'ladi : {{ d.driver_data.total_payment|format_money }} so'm</h6>
                                                 <small class="text-muted d-block ">Jami to'lagan pul miqdori</small>
                                             </article>
                                         </div>
@@ -100,7 +100,7 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}ning qilgan to'lovlari
                                                     #
                                                     {% endif %}
                                                 </td>
-                                                <td>{{ p.amount }} so'm</td>
+                                                <td>{{ p.amount|format_money }} so'm</td>
                                                 <td>
                                                     <span class="badge badge-soft-success">{{p.category.name}}</span>
 

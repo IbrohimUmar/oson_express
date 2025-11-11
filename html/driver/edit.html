@@ -48,19 +48,19 @@
 
                         <label class="text-sm">Haydovchi aktivmi</label>
                         <input type="checkbox" name="is_active" class="form-check" {% if r.is_active  %} checked{% endif %}>
-                        
+
+
+                        <label>Haydovchiga tovar berish necha kunda qulflanishi</label>
+                        <input type="number" class="form-control" name="driver_sales_delay_limit_in_days" required value="{{r.driver_sales_delay_limit_in_days}}">
+
                         
                                                                   <br>
-  <label for="allow_districts">To'lov qilishi mumkin bo'lgan kassalar:</label>
-  <select id="allowed_cashier" name="allowed_cashier" multiple row="3" class="form-control">
-
-                                      {% for d in cashier_list %}
-
-
+                          <label for="allow_districts">To'lov qilishi mumkin bo'lgan kassalar:</label>
+                          <select id="allowed_cashier" name="allowed_cashier" multiple row="3" class="form-control">
+                              {% for d in cashier_list %}
                                 <option value="{{ d.user_id }}" {% if d.user in r.driveruser.allowed_cashier.all %}selected{% endif %}>{{ d.user.first_name }} {{ d.user.last_name }}</option>
-
-                                      {% endfor %}
-  </select>
+                              {% endfor %}
+                          </select>
                         
                         
                         

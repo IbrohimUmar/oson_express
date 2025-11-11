@@ -26,6 +26,40 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
                         <section class="content-body p-xl-4">
                             <div class="row">
                                 <div class="col-lg-12">
+
+
+
+                                    {% if d.driver_data.delayed_order_count > 0 %}
+                                        <div class="col-md-12 mt-10 mb-2">
+                                            <article class="box  bg-light" style="border:1px solid red;">
+                                                <h6 class="text-center"><i style="font-size:35px;" class="material-icons md-lock"></i> </h6>
+                                                <h4 class="text-center">Tovar berish qulflandi</h4>
+                                                <p class="text-center text-muted">Eskirgan buyurtmalari soni {{ d.driver_data.delayed_order_count }} ta</p>
+
+                                                <div class="text-center">
+                                                    {% with statistic_delayed_order=d.driver_data.delayed_order_details %}
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Bekor qilindi (Haydovchida) : {{statistic_delayed_order.cancelled_count}} ta
+                                                    </span>
+                                                    <span class="badge" style="border:1px solid white;">
+                                                        Yetkazilmoqda : {{statistic_delayed_order.beng_delivered_count}} ta
+                                                    </span>
+                                                    {% endwith %}
+                                                </div>
+                                            </article>
+                                        </div>
+                                        {% else %}
+                                        <div class="col-md-12 mt-10 mb-2">
+                                            <article class="box  bg-light" style="border:1px solid green;">
+                                                <h6 class="text-center"><i style="font-size:35px;" class="material-icons md-check"></i> </h6>
+                                                <h4 class="text-center">Tovar berish mumkun</h4>
+                                                <p class="text-center text-muted">Eskirgan buyurtmalari soni mavjud emas</p>
+                                            </article>
+                                        </div>
+                                        {% endif %}
+
+
+
                                     <div class="row gx-3">
                                         <div class="col-md-12">
                                             <h5 class="text-center">Haydovchi balansi</h5>
@@ -34,7 +68,6 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
 
                                             <article class="box bg-light">
                                                 <h6>Balans
-
                                                     : {{ balance }} so'm {% if balance < 0 %}
                                                     Biz qarzmiz
                                                     {% else %}
@@ -72,10 +105,6 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
                                                 </h6>
                                             <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly">Bekor qilindi ( Mahsuloti qaytarildi ) : {{ order_status_by.canceled_returned }} ta
                                                 </h6>
-                                            <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti boshqa buyurtmaga berildi ) : {{ order_status_by.canceled_given_other_order }} ta
-                                                </h6>
-                                            <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{ order_status_by.call_back }} ta
-                                                </h6>
                                         </div>
 
 
@@ -84,9 +113,7 @@ Haydovchi : {{ d.first_name }} {{ d.last_name }}
 
                                             <h6 class="btn btn-dark btn-sm ml-1 readonly">Yetkazilmoqda: {{order_product_by_uzs.being_delivered}} so'm
                                                 </h6>
-                                            <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Mahsuloti haydovchida ): {{order_product_by_uzs.cancelled_driver}} so'm</h6>
-                                            <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly">Qayta qo'ng'iroq : {{order_product_by_uzs.call_back}} so'm
-                                                </h6>
+                                            <h6 class="btn btn-dark btn-sm mt-1 ml-1 readonly" style="white-space:normal">Bekor qilindi ( Haydovchida ): {{order_product_by_uzs.cancelled_driver}} so'm</h6>
                                             <h6 class="mt-1 ml-1 readonly" style="font-size:15px;">Jami qo'lidagi mahsulotlar summasi : {{order_product_by_uzs.total}} so'm
                                                 </h6>
                                         </div>

@@ -27,6 +27,7 @@ Haydovchilar ro'yxati
                         <th>#</th>
                         <th>Haydovchi</th>
                         <th>Maxsus daromadi</th>
+                        <th>Kechiktirish chegarasi</th>
                         <th>Viloyati</th>
                         <th>Aktivmi</th>
 
@@ -51,6 +52,15 @@ Haydovchilar ro'yxati
                             <h6>
                             {{ d.special_fee_amount|format_money }} uzs
                             </h6>
+                        </td>
+                        <td>{{ d.driver_sales_delay_limit_in_days }} kun
+
+                        {% if d.driver_data.delayed_order_count > 0 %}
+                            <br>
+                            <span class="badge badge-danger"><i class="fas fa-lock"></i> Tovar berish qulflandi</span>
+                            {% else %}
+                            <span class="badge badge-success"><i class="fas fa-unlock"></i> Tovar berish mumkun</span>
+                        {% endif %}
                         </td>
                         <td>{{ d.region.name }}</td>
                          <td>

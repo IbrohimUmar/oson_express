@@ -93,6 +93,24 @@ class DriverData(object):
 
 
 
+    @property
+    def delayed_order_count(self):
+        from datetime import timedelta, date
+        seven_days_ago = date.today() - timedelta(days=self.user.driver_sales_delay_limit_in_days)
+        return Order.objects.filter(status__in=['3', '5'],  driver=self.user, driver_shipping_start_date__lt=seven_days_ago).count()
+
+
+    @property
+    def delayed_order_details(self):
+        from datetime import timedelta, date
+        seven_days_ago = date.today() - timedelta(days=self.user.driver_sales_delay_limit_in_days)
+        return Order.objects.filter(status__in=['3', '5'],  driver=self.user, driver_shipping_start_date__lt=seven_days_ago).aggregate(
+            beng_delivered_count=Count("id", filter=Q(status='3')),
+            cancelled_count=Count("id", filter=Q(status='5'))
+        )
+
+
+
     def get_sold_precentega(self, date):
         order_status_dict = Order.objects.filter(driver_id=self.id, driver_status_changed_at__date=date).aggregate(
             delivered=Count('id', filter=Q(driver_status=2)),

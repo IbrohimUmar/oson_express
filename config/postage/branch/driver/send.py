@@ -27,9 +27,15 @@ def get_postage(logistic_branch, driver):
 
 @login_required(login_url='/login')
 def postage_branch_driver_send(request, logistic_branch_id, driver_id):
+
     logistic_branch = get_object_or_404(LogisticBranch, id=logistic_branch_id)
     logistic_branch.perms = logistic_branch.get_user_permission(request.user)
     driver = get_object_or_404(User, id=driver_id)
+
+    if int(driver.driver_data.delayed_order_count) > 0:
+        messages.info(request, "Haydovchiga buyurtma berish qulflangan")
+        return redirect("postage_branch_driver_history", logistic_branch_id)
+
 
     if request.method == 'POST':
         action = request.POST.get('action', None)

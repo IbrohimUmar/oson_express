@@ -28,23 +28,17 @@
                                             <h5 class="text-center">Haydovchi Buyurtmalar bo'yicha</h5>
                                         </div>
                                         <div class="col-md-12 text-center">
-                                            
-                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda
-                                                : {{ d.order_status.wait }} ta
-                                            </h6>
-                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot yuborildi
-                                                : {{ d.order_status.send_products }} ta
-                                            </h6>
+
                                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda
-                                                : {{ d.order_status.being_delivered }} ta
+                                                : {{ d.driver_data.order_status_by.being_delivered }} ta
                                             </h6>
                                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi
-                                                : {{ d.order_status.delivered }} ta</h6>
-                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi
-                                                : {{ d.order_status.canceled }} ta
+                                                : {{ d.driver_data.order_status_by.delivered }} ta</h6>
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi (Haydovchida)
+                                                : {{ d.driver_data.order_status_by.canceled_driver }} ta
                                             </h6>
-                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq
-                                                : {{ d.order_status.call_back }} ta
+                                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi (Qaytarildi)
+                                                : {{ d.driver_data.order_status_by.canceled_returned }} ta
                                             </h6>
                                         </div>
 
@@ -70,38 +64,20 @@
                                                             <option value="0" {% if request.GET.status == None %}selected{% endif %}>
                                                                 Hammasi
                                                             </option>
-
-                                                            <option value="1" {% if request.GET.status == '1' %}selected{% endif %}>
-                                                                Mahsulot kutilmoqda
-                                                            </option>
-                                                            <option value="2" {% if request.GET.status == '2' %}selected{% endif %}>Mahsulot yuborildi</option>
                                                             <option value="3" {% if request.GET.status == '3' %}selected{% endif %}>
                                                                 Yetkazilmoqda
                                                             </option>
                                                             <option value="4" {% if request.GET.status == '4' %}selected{% endif %}>
                                                                 Sotildi
                                                             </option>
-                                                            <option value="5" {% if request.GET.status == '5' %}selected{% endif %}>Bekor
-                                                                qilindi (Jami)
-                                                            </option>
-                                                            
-                                                            
                                                             
                                                             <option value="55" {% if request.GET.status == '55' %}selected{% endif %}>Bekor
-                                                                qilindi (Mahsuloti haydovchida)
+                                                                qilindi (Haydovchida)
                                                             </option>
                                                             <option value="555" {% if request.GET.status == '555' %}selected{% endif %}>Bekor
-                                                                qilindi (Mahsuloti qaytarib olindi)
+                                                                qilindi (Qaytarildi)
                                                             </option>
-                                                            
-                                                            <option value="5555" {% if request.GET.status == '5555' %}selected{% endif %}>Bekor
-                                                                qilindi (Mahsuloti boshqa buyurtmaga belgilandi)
-                                                            </option>
-                                                            
-                                                            
-                                                            <option value="6" {% if request.GET.status == '6' %}selected{% endif %}>Qayta
-                                                                qo'ng'iroq
-                                                            </option>
+
                                                         </select>
                                                     </div>
                                                 </div>
@@ -152,24 +128,25 @@
                                         {% for o in order %}
                                             <tr>
                                                 <td>
+                                                    {{o.id}}
                                                 </td>
                                                 <td>
 
 
-                                                    {% if o.status == '2' and o.is_send_barcode == True %}
-                                                    <h6>Barcodi Yuborildi</h6>
-                                                    {% else %}
-                                                    
-                                                    
-                                                    
-                                                    <h6>{{ o.get_status_display }}</h6>
-                                                    
-                                                    {% if o.status == '5' %}
-                                                    <span class="badge" style="border:1px solid;">{{o.get_cancelled_status_display}}</span>
-                                                    {% endif %}
-                                                    
-                                                    {% endif %}
-                                                    
+<!--                                                    {% if o.status == '2' and o.is_send_barcode == True %}-->
+<!--                                                    <h6>Barcodi Yuborildi</h6>-->
+<!--                                                    {% else %}-->
+<!--                                                    -->
+<!--                                                    -->
+<!--                                                    -->
+<!--                                                    <h6>{{ o.get_status_display }}</h6>-->
+<!--                                                    -->
+<!--                                                    {% if o.status == '5' %}-->
+<!--                                                    <span class="badge" style="border:1px solid;">{{o.get_cancelled_status_display}}</span>-->
+<!--                                                    {% endif %}-->
+<!--                                                    -->
+<!--                                                    {% endif %}-->
+<!--                                                    -->
                                                     
                                                     
                                                     
