@@ -5,6 +5,8 @@ from order.models import Order, OrderProduct
 from asgiref.sync import async_to_sync, sync_to_async
 from django.core.paginator import Paginator
 from django.db.models import Q, F, Count
+
+from services.seller.get_seller import get_seller
 from user.models import User
 import datetime
 from user.models import Regions
@@ -56,7 +58,9 @@ def export_excel_sold_orders(queryset):
 @login_required(login_url='/login')
 @permission_required('admin.seller_app_orders_list_sold', login_url="/home")
 def seller_app_orders_list_sold(request):
-    orders = Order.objects.filter(status=4).order_by("-updated_at")
+    seller = get_seller(request.user)
+
+    orders = Order.objects.filter(status=4, seller=seller).order_by("-updated_at")
     if request.GET.get("search", None):
         query = request.GET["search"]
         orders = orders.filter(
@@ -66,7 +70,7 @@ def seller_app_orders_list_sold(request):
     if request.GET.get("region", None) not in {None, "0"}:
         orders = orders.filter(customer_region_id=request.GET['region'])
 
-    products = cache.get_or_set("product_cache", Product.objects.all())
+    products = cache.get_or_set("product_cache", Product.objects.filter(seller=seller))
     regions = cache.get_or_set("region_cache", Regions.objects.all())
     if request.GET.get("product", None) not in {None, "0"}:
         orders = orders.filter(orderproduct__product_id=request.GET['product'])
