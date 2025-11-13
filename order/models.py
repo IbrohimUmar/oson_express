@@ -425,8 +425,15 @@ class Order(models.Model):
 
     @property
     def leave_fee(self):
-        leave = int(self.total_product_price) - int(
-            self.total_product_input_price) - self.seller_fee - self.driver_fee + self.driver_bonus_amount_won - self.operator_fee
+
+        # seller_fee - marketer_fee - operator_fee - input_price
+        # total_fee = sold_price - input_price - marketer_fee - logistic_fee -
+
+        leave = self.seller_fee - self.total_product_input_price - self.marketer_fee - self.operator_fee
+
+
+        # leave = int(self.total_product_price) - int(
+        #     self.total_product_input_price) - self.seller_fee - self.driver_fee + self.driver_bonus_amount_won - self.operator_fee
         return leave
 
     # @property

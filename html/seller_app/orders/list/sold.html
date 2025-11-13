@@ -84,18 +84,25 @@
                             <th>Mijoz</th>
                             <th>Viloyati</th>
                             <th>Mahsulot</th>
+
+
                             <th>Tovar sotilgan narxi</th>
+                            <th>Logistika ulushi</th>
+                            <th>Seller ulushi</th>
+
+
                             <th>Tovar tan narxi</th>
-                            <th>Admin to'lovi</th>
-                            <th>Haydovchiga to'lov(Biz belgilangan)</th>
-                            <th>Operatorga(standard)</th>
+                            <th>Marketolog ulushi</th>
+
+                            <th>Operator ulushi</th>
                             <th>Qoldiq</th>
                             <th>Sana</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for o in order %}
-                        <tr {% if o.leave_fee_we_mark < 0 %}style="background-color:#8c06066b;"{% endif %}>
+                        {% with leave_fee=o.leave_fee %}
+                        <tr {% if leave_fee < 0 %}style="background-color:#8c06066b;"{% endif %}>
                         <td>
                             #{{ o.id }}
                         </td>
@@ -121,15 +128,27 @@
                             <small>Jami soni :{{o.total_product_quantity}} ta</small>
                         </td>
                         <td><h6>{{ o.total_product_price|format_money }}</h6></td>
+                        <td><h6>{{ o.total_logistic_fee|format_money }}</h6></td>
+                        <td><h6>{{ o.seller_fee|format_money }}</h6></td>
+
                         <td>
                             <h6>{{ o.total_product_input_price|format_money }}</h6>
                         </td>
-                        <td><h6>{{ o.seller_fee|format_money }}</h6></td>
-                        <td><h6>{{ o.driver_fee|format_money }}</h6></td>
+                        <td><h6>{{ o.marketer_fee|format_money }}</h6></td>
                         <td><h6>{{o.operator_fee|format_money}}</h6></td>
-                        <td><h6>{{ o.leave_fee|format_money }}</h6></td>
+
+
+
+                        <td><h6
+                                {% if leave_fee > 0 %}
+                                class="text-brand"
+                                {% endif %}
+
+
+                        >{{ leave_fee|format_money }}</h6></td>
                         <td>{{ o.updated_at|date:"Y-m-d" }}</td>
                         </tr>
+                        {% endwith %}
                         {% endfor %}
                         </tbody>
                     </table>
@@ -159,6 +178,93 @@
                 <h6>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
             </div>
         </div>
+<!--        <div class="card-body">-->
+<!--            <div style="overflow-x:auto;">-->
+<!--                <a href="?excel=True{% for key, value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"-->
+<!--                   class="badge btn-sm btn-brand">Excel variantini olish</a>-->
+<!--                    <table class="table" id="dataTable">-->
+<!--                        <thead>-->
+<!--                        <tr class="text-center">-->
+<!--                            <th>id</th>-->
+<!--                            <th>Operator</th>-->
+<!--                            <th>Mijoz</th>-->
+<!--                            <th>Viloyati</th>-->
+<!--                            <th>Mahsulot</th>-->
+<!--                            <th>Tovar sotilgan narxi</th>-->
+<!--                            <th>Tovar tan narxi</th>-->
+<!--                            <th>Admin to'lovi</th>-->
+<!--                            <th>Haydovchiga to'lov(Biz belgilangan)</th>-->
+<!--                            <th>Operatorga(standard)</th>-->
+<!--                            <th>Qoldiq</th>-->
+<!--                            <th>Sana</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        {% for o in order %}-->
+<!--                        <tr {% if o.leave_fee_we_mark < 0 %}style="background-color:#8c06066b;"{% endif %}>-->
+<!--                        <td>-->
+<!--                            #{{ o.id }}-->
+<!--                        </td>-->
+<!--                        <td style="white-space: nowrap">-->
+<!--                            <span class="badge badge-soft-info">-->
+<!--                                {{ o.operator.first_name }} {{ o.operator.last_name }}-->
+<!--                            </span>-->
+
+<!--                        </td>-->
+<!--                        <td style="white-space: nowrap">-->
+<!--                            {{ o.customer_name }} <br>-->
+<!--                            {{ o.customer_phone }} <br>-->
+<!--                            {{ o.customer_phone2 }}-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {{ o.customer_region.name }}-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {% for p in o.order_products %}-->
+<!--                            <span class="badge badge-soft-success mb-1">{{p.product.name}}, {{p.total_quantity}} ta, {{p.total_price|format_money}} so'm</span>-->
+<!--                            <br>-->
+<!--                            {% endfor %}-->
+<!--                            <small>Jami soni :{{o.total_product_quantity}} ta</small>-->
+<!--                        </td>-->
+<!--                        <td><h6>{{ o.total_product_price|format_money }}</h6></td>-->
+<!--                        <td>-->
+<!--                            <h6>{{ o.total_product_input_price|format_money }}</h6>-->
+<!--                        </td>-->
+<!--                        <td><h6>{{ o.seller_fee|format_money }}</h6></td>-->
+<!--                        <td><h6>{{ o.driver_fee|format_money }}</h6></td>-->
+<!--                        <td><h6>{{o.operator_fee|format_money}}</h6></td>-->
+<!--                        <td><h6>{{ o.leave_fee|format_money }}</h6></td>-->
+<!--                        <td>{{ o.updated_at|date:"Y-m-d" }}</td>-->
+<!--                        </tr>-->
+<!--                        {% endfor %}-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--            </div>-->
+<!--            <div class="row ">-->
+<!--                <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">-->
+<!--                </div>-->
+<!--                <div class=" col-md-12 pagination justify-content-center mt-5">-->
+<!--                                                    <span class="step-links mr-auto ml-auto">-->
+<!--                                                        {% if page_obj.has_previous %}-->
+<!--                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"-->
+<!--                                                               class="badge btn-brand  "><<</a>-->
+<!--                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"-->
+<!--                                                               class="badge btn-brand "><</a>-->
+<!--                                                        {% endif %}-->
+<!--                                                        &lt;!&ndash;of {{ page_obj.paginator.num_pages }}.Page&ndash;&gt;-->
+<!--                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>-->
+<!--                                                        {% if page_obj.has_next %}-->
+<!--                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"-->
+<!--                                                               class="badge btn-brand">></a>-->
+<!--                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"-->
+<!--                                                               class="badge btn-brand ">>></a>-->
+<!--                                                        {% endif %}-->
+<!--                                                    </span>-->
+
+<!--                </div>-->
+<!--                <h6>Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>-->
+<!--            </div>-->
+<!--        </div>-->
         <!-- card-body end// -->
     </div>
 </section>

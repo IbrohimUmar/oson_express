@@ -85,11 +85,10 @@
                             <th>Viloyati</th>
                             <th>Mahsulot</th>
                             <th>Tovar sotilgan narxi</th>
-                            <th>Tovar tan narxi</th>
-                            <th>Admin to'lovi</th>
-                            <th>Haydovchiga to'lov(Biz belgilangan)</th>
-                            <th>Operatorga(standard)</th>
-                            <th>Qoldiq</th>
+                            <th>Seller ulushi</th>
+                            <th>Haydovchiga ulushi</th>
+                            <th>Logistika ulushi</th>
+
                             <th>Sana</th>
                         </tr>
                         </thead>
@@ -124,13 +123,10 @@
                             <small>Jami soni :{{o.total_product_quantity}} ta</small>
                         </td>
                         <td><h6>{{ o.total_product_price|format_money }}</h6></td>
-                        <td>
-                            <h6>{{ o.total_product_input_price|format_money }}</h6>
-                        </td>
                         <td><h6>{{ o.seller_fee|format_money }}</h6></td>
+
                         <td><h6>{{ o.driver_fee|format_money }}</h6></td>
-                        <td><h6>{{o.operator_fee|format_money}}</h6></td>
-                        <td><h6>{{ o.leave_fee|format_money }}</h6></td>
+                        <td><h6>{{ o.logistic_fee|format_money }}</h6></td>
                         <td>{{ o.driver_status_changed_at|date:"Y-m-d" }}</td>
                         </tr>
                         {% endfor %}
