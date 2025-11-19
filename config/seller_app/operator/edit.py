@@ -39,7 +39,7 @@ def seller_app_operator_edit(request, id):
         operator.username = int(r['username'])
         operator.operator_id = int(r['operator_id'])
         operator.first_name = r['first_name']
-        operator.last_name = r['last_name']
+        operator.last_name = r.get('last_name', '')
         operator.password = make_password(r['password_text'])
         operator.password_text = r['password_text']
         operator.payment_card = r['payment_card']

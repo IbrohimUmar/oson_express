@@ -25,7 +25,9 @@ def seller_app_operator_create(request):
         operator = User.objects.create(
             seller=request.user,
             payment_card=r['payment_card'],
-            username=int(r['phone']), first_name=r['first_name'], last_name=r['last_name'],
+            username=int(r['phone']),
+            first_name=r.get('first_name', ''),
+            last_name=r.get('last_name', ''),
             password=make_password(r['password_text']), password_text=r['password_text'],
             special_fee_amount=int(r['special_fee_amount']), type=3,
             is_active={"on": True}.get(r.get("is_active", False), False), operator_id=int(r['operator_id']),

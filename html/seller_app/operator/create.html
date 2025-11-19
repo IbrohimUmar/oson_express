@@ -35,7 +35,8 @@
                                class="form-control">
 
                         <label>Operator familiyasi</label>
-                        <input type="text" name="last_name" {% if r %} value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi" class="form-control">
+                        <input type="text" maxlength="50" name="last_name" {% if r %} value="{{r.last_name}}" {% endif %} placeholder="Operator familiyasi" class="form-control">
+
                         <label>Parol</label>
                         <input type="text" name="password_text" required {% if r %}value="{{r.password_text}}" {% endif %} placeholder="Parol"
                                class="form-control">
