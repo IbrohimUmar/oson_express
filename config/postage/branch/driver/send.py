@@ -136,11 +136,11 @@ def postage_branch_driver_send_api(request, logistic_branch_id, driver_id):
                             'message': f"Bu pochta filealda emas holati:{order.get_status_display()}",
                         })
 
-                if order.customer_region != driver.region:
-                    return JsonResponse({
-                            'status': 404,
-                            'message': f"Bu viloyati haydovchi viloyatiga to'g'ri kelamaydi",
-                        })
+                # if order.customer_region != driver.region:
+                #     return JsonResponse({
+                #             'status': 404,
+                #             'message': f"Bu viloyati haydovchi viloyatiga to'g'ri kelamaydi",
+                #         })
 
                 if body['type'] == 'check':
                     if order.transaction_lock == True:
@@ -191,10 +191,17 @@ def postage_branch_driver_send_api(request, logistic_branch_id, driver_id):
                 'message': f"Xatolik {e}"})
 
 
-    driver_districts = list(driver.allow_districts.values_list("id", flat=True))
+    # driver_districts = list(driver.allow_districts.values_list("id", flat=True))
+    # orders = Order.objects.filter(status='13',
+    #                               customer_region=driver.region,
+    #                               customer_district_id__in=driver_districts,
+    #                               logistic_branch_id=logistic_branch_id
+    #                               )
+
+    # driver_districts = list(driver.allow_districts.values_list("id", flat=True))
     orders = Order.objects.filter(status='13',
-                                  customer_region=driver.region,
-                                  customer_district_id__in=driver_districts,
+                                  # customer_region=driver.region,
+                                  # customer_district_id__in=driver_districts,
                                   logistic_branch_id=logistic_branch_id
                                   )
     postage = Postage.objects.filter(action='3', from_logistic_branch=logistic_branch,
