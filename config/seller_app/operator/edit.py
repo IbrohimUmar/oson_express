@@ -55,8 +55,6 @@ def seller_app_operator_edit(request, id):
             operator.user_permissions.add(*permission)
         else:
             operator.user_permissions.clear()
-        print(permission)
-        print(advanced_perms)
 
         operator.save()
         my_group = operator_app_permission_group()

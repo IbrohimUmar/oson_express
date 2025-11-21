@@ -6,7 +6,7 @@ from services.seller.get_seller import get_seller
 
 
 @login_required(login_url='/login')
-@permission_required('admin.seller_app_order_print', login_url="/home")
+@permission_required('admin.seller_app_orders_list_all', login_url="/home")
 def seller_app_order_print(request, id):
     seller = get_seller(request.user)
     order = Order.objects.filter(id=id, seller=seller).first()
