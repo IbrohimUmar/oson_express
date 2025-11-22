@@ -1,16 +1,15 @@
 import datetime
 
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from config.postage.permission import logistic_branch_permission_required
 import json
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from order.models import Order, OrderProduct
 from services.handle_exception import handle_exception
-from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from postage.models import Postage, LogisticBranch, PostageDetails
 from user.models import User
@@ -33,7 +32,6 @@ def postage_branch_seller_input(request, logistic_branch_id, seller_id):
     hammasini skannerlab bo'lingandan so'ng tasdiqlash tugmasi disabled false bo'lishi kerak
     '''
     if request.method == 'POST':
-        print(request.POST)
         action = request.POST.get('action', None)
         postage = Postage.objects.filter(action='1',
                                          from_user=seller,
@@ -52,9 +50,9 @@ def postage_branch_seller_input(request, logistic_branch_id, seller_id):
         try:
             with transaction.atomic():
                 if action == 'confirm':
-                    if postage_details.filter(scan_to_user=False).exists():
-                        messages.error(request, "Iltimos hamma pochtalarni skannerlang")
-                        return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
+                    # if postage_details.filter(scan_to_user=False).exists():
+                    #     messages.error(request, "Iltimos hamma pochtalarni skannerlang")
+                    #     return redirect('postage_branch_seller_input', logistic_branch_id, seller_id)
 
                     postage.from_user_status = '2'
                     postage.from_user_status_changed_at = datetime.datetime.now()

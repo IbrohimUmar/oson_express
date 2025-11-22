@@ -49,7 +49,9 @@ def postage_branch_seller_history(request, logistic_branch_id):
         print(request.POST)
         action = request.POST['action']
 
-        postage = Postage.objects.filter(Q(from_logistic_branch=logistic_branch)|Q(to_logistic_branch=logistic_branch), id=request.POST['postage_id']).first()
+        postage = Postage.objects.filter(Q(from_logistic_branch=logistic_branch)|
+                                         Q(to_logistic_branch=logistic_branch),
+                                         id=request.POST['postage_id']).first()
 
         if not postage:
             messages.error(request, "Bunday pochta mavjud emas")
@@ -65,6 +67,31 @@ def postage_branch_seller_history(request, logistic_branch_id):
             messages.success(request, "Bekor qilindi")
             return redirect('postage_branch_seller_history', logistic_branch_id)
 
+        if postage.action == '1' and action == 'confirm' and postage.from_user_status in ['1', '2'] and postage.to_user_status == '1':
+            # Seller omborga pochta topshirdi tasdqilansa ishlaydi
+            postage.from_user_status = '2'
+            if not postage.from_user_status_changed_at:
+                postage.from_user_status_changed_at = datetime.datetime.now()
+
+            postage.to_user_status = '2'
+            postage.to_user = request.user
+            postage.to_user_status_changed_at = datetime.datetime.now()
+            postage.save()
+            postage.postage_orders.update(status='13', logistic_branch_id=logistic_branch_id, transaction_lock=False)
+            messages.success(request, "Tasdiqlandi")
+            return redirect('postage_branch_seller_history', logistic_branch_id)
+
+        if postage.action == '1' and action == 'cancel' and postage.from_user_status in ['1', '2'] and postage.to_user_status == '1':
+            # Seller omborga pochta topshirdi bekor qilinsa ishlaydi
+            postage.from_user_status = '3'
+            postage.from_user_status_changed_at = datetime.datetime.now()
+            postage.to_user_status = '3'
+            postage.to_user = request.user
+            postage.to_user_status_changed_at = datetime.datetime.now()
+            postage.save()
+            postage.postage_orders.update(logistic_branch_id=None, transaction_lock=False)
+            messages.success(request, "Bekor qilindi")
+            return redirect('postage_branch_seller_history', logistic_branch_id)
 
 
     paginator = Paginator(postage_qs, 50)

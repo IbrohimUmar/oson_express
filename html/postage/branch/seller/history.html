@@ -100,7 +100,7 @@
                     {% for o in page_obj %}
                     <tr>
                         <td>
-                            {% if o.action == '1' and o.to_logistic_branch and o.to_user_status == '1' and o.from_user_status == '2' %}
+                            {% if o.action == '1' and o.to_logistic_branch and o.to_user_status == '1' and o.from_user_status == '1' %}
                             <a href="{% url 'postage_branch_seller_input' o.to_logistic_branch.id o.from_user.id %}" class="btn btn-brand btn-sm">
                                 <i class="material-icons md-info"></i>Qabul qilish</a>
                             {% endif %}
@@ -140,11 +140,11 @@
 
 
 
-                            {% if o.action == '1' and o.from_user_status == '1' %}
-                            <form method="post" class="d-inline">
+                            {% if o.action == '1' and o.from_user_status == '2' and o.to_user_status == '1' %}
+                             <form method="post" class="d-inline">
                                 {% csrf_token %}
                                 <input type="hidden" name="postage_id" value="{{o.id}}">
-                                <input type="hidden" name="action" value="none" id="action">
+                                <input type="hidden" name="action" value="confirm" >
                                 <button class="btn btn-sm btn-brand d-inline" type="button" name="type" value="confirm"
                                 onclick="return Swal.fire({
                                   title: 'Siz rostdanham tasdiqlamoqchimisiz?',
@@ -155,10 +155,15 @@
                                     confirmButtonColor: '#3BB77E',
                             }).then(function(result) {
                               if (result.value) {
-                                  document.getElementById('action').value = 'confirm'
                                 form.submit();
                               }
                             })"><i class="material-icons md-check"></i> Tasdiqlash</button>
+                            </form>
+
+                             <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postage_id" value="{{o.id}}">
+                                <input type="hidden" name="action" value="cancel">
                                 <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"
                                 onclick="return Swal.fire({
                                   title: 'Siz rostdanham bekor qilmoqchimisiz?',
@@ -169,12 +174,49 @@
                                     confirmButtonColor: '#F30000',
                             }).then(function(result) {
                               if (result.value) {
-                              document.getElementById('action').value = 'cancel'
                                 form.submit();
                               }
                             })"><i class="material-icons md-cancel"></i>Bekor qilish</button>
                             </form>
+
+
+<!--                            <form method="post" class="d-inline">-->
+<!--                                {% csrf_token %}-->
+<!--                                <input type="hidden" name="postage_id" value="{{o.id}}">-->
+<!--                                <input type="hidden" name="action" value="none" id="action">-->
+<!--                                <button class="btn btn-sm btn-brand d-inline" type="button" name="type" value="confirm"-->
+<!--                                onclick="return Swal.fire({-->
+<!--                                  title: 'Siz rostdanham tasdiqlamoqchimisiz?',-->
+<!--                                   showCancelButton: true,-->
+<!--                                  cancelButtonText: 'Qaytish',-->
+<!--                                  cancelButtonColor: '#4f5d77',-->
+<!--                                  confirmButtonText: 'Tasdiqlash',-->
+<!--                                    confirmButtonColor: '#3BB77E',-->
+<!--                            }).then(function(result) {-->
+<!--                              if (result.value) {-->
+<!--                                  document.getElementById('action').value = 'confirm'-->
+<!--                                form.submit();-->
+<!--                              }-->
+<!--                            })"><i class="material-icons md-check"></i> Tasdiqlash</button>-->
+<!--                                <button class="btn btn-sm btn-danger d-inline" type="button" name="type" value="cancel"-->
+<!--                                onclick="return Swal.fire({-->
+<!--                                  title: 'Siz rostdanham bekor qilmoqchimisiz?',-->
+<!--                                   showCancelButton: true,-->
+<!--                                  cancelButtonText: 'Qaytish',-->
+<!--                                  cancelButtonColor: '#4f5d77',-->
+<!--                                  confirmButtonText: 'Bekor qilish',-->
+<!--                                    confirmButtonColor: '#F30000',-->
+<!--                            }).then(function(result) {-->
+<!--                              if (result.value) {-->
+<!--                              document.getElementById('action').value = 'cancel'-->
+<!--                                form.submit();-->
+<!--                              }-->
+<!--                            })"><i class="material-icons md-cancel"></i>Bekor qilish</button>-->
+<!--                            </form>-->
                             {% endif %}
+
+
+
                         </td>
                         <td>
                             <span class="badge {% if o.action == '1' %}badge-soft-success{% elif o.action == '2' %}badge-soft-warning{% endif %}" >
