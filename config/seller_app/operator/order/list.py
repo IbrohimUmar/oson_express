@@ -72,6 +72,22 @@ def seller_app_operator_order_list(request):
             messages.success(request, "O'zgartirildi")
 
 
+
+        if r['action'] == '4' and r.get("select_all") == '1':
+            order = orders.filter(status='9').update(
+                status='6',
+                updated_at=datetime.datetime.now(),
+            )
+            messages.success(request, "O'zgartirildi")
+        elif r['action'] == '4' and r.get("select_all") == '0':
+            order = orders.filter(id__in=check_ids, status=9).update(
+                status='6',
+                updated_at=datetime.datetime.now(),
+            )
+            messages.success(request, "O'zgartirildi")
+
+
+
         if r['action'] == '3' and r.get("select_all") == '1':
             order = orders.filter(Q(status='6')| Q(status='9', operator__isnull=True)).update(
                 status='9',
@@ -85,6 +101,8 @@ def seller_app_operator_order_list(request):
                 updated_at=datetime.datetime.now(),
             )
             messages.success(request, "O'zgartirildi")
+
+
 
         return redirect('seller_app_operator_order_list')
 
