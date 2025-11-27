@@ -1,5 +1,7 @@
 {% extends 'seller_app/main/main.html' %}
 {% load static %}
+{% load money %}
+
 {% block content %}
 <section class="content-main" id="app">
     <form method="post" onsubmit="document.getElementById('submit_button').disabled=true">
@@ -19,6 +21,156 @@
                 </a>
             </div>
         </div>
+
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+<!--                        <h3><i class="fa-solid fa-credit-card"></i> Balans : {{o.operator_data.balance|format_money}} uzs</h3>-->
+                        <h4 class="text-muted"><i class="fa-solid fa-credit-card"></i> Balans</h4>
+<!--                        <h4 class="text-muted"> Balans</h4>-->
+                        <h3> {{o.operator_data.balance|format_money}} uzs</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+<!--                        <h3><i class="fa-solid fa-credit-card"></i> Balans : {{o.operator_data.balance|format_money}} uzs</h3>-->
+                        <h4 class="text-muted">
+                            <i class="fa-solid fa-money-bill-transfer"></i> Hold balansi</h4>
+<!--                        <h4 class="text-muted"> Balans</h4>-->
+                        <h3> {{o.operator_data.hold|format_money}} uzs</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 m-auto">
+                <div class="card">
+                    <div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-2">
+                                    <h5>
+                                        <i style="color:#d1cf19de;font-size:36px;" class="fas fa-warning text-warning"></i>
+                                    </h5>
+                                </div>
+                                <div class="col-10">
+
+                    <!--                <h6>Kunlik plan 60 ta operator kiritdi : 0 ta</h6>-->
+                                    <h5>Kunlik plan bajarilmadi, bugun kiritdi : 0 ta</h5>
+                                    <small class="text-muted font-sm">
+                                        Kunlik minimum 60 ta buyurtma kiritishi kerak
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                         <div class="col-md-12 text-center">
+                        <h6><i class="fas fa-truck text-brand"></i> Lidlar bo'yicha : {{status_count.total_lead}} ta</h6>
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yangi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlanmoqda : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlandi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Dubl buyurtma : {{ o.operator_data.order_status.delete }} ta</h6>-->
+
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yangi : {{ status_count.new }} ta</h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ status_count.callback }} ta</h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlanmoqda : {{ status_count.archiving }} ta</h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlandi : {{ status_count.archived }} ta</h6>
+                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Dubl buyurtma : {{ status_count.double }} ta</h6>
+
+
+                        <hr>
+
+
+
+
+                        <div>
+                            <h6><i class="fas fa-truck text-brand"></i> Yetkaziliyotgan buyurtmalar  : {{status_count.total_being_delivered}} ta</h6>
+
+
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ status_count.waiting }} ta</h6>
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot belgilandi : {{ status_count.marked }} ta</h6>
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qadoqlandi : {{ status_count.packed }} ta</h6>
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yuborishga tayyor : {{ status_count.ready }} ta</h6>
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ status_count.in_branch }} ta</h6>
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ status_count.delivering }} ta</h6>
+                            <h6 class="btn btn-brand btn-sm mt-2 ml-2 readonly">Sotildi : {{ status_count.sold }} ta</h6>
+
+
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot Belgilandi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qadoqlandi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yuborishga tayyor : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-brand btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+                        </div>
+
+                        <hr>
+                        <div>
+                            <h5><i class="fas fa-cancel text-danger"></i> Bekor qilingan buyurtmalar : {{status_count.total_cancelled}} ta</h5>
+
+
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Bekor qilindi : {{ status_count.cancelled }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Haydovchi filealga qaytardi : {{ status_count.driver_return }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Seller filealdan qaytarib oldi : {{ status_count.seller_return }} ta
+                            </h6>
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">Bekor qilindi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">Haydovchi filealga qaytardi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly " style="background-color:#ff141454;">Seller filealdan qaytarib oldi : {{ o.operator_data.order_status.delete }} ta</h6>-->
+                        </div>
+                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ status_count.total  }} ta
+                        </h6>
+
+
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">O'chirilgan buyurtmalari : {{ o.operator_data.order_status.delete }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.wait }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsuloti yuborilgan : {{ o.operator_data.order_status.send_products }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.being_delivered }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delivered }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi : {{ o.operator_data.order_status.canceled }} ta-->
+<!--                        </h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.call_back }} ta-->
+<!--                        </h6>-->
+<!--                        <br>-->
+<!--                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta-->
+<!--                        </h6>-->
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
         <div class="card">
             <div class="card-body">
 
@@ -27,57 +179,128 @@
                         <h3 class="text-center">Operator hisoboti</h3>
                     </div>
                     
-                    
+<!--                    -->
 
-                        <div class="col-md-6 m-auto mt-10 mb-2">
-                        <article {% if o.operator_data.order_amount_today < o.operator_data.operator_daily_limit %}class="box" style="background-color:#ff141454;"{% else %}class="box bg-light"{% endif %}>
-                            <h6>
-                                Kunlik plan {{o.operator_data.operator_daily_limit}} ta operator kiritdi : {{ o.operator_data.order_amount_today }} ta</h6>
-                            <small class="text-muted d-block ">Kunlik minimum {{o.operator_data.operator_daily_limit}} ta buyurtma kiritishi kerak</small>
-                        </article>
-                    </div>
-                    
-                    
-                    <div class="col-md-6 m-auto mt-10 mb-2">
+<!--                        <div class="col-md-6 m-auto mt-10 mb-2">-->
+<!--                        <article {% if o.operator_data.order_amount_today < o.operator_data.operator_daily_limit %}class="box" style="background-color:#ff141454;"{% else %}class="box bg-light"{% endif %}>-->
+<!--                            <h6>-->
+<!--                                Kunlik plan {{o.operator_data.operator_daily_limit}} ta operator kiritdi : {{ o.operator_data.order_amount_today }} ta</h6>-->
+<!--                            <small class="text-muted d-block ">Kunlik minimum {{o.operator_data.operator_daily_limit}} ta buyurtma kiritishi kerak</small>-->
+<!--                        </article>-->
+<!--                    </div>-->
+<!--                    -->
+<!--                    -->
+<!--                    <div class="col-md-6 m-auto mt-10 mb-2">-->
 
-                        <article class="box bg-light">
-                            <h6>
-                                Balansi : {{ o.operator_data.balance }} so'm</h6>
-                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>
-                        </article>
-                    </div>
-                    <div class="col-md-6 m-auto mt-10 mb-2">
+<!--                        <article class="box bg-light">-->
+<!--                            <h6>-->
+<!--                                Balansi : {{ o.operator_data.balance }} so'm</h6>-->
+<!--                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>-->
+<!--                        </article>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-6 m-auto mt-10 mb-2">-->
 
-                        <article class="box bg-light">
-                            <h6>
-                                Hold balansi : {{ o.operator_data.hold }} so'm</h6>
-                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>
-                        </article>
-                    </div>
+<!--                        <article class="box bg-light">-->
+<!--                            <h6>-->
+<!--                                Hold balansi : {{ o.operator_data.hold }} so'm</h6>-->
+<!--                            <small class="text-muted d-block ">Sotilgan buyurtmalardan yig'gan daromadi</small>-->
+<!--                        </article>-->
+<!--                    </div>-->
 
 
-                    <div class="col-md-12 mt-10">
-                        <h5 class="text-center">Operatorning jami kiritgan buyurtmalar bo'yicha</h5>
-                    </div>
-                    <div class="col-md-12 text-center">
+<!--                    <div class="col-md-12 mt-10">-->
+<!--                        <h5 class="text-center">Operatorning jami kiritgan buyurtmalar bo'yicha</h5>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-12 text-center">-->
+<!--                        <h6><i class="fas fa-truck text-brand"></i> Lidlar bo'yicha : {{status_count.total_lead}} ta</h6>-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yangi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlanmoqda : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlandi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Dubl buyurtma : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
 
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">O'chirilgan buyurtmalari : {{ o.operator_data.order_status.delete }} ta
-                        </h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.wait }} ta
-                        </h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsuloti yuborilgan : {{ o.operator_data.order_status.send_products }} ta
-                        </h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.being_delivered }} ta
-                        </h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delivered }} ta</h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi : {{ o.operator_data.order_status.canceled }} ta
-                        </h6>
-                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.call_back }} ta
-                        </h6>
-                        <br>
-                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta
-                        </h6>
-                    </div>
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yangi : {{ status_count.new }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ status_count.callback }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlanmoqda : {{ status_count.archiving }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Arxivlandi : {{ status_count.archived }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Dubl buyurtma : {{ status_count.double }} ta</h6>-->
+
+
+<!--                        <hr>-->
+
+
+
+
+<!--                        <div>-->
+<!--                            <h6><i class="fas fa-truck text-brand"></i> Yetkaziliyotgan buyurtmalar  : {{status_count.total_being_delivered}} ta</h6>-->
+
+
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ status_count.waiting }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot belgilandi : {{ status_count.marked }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qadoqlandi : {{ status_count.packed }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yuborishga tayyor : {{ status_count.ready }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ status_count.in_branch }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ status_count.delivering }} ta</h6>-->
+<!--                            <h6 class="btn btn-brand btn-sm mt-2 ml-2 readonly">Sotildi : {{ status_count.sold }} ta</h6>-->
+
+
+
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot Belgilandi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qadoqlandi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yuborishga tayyor : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-brand btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--                        </div>-->
+
+<!--                        <hr>-->
+<!--                        <div>-->
+<!--                            <h5><i class="fas fa-cancel text-danger"></i> Bekor qilingan buyurtmalar : {{status_count.total_cancelled}} ta</h5>-->
+
+
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Bekor qilindi : {{ status_count.cancelled }} ta-->
+<!--                            </h6>-->
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Haydovchi filealga qaytardi : {{ status_count.driver_return }} ta-->
+<!--                            </h6>-->
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Seller filealdan qaytarib oldi : {{ status_count.seller_return }} ta-->
+<!--                            </h6>-->
+
+
+
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">Bekor qilindi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">Haydovchi filealga qaytardi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly " style="background-color:#ff141454;">Seller filealdan qaytarib oldi : {{ o.operator_data.order_status.delete }} ta</h6>&ndash;&gt;-->
+<!--                        </div>-->
+
+<!--                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta-->
+<!--                        </h6>-->
+
+
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">O'chirilgan buyurtmalari : {{ o.operator_data.order_status.delete }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ o.operator_data.order_status.wait }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsuloti yuborilgan : {{ o.operator_data.order_status.send_products }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ o.operator_data.order_status.being_delivered }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Sotildi : {{ o.operator_data.order_status.delivered }} ta</h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Bekor qilindi : {{ o.operator_data.order_status.canceled }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta qo'ng'iroq : {{ o.operator_data.order_status.call_back }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <br>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ o.operator_data.total_order_amount  }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--                    </div>-->
 
 
                 </div>

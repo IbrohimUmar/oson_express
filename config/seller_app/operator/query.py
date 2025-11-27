@@ -99,6 +99,44 @@ class OperatorData(object):
                                                                                                         flat=True)))
 
     @property
+    def get_operator_stats(self):
+        operator = self.user
+        from order.models import Order
+        qs = Order.objects.filter(operator=operator)
+
+        for i in qs:
+            print(i.id, i.get_status_display())
+        return {
+            # LIDlar bo‘yicha
+            "new": qs.filter(status="9").count(),
+            "callback": qs.filter(status="6").count(),
+            "archiving": qs.filter(status="10").count(),
+            "archived": qs.filter(status="11").count(),
+            "double": qs.filter(status="12").count(),
+
+            # Yetkazilyotganlar
+            "waiting": qs.filter(status="1").count(),
+            "marked": qs.filter(status="7").count(),
+            "packed": qs.filter(status="8").count(),
+            "ready": qs.filter(status="2").count(),
+            "in_branch": qs.filter(status="13").count(),
+            "delivering": qs.filter(status="3").count(),
+            "sold": qs.filter(status="4").count(),
+
+            # Bekor qilinganlar
+            "cancelled": qs.filter(status="5").count(),
+            "driver_return": qs.filter(status="14").count(),
+            "seller_return": qs.filter(status="15").count(),
+
+            # Jami buyurtma
+            "total": qs.count(),
+
+            "total_cancelled": qs.filter(status__in=['5', '14', '15']).count(),
+            "total_being_delivered": qs.filter(status__in=['1', '7', '8', '2', '13', '3', '4']).count(),
+            "total_lead": qs.filter(status__in=['9', '6', '10', '11', '12']).count(),
+        }
+
+    @property
     def order(self):
         import order
         return order.models

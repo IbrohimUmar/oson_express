@@ -43,8 +43,13 @@ def seller_app_operator_details(request, id):
         })
     total_order = sum([d['input_order'] for d in data])
     total_payment = sum([d['payment'] for d in data])
+
+
     return render(request, 'seller_app/operator/details.html',
-                  {"o": operator, 'data': data, 'dates': today.strftime(("%Y-%m")), 'total_order': total_order,
+                  {"o": operator, 'data': data,
+                   "status_count": operator.operator_data.get_operator_stats,
+
+                   'dates': today.strftime(("%Y-%m")), 'total_order': total_order,
                    'total_payment': total_payment})
 
 
