@@ -3,36 +3,275 @@
 {% block content %}
 
 <section class="content-main">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-xl col-lg">
-                                <h3>Xush kelibsiz  {{ request.user.first_name}} {{ request.user.last_name }}</h3>
-                            </div>
-                            <div class="col-xl-4 text-md-end">
-                                <a onclick="return Swal.fire({
-                                                  title: 'Buyurtma rostdan ham yetib bordimi?',
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-12">
+
+            <div class="card shadow-sm p-3">
+
+                <div class="row align-items-center">
+
+                    <!-- Avatar Left -->
+                    <div class="col-md-3 text-center">
+                        <img src="{% static 'imgs/theme/seller.svg' %}"
+                             class="rounded-circle border"
+                             style="width:120px; height:120px;"
+                             alt="User Avatar">
+                    </div>
+
+                    <!-- User Info Center -->
+                    <div class="col-md-5 text-center text-md-start mt-3 mt-md-0">
+                        <h4 class="card-title mb-1">
+                            {{ user.first_name }} {{ user.last_name }}
+                        </h4>
+                        <h6 class="text-dark badge  badge-dark"><i class="fas fa-truck-fast"></i> Logistikachi</h6>
+
+                        <p class="text-muted mb-2">📱 +{{ user.username }}</p>
+                    </div>
+
+
+
+                    <!-- Buttons Right -->
+<div class="col-md-4 mt-3 mt-md-0 text-center text-md-end">
+
+    <a href="{% url 'home' %}"
+       class="btn w-100 mb-2 py-2"
+       style="background-color:#f9f9f9 !important; color:#1e2129 !important; border-radius:10px;">
+        <i class="fas fa-key fs-6 me-2"></i> Parolni o'zgartirish
+    </a>
+
+                {% if request.user.username == '998777777777' or request.user.username == '998000000000' %}
+    <a href="?sync_permission=212"
+       class="btn w-100 mb-2 py-2"
+       style="background-color:#f9f9f9 !important; color:#1e2129 !important; border-radius:10px;">
+        <i class="fas fa-refresh fs-6 me-2"></i> Permissionlarni sinxronlash
+    </a>
+                {% endif %}
+    <a  onclick="return Swal.fire({
+                                                  title: 'Siz rostdan chiqmoqchimisiz?',
                                                   showDenyButton: true,
                                                   showCancelButton: false,
-                                                  confirmButtonText: 'Saqlash',
+                                                  confirmButtonText: 'Ha',
                                                   denyButtonText: `Qaytish`,
                                                 }).then((result) => {
                                                   /* Read more about isConfirmed, isDenied below */
                                                   if (result.isConfirmed) {
                                                       window.open('{% url 'logout' %}', '_self');
                                                   }
-                                                })" class="btn btn-primary"> Chiqish <i class="material-icons md-exit_to_app"></i> </a>
-                            </div>
+                                                })"
+       class="btn btn-warning w-100 py-2"
+       style="border-radius:10px;">
+        <i class="fa-solid fa-right-from-bracket fs-6 me-2"></i> Tizimdan chiqish
+    </a>
+
+</div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-people-group"></i>
+                                Sellerlar soni</h4>
+                            <h3>{{user_stat.seller_count}} ta</h3>
                         </div>
                     </div>
                 </div>
 
-                {% if request.user.username == '998777777777' or request.user.username == '998000000000' %}
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <a href="?sync_permission=212" class="btn btn-brand btn-sm">Permissionlarni sinxronlash</a>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-car"></i>
+                                Haydovchilar soni</h4>
+                            <h3>{{user_stat.driver_count}} ta</h3>
+                        </div>
                     </div>
                 </div>
-                {% endif %}
+
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-network-wired"></i>
+                                Marketologlar soni</h4>
+                            <h3>{{user_stat.marketer_count}} ta</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-headphones"></i>
+                                Operatorlar soni</h4>
+                            <h3>{{user_stat.operator_count}} ta</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card">
+                        <div class="card-body ">
+                            <h4 class="mb-2 text-center text-muted">
+                                <i class="fa-solid fa-box-open"></i>
+                                Pochtalar umumiy statistikasi</h4>
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Nomi</th>
+                                    <th>Soni</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-inbox"></i>
+                                            Filealdagi pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.filealdagi_pochta}} ta</h6></td>
+                                </tr>
+
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-truck-fast"></i>
+                                            Yetkazilayotgan pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.yetkazilayotgan}} ta</h6></td>
+                                </tr>
+
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-check-circle"></i>
+                                            Yetkazilgan pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.yetkazilgan}} ta</h6></td>
+                                </tr>
+
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-ban"></i>
+                                            Bekor qilingan haydovchidagi pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.bekor_haydovchi}} ta</h6></td>
+                                </tr>
+
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-ban"></i>
+                                            Bekor qilingan filealdagi pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.bekor_filealda}} ta</h6></td>
+                                </tr>
+
+                                <tr style="border-bottom:1px solid #ffffff85">
+                                    <th>
+                                        <h6 class="text-muted">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                            Bekor qilingan sellerga qaytarilgan pochta soni
+                                        </h6>
+                                    </th>
+                                    <td><h6>{{order_stat.bekor_seller}} ta</h6></td>
+                                </tr>
+
+
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card">
+                        <div class="card-body ">
+                            <h4 class="mb-2 text-center text-muted">
+                                <i class="fa-solid fa-box-open"></i>
+                                So'ngi 3 kunlik statistika</h4>
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Nomi</th>
+                                    {% for d in date_labels %}
+                                    <th>{{d.weekday}} {{d.date}}</th>
+                                    {% endfor %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                             <h6 class="text-muted">
+                                            Kelgan lidlar
+                                            </h6>
+                                        </td>
+                                        <td>{{ stats.lead_day2|default:0 }} ta</td>
+                                        <td>{{ stats.lead_day1|default:0 }} ta</td>
+                                        <td>{{ stats.lead_day0|default:0 }} ta</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h6 class="text-muted">Sotilganlar
+                                            </h6></td>
+                                        <td>{{ stats.sold_day2|default:0 }} ta</td>
+                                        <td>{{ stats.sold_day1|default:0 }} ta</td>
+                                        <td>{{ stats.sold_day0|default:0 }} ta</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h6 class="text-muted">Haydovchilarga chiqqan
+                                        </h6></td>
+                                        <td>{{ stats.shipped_day2|default:0 }} ta</td>
+                                        <td>{{ stats.shipped_day1|default:0 }} ta</td>
+                                        <td>{{ stats.shipped_day0|default:0 }} ta</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+<!--                 <div class="col-md-4 col-6">-->
+<!--                                <a class="card mb-2" href="{% url 'home' %}" style="border:0.5px solid #ffffff7d;cursor:pointer;">-->
+<!--                                    <div class="card-body text-center text-white">-->
+<!--                                        <i class="fas fa-home" style="font-size:50px;"></i>-->
+<!--                                       <h5>Ombor</h5>-->
+<!--                                    </div>-->
+<!--                                </a>-->
+<!--                            </div>-->
+            </div>
+
             </section>
+{% endblock %}
+{% block header %}
+        <link href="{% static '' %}css/table_custom.css" rel="stylesheet" type="text/css">
+
 {% endblock %}
