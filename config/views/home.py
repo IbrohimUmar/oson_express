@@ -133,29 +133,19 @@ def home(request):
 
     last_3_days_stats = Order.objects.aggregate(
         # 1. Uch kun ichida kelgan lidlar
-        lead_day0=Sum(Case(When(created_at__date=last_3_days[2], then=1), output_field=IntegerField())),
-        lead_day1=Sum(Case(When(created_at__date=last_3_days[1], then=1), output_field=IntegerField())),
-        lead_day2=Sum(Case(When(created_at__date=last_3_days[0], then=1), output_field=IntegerField())),
+        lead_day0=Count('id', filter=Q(created_at__date=last_3_days[2])),
+        lead_day1=Count('id', filter=Q(created_at__date=last_3_days[1])),
+        lead_day2=Count('id', filter=Q(created_at__date=last_3_days[0])),
 
-        # 2. Sotilganlar (status=4)
-        sold_day0=Sum(
-            Case(When(status="4", driver_status_changed_at__date=last_3_days[2], then=1), output_field=IntegerField())),
-        sold_day1=Sum(
-            Case(When(status="4", driver_status_changed_at__date=last_3_days[1], then=1), output_field=IntegerField())),
-        sold_day2=Sum(
-            Case(When(status="4", driver_status_changed_at__date=last_3_days[0], then=1), output_field=IntegerField())),
+        sold_day0=Count('id', filter=Q(status="4", driver_status_changed_at__date=last_3_days[2])),
+        sold_day1=Count('id', filter=Q(status="4", driver_status_changed_at__date=last_3_days[1])),
+        sold_day2=Count('id', filter=Q(status="4", driver_status_changed_at__date=last_3_days[0])),
 
-        # 3. Haydovchilarga chiqqan pochta
-        shipped_day0=Sum(
-            Case(When(Q(status__in=["3", "4", "5", "14", "15"]) & Q(driver_shipping_start_date=last_3_days[2]), then=1),
-                 output_field=IntegerField())),
-        shipped_day1=Sum(
-            Case(When(Q(status__in=["3", "4", "5", "14", "15"]) & Q(driver_shipping_start_date=last_3_days[1]), then=1),
-                 output_field=IntegerField())),
-        shipped_day2=Sum(
-            Case(When(Q(status__in=["3", "4", "5", "14", "15"]) & Q(driver_shipping_start_date=last_3_days[0]), then=1),
-                 output_field=IntegerField())),
+        shipped_day0=Count('id', filter=Q(status__in=["3", "4", "5", "14", "15"], driver_shipping_start_date=last_3_days[2])),
+        shipped_day1=Count('id', filter=Q(status__in=["3", "4", "5", "14", "15"], driver_shipping_start_date=last_3_days[1])),
+        shipped_day2=Count('id', filter=Q(status__in=["3", "4", "5", "14", "15"], driver_shipping_start_date=last_3_days[0])),
     )
+    print(last_3_days_stats)
 
     return render(request, 'home/index.html', {
         "user_stat":user_stat,

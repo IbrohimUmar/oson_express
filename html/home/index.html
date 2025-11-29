@@ -20,9 +20,9 @@
 
                     <!-- User Info Center -->
                     <div class="col-md-5 text-center text-md-start mt-3 mt-md-0">
-                        <h4 class="card-title mb-1">
+                        <h2 class="card-title mb-1">
                             {{ user.first_name }} {{ user.last_name }}
-                        </h4>
+                        </h2>
                         <h6 class="text-dark badge  badge-dark"><i class="fas fa-truck-fast"></i> Logistikachi</h6>
 
                         <p class="text-muted mb-2">📱 +{{ user.username }}</p>
@@ -228,45 +228,31 @@
                                             Kelgan lidlar
                                             </h6>
                                         </td>
-                                        <td>{{ stats.lead_day2|default:0 }} ta</td>
-                                        <td>{{ stats.lead_day1|default:0 }} ta</td>
-                                        <td>{{ stats.lead_day0|default:0 }} ta</td>
+                                        <td>{{ last_3_days_stats.lead_day2 }} ta</td>
+                                        <td>{{ last_3_days_stats.lead_day1 }} ta</td>
+                                        <td>{{ last_3_days_stats.lead_day0 }} ta</td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <h6 class="text-muted">Sotilganlar
                                             </h6></td>
-                                        <td>{{ stats.sold_day2|default:0 }} ta</td>
-                                        <td>{{ stats.sold_day1|default:0 }} ta</td>
-                                        <td>{{ stats.sold_day0|default:0 }} ta</td>
+                                        <td>{{ last_3_days_stats.sold_day2 }} ta</td>
+                                        <td>{{ last_3_days_stats.sold_day1 }} ta</td>
+                                        <td>{{ last_3_days_stats.sold_day0 }} ta</td>
                                     </tr>
                                     <tr>
                                         <td><h6 class="text-muted">Haydovchilarga chiqqan
                                         </h6></td>
-                                        <td>{{ stats.shipped_day2|default:0 }} ta</td>
-                                        <td>{{ stats.shipped_day1|default:0 }} ta</td>
-                                        <td>{{ stats.shipped_day0|default:0 }} ta</td>
+                                        <td>{{ last_3_days_stats.shipped_day2 }} ta</td>
+                                        <td>{{ last_3_days_stats.shipped_day1 }} ta</td>
+                                        <td>{{ last_3_days_stats.shipped_day0 }} ta</td>
                                     </tr>
 
                                 </tbody>
                             </table>
-
-
                         </div>
                     </div>
                 </div>
-
-
-
-
-<!--                 <div class="col-md-4 col-6">-->
-<!--                                <a class="card mb-2" href="{% url 'home' %}" style="border:0.5px solid #ffffff7d;cursor:pointer;">-->
-<!--                                    <div class="card-body text-center text-white">-->
-<!--                                        <i class="fas fa-home" style="font-size:50px;"></i>-->
-<!--                                       <h5>Ombor</h5>-->
-<!--                                    </div>-->
-<!--                                </a>-->
-<!--                            </div>-->
             </div>
 
             </section>
