@@ -92,7 +92,6 @@
 
                         <div>
                             <h6><i class="fas fa-truck text-brand"></i> Yetkaziliyotgan buyurtmalar  : {{status_count.total_being_delivered}} ta</h6>
-
                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot kutilmoqda : {{ status_count.waiting }} ta</h6>
                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Mahsulot belgilandi : {{ status_count.marked }} ta</h6>
                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qadoqlandi : {{ status_count.packed }} ta</h6>
@@ -100,7 +99,6 @@
                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ status_count.in_branch }} ta</h6>
                             <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ status_count.delivering }} ta</h6>
                             <h6 class="btn btn-brand btn-sm mt-2 ml-2 readonly">Sotildi : {{ status_count.sold }} ta</h6>
-
                         </div>
 
                         <hr>
@@ -125,9 +123,21 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                         <div class="col-md-12 text-center">
+                        <h6 class="mb-2"><i class="fas fa-truck text-brand"></i> Izoh bo'yicha</h6>
+                             {% for c in comments %}
+                                <span class="mt-1 mb-1 badge  badge-dark text-dark">{{c.description}} : {{c.order_count}}</span>
+                            {% endfor %}
+                    </div>
+
+                    </div>
+                </div>
+            </div>
 
 
-        </div>
 
 
 

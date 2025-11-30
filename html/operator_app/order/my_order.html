@@ -97,7 +97,6 @@
                                             <small class="d-block">Soni : {{p.total_quantity}} ta</small>
                                             <small class="d-block">Narxi : {{p.unit_price}} so'm</small>
 
-                                            {{p.is_delivery_free}}
                                             {% if p.is_delivery_free is True %}
                                             <small class="d-block">Yo'l kira : Bepul</small>
                                             {% else %}
@@ -129,14 +128,22 @@
                                     <i class="material-icons md-message"
                                        style="    vertical-align: bottom;    font-size: 19px;"></i> Sizning izohingiz
 
-                                    <select class="form-select" name="status_description">
-                                        <option value="0">--------</option>
-                                        {% for i in descriptions %}
-                                        <option value="{{i.id}}" {% if o.operator_note == i.description %}selected{% endif %}>
+                                    <select class="form-select" name="status_description"
+                                        onchange="handleRequiredDesc({{o.id}}, this)">
+                                    <option value="0" data-required="false">--------</option>
+                                    {% for i in descriptions %}
+                                        <option value="{{i.id}}" {% if o.operator_comment.id == i.id %}selected{% endif %} data-required="{{ i.is_desc_required|yesno:'true,false' }}">
                                             {{i.description}}
                                         </option>
-                                        {% endfor %}
-                                    </select>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="mb-2 mt-2" id="extraCommentContainer_{{o.id}}" style="display:none;">
+                                    <label>Qo‘shimcha izoh kiriting</label>
+                                    <textarea class="form-control" rows="2" name="extra_comment" id="extraComment_{{o.id}}">{{o.operator_note}}</textarea>
+                                </div>
+
+
                                     <p class="text-muted"
                                        style="font-size:10px !important; line-height:11px !important;">
                                         Yozgan izohingiz mijozlarga va adminlarga ko'rinadi shu bois tushunarli va
@@ -246,9 +253,36 @@
     function submitForm() {
                  document.getElementById('take_order_card').style.display = 'none';
                  document.getElementById('loading').style.display = 'block';
-
      }
 
 
 </script>
+<script>
+function handleRequiredDesc(orderId, selectElement) {
+    let selectedOption = selectElement.options[selectElement.selectedIndex];
+    let isRequired = selectedOption.getAttribute('data-required') === 'true';
+
+    let container = document.getElementById("extraCommentContainer_" + orderId);
+    let textarea = document.getElementById("extraComment_" + orderId);
+
+    if (isRequired) {
+        container.style.display = "block";   // Izoh maydonini ko‘rsatish
+        textarea.setAttribute("required", "required");
+    } else {
+        container.style.display = "none";    // Yashirish
+        textarea.removeAttribute("required");
+        //textarea.value = "";  // Tozalash
+    }
+}
+    /* --- YANGI QO'SHIMCHA --- */
+/* Sahifa yuklanganda barcha buyurtmalarni tekshiradi */
+window.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("select[name='status_description']").forEach(select => {
+        // orderId ni select elementidan chiqarish
+        let orderId = select.getAttribute("onchange").match(/\d+/)[0];
+        handleRequiredDesc(orderId, select);
+    });
+});
+</script>
+
 {% endblock %}

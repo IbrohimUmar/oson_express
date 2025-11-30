@@ -31,6 +31,7 @@ def operator_app_my_order(request):
         try:
             with transaction.atomic():
                 r = request.POST
+                extra_comment = r.get("extra_comment", None)
                 order = Order.objects.filter(id=r['id'], status__in=[9, 6], operator=request.user).first()
                 if order:
                     if r['status_description'] == '0':
@@ -40,7 +41,9 @@ def operator_app_my_order(request):
                     status_and_desc = get_object_or_404(SellerOperatorStatusDesc, seller=seller, id=r['status_description'])
                     order.status = status_and_desc.status
                     order.operator_comment = status_and_desc
-                    order.operator_note = status_and_desc.description
+                    if extra_comment:
+                        # order.operator_note = status_and_desc.description
+                        order.operator_note = extra_comment
                     order.operator_status_changed_at = datetime.datetime.now()
 
                     order.save()
@@ -58,7 +61,6 @@ def operator_app_my_order(request):
 
     for d in descriptions:
         d.order_count = order.filter(operator_comment=d).count()
-        print(d)
 
     comment = request.GET.get("comment", None)
     if comment:

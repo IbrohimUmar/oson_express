@@ -13,6 +13,7 @@ def seller_app_setting_operator_comment_edit(request, id):
     if request.method == 'POST':
         seller_operator_status_desc.description=request.POST['desc']
         seller_operator_status_desc.status=request.POST['status']
+        seller_operator_status_desc.is_desc_required = {'0': False, '1': True}.get(request.POST['is_desc_required'], '0')
         seller_operator_status_desc.save()
         messages.success(request, "Ma'lumotlar o'zgartirildi")
         return redirect('seller_app_setting_operator_comment_edit', id)

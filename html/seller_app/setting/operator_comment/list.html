@@ -54,6 +54,7 @@
                     <tr>
                         <th>Holati</th>
                         <th>Izoh</th>
+                        <th>Qo'shimcha izoh kiritsinmi?</th>
                         <th>#</th>
 
                     </tr>
@@ -66,6 +67,13 @@
                         </td>
                         <td>
                             {{ o.description }}
+                        </td>
+                        <td>
+                            {% if o.is_desc_required %}
+                            <span class="badge badge-soft-success">Ha kiritsin</span>
+                            {% else %}
+                            <span class="badge badge-soft-danger">Kiritmasin</span>
+                            {% endif %}
                         </td>
 
                         <td>

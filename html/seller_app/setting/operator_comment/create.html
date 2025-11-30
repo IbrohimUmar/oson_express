@@ -29,12 +29,12 @@
             </header>
             <div class="card-body">
                 <div class="row  order-info-wrap">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-2">
                         <label>Izoh</label>
                         <input type="text" name="desc" placeholder="Izohni kiriting" required
                                class="form-control">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-2">
                         <label>Izoh tanlanganida buyurtma holati</label>
                         <select name="status" class="form-control">
                             <option value="9">Yangi</option>
@@ -43,9 +43,14 @@
                             <option value="12">Dubl buyurtma</option>
                             <option value="6">Qayta qo'ng'iroq</option>
                         </select>
+                    </div>
 
-
-
+                    <div class="col-md-6 mt-2">
+                        <label>Izohga o'tkazishda operator qo'shimcha izoh kiritsinmi?</label>
+                        <select name="is_desc_required" class="form-control">
+                            <option value="0">Qo'shimcha izoh kiritmasin</option>
+                            <option value="1">Qo'shimcha izoh kiritsin</option>
+                        </select>
                     </div>
                 </div>
             </div>

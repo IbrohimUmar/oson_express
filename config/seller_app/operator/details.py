@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect
-from order.models import Order
+from order.models import Order, SellerOperatorStatusDesc
+from services.seller.get_seller import get_seller
 from user.models import User
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
@@ -15,6 +16,7 @@ import calendar
 @permission_required('admin.seller_app_operator_details', login_url="/home")
 def seller_app_operator_details(request, id):
     operator = get_object_or_404(User, id=id, seller=request.user, type=3)
+    seller = get_seller(operator)
     if request.method == 'POST':
         year = int(request.POST['to'][:4])
         month = int(request.POST['to'][5:])
@@ -44,9 +46,17 @@ def seller_app_operator_details(request, id):
     total_order = sum([d['input_order'] for d in data])
     total_payment = sum([d['payment'] for d in data])
 
+    comments = SellerOperatorStatusDesc.objects.filter(seller=seller)
+
+    orders = Order.objects.filter(operator=operator)
+    for c in comments:
+        c.order_count = orders.filter(operator_comment=c).count()
+
 
     return render(request, 'seller_app/operator/details.html',
-                  {"o": operator, 'data': data,
+                  {"o": operator,
+                   'data': data,
+                   'comments': comments,
                    "status_count": operator.operator_data.get_operator_stats,
 
                    'dates': today.strftime(("%Y-%m")), 'total_order': total_order,

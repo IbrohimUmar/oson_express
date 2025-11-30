@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 
-from order.models import Order
+from order.models import Order, SellerOperatorStatusDesc
 from services.seller.get_seller import get_seller
 from user.models import User
 from cash.models import Cash
@@ -30,6 +30,10 @@ def seller_app_operator_order_list(request):
     operator_id = request.GET.get("operator_id", '0')
     if operator_id != '0':
         orders = orders.filter(operator_id=operator_id)
+
+    operator_comment = request.GET.get("operator_comment", '0')
+    if operator_comment != '0':
+        orders = orders.filter(operator_comment_id=operator_comment)
 
     filter_query = request.GET.get("filter", None)
     if filter_query:
@@ -117,10 +121,9 @@ def seller_app_operator_order_list(request):
                 updated_at=datetime.datetime.now(),
             )
             messages.success(request, "O'zgartirildi")
-
-
-
         return redirect('seller_app_operator_order_list')
+
+    descriptions = SellerOperatorStatusDesc.objects.filter(seller=seller)
 
     operators = User.objects.filter(seller=seller, type='3').order_by("-id")
     paginator = Paginator(orders, 50)
@@ -128,6 +131,6 @@ def seller_app_operator_order_list(request):
     return render(request, 'seller_app/operator/order/list.html', {
         'page_obj': orders_qs,
         'operators': operators,
-        'Status':Status,
-                                                                   'count':orders.count()})
+        'descriptions': descriptions,
+        'Status': Status, 'count':orders.count()})
 

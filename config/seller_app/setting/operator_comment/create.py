@@ -13,7 +13,9 @@ def seller_app_setting_operator_comment_create(request):
         SellerOperatorStatusDesc.objects.create(
             seller=seller,
             description=request.POST['desc'],
-            status=request.POST['status'])
+            status=request.POST['status'],
+            is_desc_required={'0':False, '1':True}.get(request.POST['is_desc_required'], '0'),
+        )
         messages.success(request, "Ma'lumotlar saqlandi")
         return redirect('seller_app_setting_operator_comment_list')
 

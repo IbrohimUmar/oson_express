@@ -103,6 +103,7 @@ class SellerOperatorStatusDesc(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=50, choices=Status)
     description = models.TextField()
+    is_desc_required = models.BooleanField(default=False, null=False, verbose_name="Izoh majburiymi")
 
     def __str__(self):
         return self.status

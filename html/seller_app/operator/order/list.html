@@ -40,6 +40,15 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="col-md-2">
+                                    <h6>Izoh</h6>
+                                    <select class="form-control" name="operator_comment">
+                                         <option value="0">---------</option>
+                                        {% for d in descriptions %}
+                                        <option value="{{d.id}}" {% if request.GET.operator_comment|add:"0" == d.id %}selected{% endif %}>{{d.description}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
 
                                 <div class="col-md-2">
                                     <h6>Qo'llash</h6>
@@ -97,6 +106,8 @@
                                  <th>Barcodi</th>
                                 <th>Viloyati</th>
                                 <th>Operator</th>
+                                <th>Operator tanlangan izoh</th>
+                                <th>Operator yozgan izoh</th>
                                 <th>Operator ulushi</th>
                                 <th>Mijoz</th>
                                 <th>Mahsulot</th>
@@ -159,6 +170,20 @@
                                         {% endif %}
                                             </h6>
 
+                                    </td>
+                                    <td>
+                                        {% if o.operator_comment %}
+                                        <span class="badge badge-dark">{{o.operator_comment.description}}</span>
+                                        {% else %}
+                                        ---------------
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if o.operator_note %}
+                                            {{o.operator_note}}
+                                        {% else %}
+                                        ---------------
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{o.operator_fee}}

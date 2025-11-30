@@ -29,12 +29,12 @@
             </header>
             <div class="card-body">
                 <div class="row  order-info-wrap">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-2">
                         <label>Izoh</label>
                         <input type="text" name="desc" value="{{seller_operator_status_desc.description}}" placeholder="Izohni kiriting" required
                                class="form-control">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-2">
                         <label>Izoh tanlanganida buyurtma holati</label>
                         <select name="status" class="form-control">
                             <option value="9" {% if seller_operator_status_desc.status == '9' %}selected{% endif %}>Yangi</option>
@@ -43,10 +43,17 @@
                             <option value="12" {% if seller_operator_status_desc.status == '12' %}selected{% endif %}>Dubl buyurtma</option>
                             <option value="6" {% if seller_operator_status_desc.status == '6' %}selected{% endif %}>Qayta qo'ng'iroq</option>
                         </select>
-
-
-
                     </div>
+
+
+                    <div class="col-md-6 mt-2">
+                        <label>Izohga o'tkazishda operator qo'shimcha izoh kiritsinmi?</label>
+                        <select name="is_desc_required" class="form-control">
+                            <option value="0" {% if seller_operator_status_desc.is_desc_required == False %}selected{% endif %}>Qo'shimcha izoh kiritmasin</option>
+                            <option value="1" {% if seller_operator_status_desc.is_desc_required == True %}selected{% endif %}>Qo'shimcha izoh kiritsin</option>
+                        </select>
+                    </div>
+
                 </div>
             </div>
         </div>

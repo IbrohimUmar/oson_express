@@ -4,7 +4,8 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import render
 
-from order.models import Order, Status
+from order.models import Order, Status, SellerOperatorStatusDesc
+from services.seller.get_seller import get_seller
 
 
 @login_required(login_url='/login')
@@ -12,6 +13,7 @@ from order.models import Order, Status
 @async_to_sync
 async def operator_app_order_history(request):
     orders = Order.objects.filter(operator=request.user).exclude(status__in=[9, 6]).order_by("-id")
+    seller = get_seller(request.user)
     order_counts_by_status = orders.values("status").annotate(order_count=Count("id"))
     statuses_with_counts = []
     total_order_count = 0
@@ -38,5 +40,7 @@ async def operator_app_order_history(request):
     order_object = Paginator(orders, 25)
     page_number = request.GET.get('page')
     orders_pagination = order_object.get_page(page_number)
-    return render(request, 'operator_app/order/history.html', {"order": orders_pagination, 'count': orders.count(), "statuses_with_counts":statuses_with_counts})
+    return render(request, 'operator_app/order/history.html', {
+        "order": orders_pagination,
+                                                               'count': orders.count(), "statuses_with_counts":statuses_with_counts})
 
