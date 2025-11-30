@@ -140,7 +140,7 @@
 
                                 <div class="mb-2 mt-2" id="extraCommentContainer_{{o.id}}" style="display:none;">
                                     <label>Qo‘shimcha izoh kiriting</label>
-                                    <textarea class="form-control" rows="2" name="extra_comment" id="extraComment_{{o.id}}">{{o.operator_note}}</textarea>
+                                    <textarea class="form-control" rows="2" required name="extra_comment" id="extraComment_{{o.id}}" placeholder="Izoh kiriting...">{% if o.operator_note is not None and o.operator_note != 'None' %}{{o.operator_note}}{% endif%}</textarea>
                                 </div>
 
 
