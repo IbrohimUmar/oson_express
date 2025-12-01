@@ -5,7 +5,7 @@ from .edit import seller_app_operator_edit
 from .list import seller_app_operator_list
 from .statistic_list import seller_app_operator_statistic_list
 from .date_by_statistic_list import seller_app_operator_date_by_statistic
-
+from .comment_date_by_statistic import seller_app_operator_comment_date_by_statistic
 
 urlpatterns = [
 
@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('statistic-list/', seller_app_operator_statistic_list, name='seller_app_operator_statistic_list'),
     path('date-by-statistic-list/', seller_app_operator_date_by_statistic, name='seller_app_operator_date_by_statistic'),
+    path('comment-date-by-statistic-list/', seller_app_operator_comment_date_by_statistic, name='seller_app_operator_comment_date_by_statistic'),
 
     path('list/', seller_app_operator_list, name='seller_app_operator_list'),
     path('create/', seller_app_operator_create, name='seller_app_operator_create'),

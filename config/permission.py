@@ -55,6 +55,8 @@ seller_app_operator_permission = [
 
     ("Seller app | Operator | Boshqaruv | Sana bo'yicha statistika", 'seller_app_operator_date_by_statistic'),
 
+    ("Seller app | Operator | Boshqaruv | Izoh bo'yicha statistika", 'seller_app_operator_comment_date_by_statistic'),
+
     ("Seller app | Operator | Boshqaruv | Haqida batafsil", 'seller_app_operator_details'),
 
     ("Seller app | Operator | Boshqaruv | O'zgartirish", 'seller_app_operator_edit'),

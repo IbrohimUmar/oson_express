@@ -1,0 +1,173 @@
+{% extends 'seller_app/main/main.html' %}
+{% load static %}
+{% block title %}
+Haydovchilar ro'yxati
+{% endblock %}
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h3 class="content-title">Izohlar bo'yicha statistikasi</h3>
+        <div>
+            <a href="{% url 'seller_app_operator_list' %}" class="btn btn-brand btn-sm"> Qaytish</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5>Sana oralig'idagi statistika</h5>
+
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12 me-auto mb-md-0 mb-3">
+                    <form method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Dan :</label>
+                                <input type="date" class="form-control" id="from" {% if request.GET.from_date %} value="{{request.GET.from_date}}"{% else %}value="{{now}}"{% endif %} name="from_date">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Gacha :</label>
+                                <input type="date" class="form-control" id="to" {% if request.GET.to_date %} value="{{request.GET.to_date}}"{% else %}value="{{now}}"{% endif %} name="to_date">
+                            </div>
+
+                            <div class="col-md-2">
+                                <h6 >Qo'llash</h6>
+                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
+                                                                </button>
+                                {% if request.GET.from_date or request.GET.to_date %}
+                                 <a class="btn btn-danger" href="{% url 'seller_app_operator_comment_date_by_statistic' %}" type="submit"><i class="material-icons md-search_off"></i>
+                                                                </a>{% endif%}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h6 class="text-center">Jami statistika </h6>
+            <h6 class="text-center">
+
+                {% for i in status_desc_all %}
+                    <span class="btn btn-sm" style="border:1px solid white;">
+                        {{i.description}} : {{i.order_count}} ta
+                    </span>
+                {% endfor %}
+
+                </h6>
+        </div>
+
+        <div class="card-body text-center">
+
+            <div style="overflow-x:auto;">
+                <table class="table table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Operator</th>
+                        {% for i in status_desc_all %}
+                            <th>{{i.description}}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody >
+                    {% for d in operators %}
+                    <tr>
+                        <td>
+                            <h6 class="text-center">
+                            {{ d.first_name }} {{ d.last_name }}
+                            <br>
+                            +{{ d.username }}
+                                </h6>
+                        </td>
+                        {% for s in d.stat %}
+                        <td><h6>{{ s }} ta</h6></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+                           <div class="row ">
+ <div class="col-md-12 mr-auto mt-auto pagination justify-content-center">
+                </div>
+                <div class=" col-md-12 pagination justify-content-center mt-5">
+                                                    <span class="step-links mr-auto ml-auto">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-sm btn-brand  "><<</a>
+                                                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand "><</a>
+                                                        {% endif %}
+                                                        <!--of {{ page_obj.paginator.num_pages }}.Page-->
+                                                    <span class="h6 mr-10 ml-10"> {{ page_obj.number }}</span>
+                                                        {% if page_obj.has_next %}
+                                                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand">></a>
+                                                            <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                                               class="btn btn-sm btn-brand ">>></a>
+                                                        {% endif %}
+                                                    </span>
+
+                </div>
+                                        <h6 class="text-center mt-2 text-muted">Jami sahifa soni : {{ page_obj.paginator.num_pages }} ta</h6>
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+</section>
+{% endblock %}
+{% block header %}
+{% include 'table/head.html' %}
+
+<style>
+        #dataTable tr:nth-child(odd){background:#3c4252}
+</style>
+{% endblock %}
+{% block footer %}
+{% include 'table/footer.html' %}
+<script>
+        var table = $('#dataTable').DataTable({
+            paging: true,
+            pageLength: 55,
+            ordering: false,
+            autoWidth: true,
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'searchPanes', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'excel', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                }, {
+                    extend: 'pdf', className: 'btn btn-success btn-sm glyphicon glyphicon-list-alt'
+                },
+            ],
+            dom: 'Bfrtip',
+            language: {
+                lengthMenu: "Саҳифада _MENU_ та маълумот кўрсат",
+                zeroRecords: "Хеч нарса топилмади узр!",
+                info: "<span class='text-sm'>_PAGE_ саҳифа, <br> жами _PAGES_ та саҳифа</span>",
+                infoEmpty: "Маълумотлар мавжуд емас",
+                infoFiltered: "(_MAX_ та маълумот филтирланган)",
+                search: "Излаш",
+                oPaginate: {
+                    sNext: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-forward"> > </i></button> ',
+                    sPrevious: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-backward"> < </i></button> ',
+                    sFirst: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-backward"> > </i></button> ',
+                    sLast: ' <button class="btn btn-sm" style="color: black"><i class="fa fa-step-forward"> << </i></button> '
+                },
+                searchPanes: {
+                    clearMessage: 'Бекор қилиш',
+                    collapse: {0: 'Fliter', _: 'Filter (%d)'}
+                }
+            }
+        });
+
+</script>
+
+{% endblock %}

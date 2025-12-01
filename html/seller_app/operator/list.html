@@ -27,6 +27,11 @@
                 Buyurtmalar boshqaruvi
             </a>
             {% endif %}
+            {% if perms.admin.seller_app_operator_comment_date_by_statistic %}
+            <a href="{% url 'seller_app_operator_comment_date_by_statistic' %}" class="btn btn-brand btn-sm">
+                Izoh bo'yicha statistika
+            </a>
+            {% endif %}
 <!--            <a href="" class="btn btn-primary">To'lovlari</a>-->
         </div>
     </div>
