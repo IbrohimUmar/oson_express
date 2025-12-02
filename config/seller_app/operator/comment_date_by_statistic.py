@@ -30,7 +30,6 @@ def seller_app_operator_comment_date_by_statistic(request):
         i.order_count = orders.filter(operator_comment=i).count()
 
 
-
     operators = User.objects.filter(type='3', seller=seller, is_active=True)
 
     paginator = Paginator(operators, 10)
@@ -41,7 +40,7 @@ def seller_app_operator_comment_date_by_statistic(request):
     for operator in page_operators:
         stat = []
         for i in status_desc_all:
-            stat.append(orders.filter(operator_comment=i).count())
+            stat.append(orders.filter(operator=operator, operator_comment=i).count())
         operator.stat = stat
 
     return render(request, 'seller_app/operator/comment_date_by_statistic.html', {
