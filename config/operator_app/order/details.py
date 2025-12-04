@@ -58,8 +58,8 @@ def operator_app_order_details(request, id):
                 order.customer_phone2 = r['customer_phone2']
                 order.customer_region_id = r['region']
                 order.customer_district_id = r['district']
-                order.street = r['street']
-                order.operator_note = r['operator_note']
+                order.customer_street = r['street']
+                # order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
                 order.operator_status_changed_at = datetime.now()
                 OrderProduct.objects.filter(order_id=r['order_id']).delete()

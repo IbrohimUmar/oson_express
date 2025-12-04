@@ -22,9 +22,9 @@ def driver_app_order_api_list(request):
 
     status = int(request.GET.get('status', 1))
     if status:
-        if status == 33:
+        if status == 33: # bekor qilindi haydovchida emas
             orders = orders.filter(driver_status='3').exclude(status='5')
-        elif status == 3:
+        elif status == 3: # bekor qilindi haydovchida
             orders = orders.filter(driver_status='3', status='5')
         else:
             orders = orders.filter(driver_status=status)
@@ -93,8 +93,9 @@ def driver_app_order_api_list(request):
         elif r.driver_status == '3' and r.status == '5' and r.transaction_lock == False:
             status_name = f"{status_name} (Haydovchida)"
 
-        if r.driver_status == '2':
-            has_edit = False
+        # if r.driver_status == '2':
+        #     has_edit = False
+
 
         order_list.append(
             {

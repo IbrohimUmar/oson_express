@@ -125,12 +125,12 @@
                                 <hr>
                                 <h6>Ko'cha uy, mo'ljal</h6>
                                 <textarea rows="1" required class="form-control"
-                                          placeholder="Ko'cha uy, mo'ljal"
+                                          placeholder="Ko'cha uy, mo'ljal, Qo'shimcha ma'lumot qisqacha"
                                           name="street">{% if order %}{{ order.street }}{% endif %}</textarea>
                                 <hr>
-                                <h6>Qo'shimcha ma'lumot (Ixtiyoriy)</h6>
-                                <textarea rows="1" class="form-control"
-                                          placeholder="Qo'shimcha ma'lumot (masalan soat 9 gacha yetkazish kerak ishga ketib qoladi)"
+                                <h6>Operator izohi</h6>
+                                <textarea rows="1" class="form-control" style="background-color:#80808185;" disabled
+                                          placeholder="----"
                                           name="operator_note">{% if order and order.operator_note %}{{ order.operator_note }}{% endif %}</textarea>
 
                             </div>

@@ -306,6 +306,36 @@ from django.db import transaction
 from django.db import transaction
 from django.db.models import Sum
 
+
+
+
+def cancel_sold_order(order_id):
+    order = Order.objects.filter(id=order_id, total_driver_payment_status__in=[2, 3]).first()
+    if order:
+        try:
+            with transaction.atomic():
+                cash_relation = CashOrderRelation.objects.filter(order=order)
+
+                for c in cash_relation:
+                    cash = c.cash
+                    cash.leave_amount += c.amount
+                    cash.save()
+                    c.delete()
+
+                order.total_driver_payment = 0
+                order.total_driver_payment_status = '1'
+                order.total_driver_payment_paid_at = None
+                order.save()
+
+                return True
+        except IntegrityError as e:
+            handle_exception(e)
+            return e
+    return True
+
+
+
+
 # def check_and_fix_cash_distribution(cash_id):
 def update_paid_orders(cash_id):
     """

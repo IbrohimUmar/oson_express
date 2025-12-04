@@ -3,6 +3,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
+
+from config.cash.crud import cancel_sold_order
 from order.models import Order, DefectiveOrderDriverFee, OrderProduct, OrderComment
 from config.driver_app.permission import is_driver
 from django.db.models import F, Sum
@@ -72,12 +74,18 @@ def driver_app_order_api_edit(request):
                                                       'config.driver_app.order.api.edit')
                             return JsonResponse({'status': 200, 'messages': "O'zgartirildi"})
 
-                    if body['next_status'] == 3:
+                    if body['next_status'] == 3: # agar sotildini bekor qilinayotgan bo'lsa
+
                         if order_status in [3, 4]:
+                            if order_status == 4:
+                                cancel_sold_order(order.id)
+                                order.refresh_from_db()
+
                             order.status = 5
                             order.driver_status = '3'
                             order.driver_status_changed_at=datetime.datetime.now()
-                            OrderComment.objects.create(order=order, user=request.user, message=body['desc'])
+                            if body.get("desc", None):
+                                OrderComment.objects.create(order=order, user=request.user, message=body['desc'])
                             order.save()
                             save_order_status_history(order, order.status, "Buyurtma haydovchi tarafidan bekor qilindi",
                                                       request.user,

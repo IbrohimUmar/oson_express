@@ -54,7 +54,7 @@ def operator_app_order_create(request):
                 order.seller = seller
                 order.operator = request.user
                 order.customer_street = r['street']
-                order.operator_note = r['operator_note']
+                # order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
                 order.operator_status_changed_at = datetime.now()
                 order.driver_is_bonus = False

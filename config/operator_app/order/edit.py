@@ -60,7 +60,7 @@ def operator_app_order_edit(request, id):
                 order.customer_region_id = r['region']
                 order.customer_district_id = r['district']
                 order.customer_street = r['street']
-                order.operator_note = r['operator_note']
+                # order.operator_note = r['operator_note']
                 order.delivered_date = r['delivered_date']
                 order.driver_is_bonus = False
                 order.operator_status_changed_at = datetime.datetime.now()
