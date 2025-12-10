@@ -79,15 +79,23 @@ def seller_app_warehouse_product_attachment_print_api(request):
             obj.barcode
         return None
 
+
+
     for i in page.object_list:
+        operator = ''
+        if i.operator is not None:
+            operator = i.operator.username
+        else:
+            operator = seller.username
         data = {"id":i.id, 'barcode':i.barcode,
                 'is_print':i.is_print,
+                'operator':operator,
                 'customer_name':i.customer_name, 'is_there_previous_order':get_or_None(i.is_there_previous_order),
                 'customer_phone':i.customer_phone, 'customer_phone2':i.customer_phone2,
                 'customer_region':i.customer_region.name if i.customer_region is not None else '',
                 'customer_district':i.customer_district.name if i.customer_district is not None else '',
                 'customer_street':i.customer_street,
-              "total_price":i.total_product_price}
+                "total_price": i.total_product_price}
 
         product_list = []
         for p in i.order_products:
