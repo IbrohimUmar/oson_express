@@ -29,9 +29,8 @@
             </table>
         </div>
 
-<!--        <span class="item-line">&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Mahsulotlar -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</span>-->
-        <span class="item-line">-------------------------------- Mahsulotlar -----------------------------</span>
-        <h6 class="total-price-span text-center">Jami ------------------- {{order.total_product_price|format_money}} so'm</h6>
+        <span class="item-line">-------------------------------------------- Mahsulotlar -----------------------------------------------</span>
+        <h6 class="total-price-span text-center">Jami -------------------------------- {{order.total_product_price|format_money}} so'm</h6>
         {% for p in order.order_products %}
         {% if p.product_type == "1" %}
         <span class="product-list-span">{{p.product.name}} {% if p.product_variable.color %}[{{p.product_variable.color.name}}]{% endif %} {% if p.product_variable.measure_item %}[{{p.product_variable.measure_item.name}}]{% endif %} --- <span class="product-list-price-span">{{p.total_quantity}} ta,{{p.total_price|format_money}} uzs</span></span>
