@@ -18,8 +18,8 @@ table, th, td{
 
 .example_box {
   box-sizing: content-box;
-  width: 226px !important;
-  height: 302px !important;
+  width: 220px !important;
+  height: 220px !important;
   padding: 3px;
   display:inline-block !important;
 }
