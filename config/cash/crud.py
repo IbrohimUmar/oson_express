@@ -243,6 +243,7 @@ def check_paid_orders(driver_id):
                                          'total_driver_payment_paid_at']
                         log_update(
                             request=None,
+                            created_by_user=None,
                             old_instance=old_order,
                             new_instance=order_obj,
                             fields=fields_to_log,
