@@ -13,7 +13,7 @@ def seller_statistic_list(request):
         supplier = sellers.filter(
             Q(username__contains=query) | Q(first_name__contains=query) | Q(last_name__contains=query))
 
-    paginator = Paginator(sellers, 50)
+    paginator = Paginator(sellers, 10)
     page_number = request.GET.get('page')
     queryset = paginator.get_page(page_number)
     return render(request, 'seller/statistic_list.html', {'page_obj': queryset, 'count': sellers.count()})

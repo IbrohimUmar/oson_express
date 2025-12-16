@@ -10,20 +10,21 @@ from django.db import transaction, IntegrityError
 from services.seller.get_seller import get_seller
 from warehouse.models import WareHouseStock
 from django.db.models.functions import Coalesce
-from user.models import Regions
+from user.models import Regions, User
 
 
 @login_required(login_url='/login')
 @permission_required('admin.order_sold_list', login_url="/home")
 def order_sold_list(request):
     orders = Order.objects.filter(status='4').order_by("-created_at")
+
     region = request.GET.get("region", 'None')
-    if region != 'None':
+    if region not in ['None', '0']:
         orders = orders.filter(customer_region=region)
 
-    status = request.GET.get("status", 'None')
-    if status != 'None':
-        orders = orders.filter(status=status)
+    seller = request.GET.get("seller", 'None')
+    if seller not in ['None', '0']:
+        orders = orders.filter(seller_id=seller)
 
     filter_query = request.GET.get("filter", None)
     if filter_query:
@@ -32,5 +33,8 @@ def order_sold_list(request):
     paginator = Paginator(orders, 50)
     order = paginator.get_page(int(request.GET.get("page", 1)))
     return render(request, 'order/sold_list.html', {'quary': filter_query,'page_obj': order, "order": order, 'count': orders.count(),
-                                                           "statuses":Status, "regions":Regions.objects.all()
+                                                           "statuses":Status,
+                                                    "regions":Regions.objects.all(),
+                                                    "sellers":User.objects.filter(type='6')
+
                                                           })

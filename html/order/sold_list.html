@@ -36,6 +36,18 @@
                             </div>
 
                             <div class="col-md-4">
+                                <label>Seller bo'yicha : </label>
+                                <select name="seller" class="form-select">
+                                    <option value="0" {% if request.GET.seller == None %}selected{% endif %}>---------
+                                    </option>
+
+                                    {% for p in sellers %}
+                                    <option value="{{p.id}}" {% if request.GET.seller|add:'0' == p.id %}selected{% endif %}>{{p.full_name}} +{{p.username}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
                                 <label>Viloyat bo'yicha : </label>
                                 <select name="region" class="form-select">
                                     <option value="0" {% if request.GET.region == None %}selected{% endif %}>---------
@@ -61,7 +73,7 @@
                                 <button class="btn btn-brand" type="submit"><i class="material-icons md-search"></i>
                                 </button>
                                 {% if request.GET.site or request.GET.from or request.GET.to or request.GET.search or request.GET.region %}
-                                <a class="btn btn-danger" href="{% url 'seller_app_orders_list_sold' %}" type="submit"><i
+                                <a class="btn btn-danger" href="{% url 'order_sold_list' %}" type="submit"><i
                                         class="material-icons md-search_off"></i>
                                 </a>{% endif%}
                             </div>
@@ -81,6 +93,7 @@
                         <tr class="text-center">
                             <th>id</th>
                             <th>Haydovchi To'lovi holati</th>
+                            <th>Seller</th>
                             <th>Mijoz</th>
                             <th>Viloyati</th>
                             <th>Mahsulot</th>
@@ -105,7 +118,13 @@
                             <span class="badge badge-soft-warning">{{ o.get_total_driver_payment_status_display }}</span>
                             {% elif o.total_driver_payment_status == '3' %}
                             <span class="badge badge-soft-primary">{{ o.get_total_driver_payment_status_display }}</span>
+                            <br>
+                            <p>{{o.total_driver_payment_paid_at}}</p>
                             {% endif %}
+                        </td>
+                        <td style="white-space: nowrap">
+                            {{ o.seller.full_name }} <br>
+                           +{{ o.seller.username }}
                         </td>
                         <td style="white-space: nowrap">
                             {{ o.customer_name }} <br>

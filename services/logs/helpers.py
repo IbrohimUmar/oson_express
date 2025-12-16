@@ -2,11 +2,24 @@
 
 
 from datetime import datetime
+from datetime import datetime, date
+from decimal import Decimal
+
 
 def serialize_value(value):
-    if isinstance(value, datetime):
-        return value.isoformat()  # '2025-11-04T12:34:56.789123'
-    return value
+    if value is None:
+        return None
+
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+
+    if isinstance(value, Decimal):
+        return float(value)
+
+    if hasattr(value, "id"):
+        return value.id
+
+    return str(value)
 
 
 def get_changed_fields(old_instance, new_instance, fields):

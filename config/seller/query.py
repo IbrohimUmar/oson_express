@@ -16,6 +16,7 @@ class SellerData(object):
         self.id = id
         self.user = get_object_or_404(User, id=id)
 
+
     @property
     def hold_seller_fee(self):
         """Beklemede olan (henüz ödeme süresi dolmamış) tutar"""
@@ -25,6 +26,7 @@ class SellerData(object):
         orders = (
             Order.objects.filter(
                 seller=self.user,
+                status='4',
                 total_driver_payment_status='3',
                 total_driver_payment_paid_at__gt=deadline_date,  # Süresi henüz dolmamış
             )
@@ -174,6 +176,7 @@ class SellerData(object):
                                                         created_at__month=self.today.month).values_list('operator_fee',
                                                                                                         flat=True)))
 
+
     @property
     def order(self):
         import order
@@ -200,7 +203,7 @@ class SellerData(object):
                 'status_name': status_name,  # senin örneğine uygun küçük harf
                 'count': item['count']
             })
-
+        print(result)
         return result
 
     @property
