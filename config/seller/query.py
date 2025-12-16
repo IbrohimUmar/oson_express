@@ -7,7 +7,7 @@ from order.models import Order
 from user.models import User
 from django.shortcuts import get_object_or_404
 from cash.models import Cash
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.db.models.functions import Coalesce
 
 
@@ -176,35 +176,66 @@ class SellerData(object):
                                                         created_at__month=self.today.month).values_list('operator_fee',
                                                                                                         flat=True)))
 
-
     @property
     def order(self):
         import order
         return order.models
 
+
+
     @property
     def order_statuses(self):
         # Status kodu → status ismi eşlemesi
-        from order.models import Status
-        status_map = dict(Status)
-        # Her status için sayım (tek sorguda)
-        qs = (
-            self.order.Order.objects
-            .filter(operator_id=self.id)
-            .values('status')
-            .annotate(count=Count('id'))
+        qs = self.order.Order.objects.filter(seller=self.user)
+
+        delay_days = self.user.seller_payment_delay_days or 0
+        now = timezone.now()
+        deadline_date = now - timedelta(days=delay_days)
+        return qs.aggregate(
+            # =====================
+            # DELIVERY PROCESS
+            # =====================
+            in_branch=Count('id', filter=Q(status='13')),
+            being_delivered=Count('id', filter=Q(status='3')),
+            total_in_delivery=Count('id', filter=Q(status__in=['13', '3'])),
+
+            # =====================
+            # SOLD ORDERS
+            # =====================
+            sold_total=Count('id', filter=Q(status='4')),
+
+            sold_added_to_balance=Count(
+                'id',
+                filter=Q(
+                    status='4',
+                    total_driver_payment_status='3',
+                    total_driver_payment_paid_at__lte=deadline_date
+                )
+            ),
+
+            sold_on_hold=Count(
+                'id',
+                filter=Q(
+                    status='4',
+                    total_driver_payment_status='3',
+                    total_driver_payment_paid_at__gt=deadline_date
+                )
+            ),
+
+            sold_processing=Count(
+                'id',
+                filter=Q(status='4') & ~Q(total_driver_payment_status='3')
+            ),
+
+            # =====================
+            # CANCELLED ORDERS
+            # =====================
+            cancelled_total=Count('id', filter=Q(status__in=['5', '14', '15'])),
+
+            cancelled_by_driver=Count('id', filter=Q(status='14')),
+            cancelled_by_seller=Count('id', filter=Q(status='15')),
+            cancelled_general=Count('id', filter=Q(status='5')),
         )
-        # İstenen formata dönüştür
-        result = []
-        for item in qs:
-            status_code = item['status']
-            status_name = status_map.get(status_code, 'Nomaʼlum')  # bilinmeyen kod varsa fallback
-            result.append({
-                'status_name': status_name,  # senin örneğine uygun küçük harf
-                'count': item['count']
-            })
-        print(result)
-        return result
 
     @property
     def order_status(self):

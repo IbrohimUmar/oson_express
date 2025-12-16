@@ -86,7 +86,7 @@
                                 <i class="material-icons md-edit"></i> O'zgartirish</a>
                             {% endif %}
                             {% if perms.admin.seller_details %}
-                            <a href="{% url 'seller_edit' o.id %}" class="btn btn-brand btn-sm">
+                            <a href="{% url 'seller_details' o.id %}" class="btn btn-brand btn-sm">
                                 <i class="material-icons md-payment"></i> Hisobot</a>
                             {% endif %}
                         </td>

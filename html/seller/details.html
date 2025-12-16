@@ -1,0 +1,223 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% load money %}
+
+{% block content %}
+<section class="content-main" id="app">
+    <div class="content-header">
+        <h3 class="content-title">Seller hisoboti</h3>
+        <div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+            <div class="card-body" style="padding:16px; ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'home' %}">Boshqaruv paneli</a></li>
+                            <li class="breadcrumb-item d-inline"><a href="{% url 'seller_list' %}">Sellerlar ro'yxati</a></li>
+                            <li class="breadcrumb-item d-inline active">Seller hisoboti</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+            <div class="row mt-4">
+
+                <div class="col-md-12 m-auto">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted"><i class="fa-solid fa-credit-card"></i> Balans</h4>
+                            <h3> {{seller_data.balance|format_money}} uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Sotilgan buyurtmalardan yig'gan daromadi</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-money-bill-transfer"></i> Hold balansi</h4>
+                            <h3> {{seller_data.hold_seller_fee|format_money}} uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Sotilgan To'lovi haydovchidan olingan va seller kutish muddatidagi summa</small>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-money-bill-transfer"></i> Qayta ishlashda</h4>
+                            <h3> {{seller_data.processing_seller_fee|format_money}} uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Sotilgan lekin puli hali filealga yetib kelmagan</small>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fa-solid fa-money-bill-transfer"></i> Yo'lda</h4>
+                            <h3> {{seller_data.being_delivered_seller_fee|format_money}} uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Yetkaziliyatgan buyurtmalarning seller ulushi</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fas fa-cancel text-danger"></i> Bekor qilindi (<i class="fas fa-car"></i> Haydovchida) </h4>
+                            <h3> {{ seller_data.cancelled_product_price_in_driver|format_money }} uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Bekor qilingan va mahsulotlar haydovchida bo'lgan buyurtmalarning jami summasi</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h4 class="text-muted">
+                                <i class="fas fa-cancel text-danger"></i> Bekor qilindi (<i class="fas fa-store"></i> Filealda)</h4>
+                            <h3> {{ seller_data.cancelled_product_price_in_branch|format_money }}  uzs</h3>
+                            <small class="text-muted f-sm" style="font-size: 11px;">Bekor qilingan va filealda qaytarishga tayyor bo'lgan buyurtmalar jami summasi</small>
+                        </div>
+                    </div>
+                </div>
+
+
+                {% with order_stat=seller_data.order_statuses %}
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+
+                            <h6>
+                                <i class="fas fa-truck text-brand"></i>
+                                Yetkazish jarayonidagi buyurtmalar: {{ order_stat.total_in_delivery }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">
+                                Filialda: {{ order_stat.in_branch }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">
+                                Yetkazilmoqda: {{ order_stat.being_delivered }} ta
+                            </h6>
+
+                            <hr>
+
+                            <h6>
+                                <i class="fa-solid fa-check-double text-brand"></i>
+                                Sotilgan buyurtmalar: {{ order_stat.sold_total }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">
+                                Balansga qo‘shilgan: {{ order_stat.sold_added_to_balance }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">
+                                Hold balansdagi: {{ order_stat.sold_on_hold }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">
+                                Qayta ishlanmoqda: {{ order_stat.sold_processing }} ta
+                            </h6>
+
+                            <hr>
+
+                            <h5 class="text-danger">
+                                <i class="fas fa-ban"></i>
+                                Bekor qilingan buyurtmalar: {{ order_stat.cancelled_total }} ta
+                            </h5>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Bekor qilindi: {{ order_stat.cancelled_general }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Haydovchi filialga qaytardi: {{ order_stat.cancelled_by_driver }} ta
+                            </h6>
+
+                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">
+                                Seller filialdan qaytarib oldi: {{ order_stat.cancelled_by_seller }} ta
+                            </h6>
+
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+
+
+<!--            {% with order_stat=seller_data.order_statuses %}-->
+<!--            <div class="col-md-12">-->
+<!--                <div class="card">-->
+<!--                    <div class="card-body">-->
+<!--                         <div class="col-md-12 text-center">-->
+<!--                        <h6><i class="fas fa-truck text-brand"></i> Yetkazish jarayonida : {{order_stat.total_being_delivered}} ta</h6>-->
+
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Filealda : {{ order_stat.filialda }} ta</h6>-->
+<!--                        <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Yetkazilmoqda : {{ order_stat.yetkazilmoqda }} ta</h6>-->
+<!--                        <hr>-->
+
+<!--                        <div>-->
+
+<!--                            <h6><i class="fa-solid fa-check-double text-brand"></i> Sotilgan : {{order_stat.sotildi_total}} ta</h6>-->
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Balansga qo'shilgan : {{ order_stat.sotildi_add_balance }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Hold balansdagi : {{ order_stat.sotildi_hold }} ta</h6>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly">Qayta ishlashdagi : {{ order_stat.sotildi_processing }} ta</h6>-->
+<!--                        </div>-->
+
+<!--                        <hr>-->
+<!--                        <div>-->
+<!--                            <h5><i class="fas fa-cancel text-danger"></i> Bekor qilingan buyurtmalar : {{order_stat.total_cancelled}} ta</h5>-->
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Bekor qilindi (haydovchida) : {{ order_stat.bekor_qilindi }} ta-->
+<!--                            </h6>-->
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Haydovchi filealga qaytardi : {{ order_stat.driver_qaytardi }} ta-->
+<!--                            </h6>-->
+
+<!--                            <h6 class="btn btn-light btn-sm mt-2 ml-2 readonly" style="background-color:#ff141454;">-->
+<!--                                Seller filealdan qaytarib oldi : {{ order_stat.seller_qaytardi }} ta-->
+<!--                            </h6>-->
+<!--                        </div>-->
+<!--&lt;!&ndash;                        <h6 class="btn btn-primary btn-sm mt-2 ml-2 readonly">Jami kiritdi : {{ status_count.total  }} ta&ndash;&gt;-->
+<!--&lt;!&ndash;                        </h6>&ndash;&gt;-->
+<!--                    </div>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--                {% endwith %}-->
+
+        </div>
+
+
+</section>
+{% endblock %}
+{% block header %}
+<style>
+    th {
+        white-space: nowrap
+    }
+    td {
+        white-space: nowrap
+    }
+    #dataTable tr:nth-child(odd){background:#3c4252}
+</style>
+{% endblock %}
