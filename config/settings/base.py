@@ -22,7 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.SECRET_KEY
-IS_SERVER = env.IS_SERVER
+IS_SERVER = os.getenv("IS_SERVER", "False").lower() == "true"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.DEBUG
 TOLL_AMOUNT = int(env.TOLL_AMOUNT)
@@ -59,7 +60,7 @@ INTERNAL_IPS = [
 ] # for django-debug-toolbar
 
 SITE_NAME = 'Oson.express'
-API_ALLOWED_URLS = {"127.0.0.1:8000": True, "oson-express.operators.uz": True, "Oson-express.operators.uz": True}
+API_ALLOWED_URLS = {"127.0.0.1:8000": True, "express.nasil.uz": True, "Express.nasil.uz": True}
 OPERATOR_BONUS_FOR_ADDITIONAL_SOLD = 500
 
 DEVELOPER_TG_CHAT_ID = 6937180
@@ -69,7 +70,7 @@ EXCEPTION_BOT_TOKEN = "5987201267:AAHUho2camKMj25dgdrGBC6-V3FPRl8Iby4"
 def global_variables(request):
     return {
         'SITE_NAME': SITE_NAME,
-        'SITE_ADDRESS': 'https://oson-express.operators.uz',
+        'SITE_ADDRESS': 'https://express.nasil.uz',
         'SITE_EMAIL': 'contact@mysite.com',
         'SITE_TEL': 'contact@mysite.com',
     }
@@ -192,11 +193,10 @@ CKEDITOR_CONFIGS = {
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 
-if IS_SERVER in {True, 'True'}:
-    print('ishladi')
+if IS_SERVER:
     # from config.connection.send_developer import send_private_message_developer
     # send_private_message_developer(f"Is server calisti {IS_SERVER}")
-    CSRF_TRUSTED_ORIGINS = ['https://oson-express.operators.uz', 'http://oson-express.operators.uz']
+    CSRF_TRUSTED_ORIGINS = ['https://express.nasil.uz', 'http://express.nasil.uz']
     ALLOWED_HOSTS = ["*"]
     # SESSION_COOKIE_AGE = 604800
     os.environ['OPENBLAS_NUM_THREADS'] = '1'
