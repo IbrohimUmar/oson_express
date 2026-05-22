@@ -193,25 +193,36 @@ CKEDITOR_CONFIGS = {
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 
+
+
+
+
 if IS_SERVER:
-    # from config.connection.send_developer import send_private_message_developer
-    # send_private_message_developer(f"Is server calisti {IS_SERVER}")
-    CSRF_TRUSTED_ORIGINS = ['https://express.nasil.uz', 'http://express.nasil.uz']
-    ALLOWED_HOSTS = ["*"]
-    # SESSION_COOKIE_AGE = 604800
-    os.environ['OPENBLAS_NUM_THREADS'] = '1'
-    SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-    CSRF_COOKIE_SECURE = True
+    ALLOWED_HOSTS = ["express.nasil.uz", "www.express.nasil.uz", 'localhost', '127.0.0.1']
+    CSRF_TRUSTED_ORIGINS = [
+        "https://express.nasil.uz",
+        "https://www.express.nasil.uz"
+    ]
+    CSRF_ALLOWED_ORIGINS = ["https://express.nasil.uz"]
+    CORS_ORIGIN_WHITELIST = [
+        'https://express.nasil.uz',
+        'http://express.nasil.uz'
+    ]
+    CORS_ALLOW_CREDENTIALS = True
+    SESSION_COOKIE_NAME = "sessionid"
+    SESSION_COOKIE_SECURE = True  # Majburiy
+    SESSION_COOKIE_SAMESITE = "None"  # OAuth uchun zarur
+    SESSION_COOKIE_DOMAIN = ".nasil.uz"  # Subdomainlar uchun yagona domain
+
+    USE_X_FORWARDED_HOST = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # ACCESS_TOKEN_LIFETIME = env.ACCESS_TOKEN_LIFETIME
-    # REFRESH_TOKEN_LIFETIME = env.REFRESH_TOKEN_LIFETIME
-    # ALLOWED_HOSTS = [
-    #     "ahilshop.uz",
-    #     "www.ahilshop.uz",
-    #     "zeno.uz",
-    #     "www.zeno.uz",
-    # ]
+
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_DOMAIN = ".nasil.uz"
+else:
+    ALLOWED_HOSTS = ["*"]
+
 # CSRF_TRUSTED_ORIGINS = ['*']
 
 # Application definition
