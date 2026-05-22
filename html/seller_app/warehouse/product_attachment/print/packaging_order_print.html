@@ -177,7 +177,6 @@ table, th, td{
 
 .example_box {
   box-sizing: content-box;
-
   width: 301.5px !important;
   max-width: 301.5px !important;
   min-width: 301.5px !important;
@@ -294,7 +293,6 @@ JsBarcode(".barcode").init();
                 total_order_count :0,
                 total_unprinted_order_count :0,
                 total_printed_order_count :0,
-
                 order_products :[],
                 product_list :[],
                 selected_product :0,
@@ -321,8 +319,6 @@ JsBarcode(".barcode").init();
               },
             methods:{
             print_div(){
-
-
                 const printableContent = document.getElementById('printableAreaMain')
                 const printableScript = document.getElementById('my_scripts')
                       const printWindow = window.open('', '', 'height=1000,width=1000')
@@ -400,6 +396,7 @@ JsBarcode(".barcode").init();
                           if (data.status == 200){
                             //console.log('12312')
                             console.log(data.data)
+                              
                               this.has_next = data.has_next;
                               this.has_previous = data.has_previous;
                               this.total_pages = data.num_pages;

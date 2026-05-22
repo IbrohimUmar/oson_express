@@ -48,7 +48,7 @@ def seller_create(request):
     if request.method == 'POST':
         r = request.POST
         if User.objects.filter(username=r['username']).exists():
-            return render(request, 'supplier/create.html', {
+            return render(request, 'seller/create.html', {
                 'r': r,
                 'messages_error': "Bu telefon raqamda boshqa foydalanuvchi mavjud. Iltimos, boshqa telefon raqam kiriting."
             })

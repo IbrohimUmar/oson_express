@@ -28,7 +28,7 @@ def order_sold_list(request):
 
     filter_query = request.GET.get("filter", None)
     if filter_query:
-        orders = orders.filter(Q(id__icontains=filter_query) | Q(customer_phone__icontains=filter_query) | Q(barcode__icontains=filter_query))
+        orders = orders.filter(Q(id__icontains=filter_query) | Q(customer_phone__icontains=filter_query))
 
     paginator = Paginator(orders, 50)
     order = paginator.get_page(int(request.GET.get("page", 1)))

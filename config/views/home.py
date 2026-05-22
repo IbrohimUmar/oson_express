@@ -64,6 +64,22 @@ def development(request):
     # order.update_driver_fee()
     # order.update_logistic_fee()
     # print(order.driver_fee)
+
+    # count = 0
+    # find = 0
+    # orders = Order.objects.filter(status='4')
+    # for o in orders:
+    #     count += 1
+    #     leave = o.total_product_price - o.seller_fee - o.total_logistic_fee
+    #     if leave != 0:
+    #         # print(o.id)
+    #         find+=1
+    #         # o.update_seller_fee()
+    #         print(f'order_id : {o.id}, total_sold_price : {o.total_product_price}, seller_fee {o.seller_fee}, | logistic_Fee :{o.total_logistic_fee}, driver_fee :{o.driver_fee}, | leave {leave}')
+    #     # print(count, '--------------------------')
+    #     # print(o.status)
+    # print('total_count :', count)
+    # print('total_find :', find)
     return JsonResponse({"status":200}, safe=False)
 
 
