@@ -198,15 +198,15 @@ DJANGO_CELERY_BEAT_TZ_AWARE = False
 
 
 if IS_SERVER:
-    ALLOWED_HOSTS = ["express.nasil.uz", "www.express.nasil.uz", 'localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ["e.nasil.uz", "www.e.nasil.uz", 'localhost', '127.0.0.1']
     CSRF_TRUSTED_ORIGINS = [
-        "https://express.nasil.uz",
-        "https://www.express.nasil.uz"
+        "https://e.nasil.uz",
+        "https://www.e.nasil.uz"
     ]
-    CSRF_ALLOWED_ORIGINS = ["https://express.nasil.uz"]
+    CSRF_ALLOWED_ORIGINS = ["https://e.nasil.uz"]
     CORS_ORIGIN_WHITELIST = [
-        'https://express.nasil.uz',
-        'http://express.nasil.uz'
+        'https://e.nasil.uz',
+        'http://e.nasil.uz'
     ]
     CORS_ALLOW_CREDENTIALS = True
     SESSION_COOKIE_NAME = "sessionid"
